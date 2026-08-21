@@ -1,0 +1,6 @@
+# robots.txt for AI Hub Directory
+User-agent: *
+Allow: /
+
+# Sitemap Location
+Sitemap: https://ai-hub-directory.com/sitemap.xml
