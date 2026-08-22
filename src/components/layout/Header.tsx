@@ -4,11 +4,32 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, User, LogOut, Layout } from '../shared/Icons';
 import { useAuth } from '../../context/AuthContext';
 
+const Bookmark: React.FC<{ size?: number }> = ({ size = 18 }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
+  </svg>
+);
+
+const GlobeIcon: React.FC<{ size?: number }> = ({ size = 18 }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/>
+    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+    <path d="M2 12h20"/>
+  </svg>
+);
+
+const ChevronDown: React.FC<{ size?: number }> = ({ size = 14 }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m6 9 6 6 6-6"/>
+  </svg>
+);
+
 export const Header: React.FC = () => {
   const { user, logout, isOwner, isAdmin } = useAuth();
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -100,27 +121,102 @@ export const Header: React.FC = () => {
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '20px',
+            gap: '24px',
           }}
           className="desktop-nav"
         >
-          <Link to="/ai-tools" style={navLinkStyle}>Discover</Link>
-          <Link to="/ai-tools" style={navLinkStyle}>Categories</Link>
-          <Link to="/trending" style={navLinkStyle}>Trending</Link>
-          <Link to="/new" style={navLinkStyle}>New Tools</Link>
-          <Link to="/collections" style={navLinkStyle}>Collections</Link>
-          <Link to="/compare" style={navLinkStyle}>Compare</Link>
-          <Link to="/blog" style={navLinkStyle}>Blog</Link>
+          <Link to="/ai-tools" style={navLinkStyle}>Full List</Link>
+          <a href="/#categories" style={navLinkStyle}>AI Categories</a>
+          <Link to="/blog" style={navLinkStyle}>AI Tutorials</Link>
+          
+          <div 
+            style={{ position: 'relative' }}
+            onMouseEnter={() => setMoreDropdownOpen(true)}
+            onMouseLeave={() => setMoreDropdownOpen(false)}
+          >
+            <button
+              style={{
+                ...navLinkStyle,
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                cursor: 'pointer',
+              }}
+            >
+              <span>+ More</span>
+              <ChevronDown size={14} />
+            </button>
+            
+            {moreDropdownOpen && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  marginTop: '8px',
+                  width: '190px',
+                  backgroundColor: 'var(--bg-card)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-md)',
+                  boxShadow: 'var(--shadow-lg)',
+                  padding: '6px',
+                  zIndex: 1000,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '2px',
+                }}
+              >
+                <Link to="/trending" className="dropdown-link" style={{ padding: '8px 12px', fontSize: '13px' }}>
+                  Trending AI Tools
+                </Link>
+                <Link to="/new" className="dropdown-link" style={{ padding: '8px 12px', fontSize: '13px' }}>
+                  Newest Listings
+                </Link>
+                <Link to="/collections" className="dropdown-link" style={{ padding: '8px 12px', fontSize: '13px' }}>
+                  Curated Collections
+                </Link>
+                <Link to="/compare" className="dropdown-link" style={{ padding: '8px 12px', fontSize: '13px' }}>
+                  Compare Tools
+                </Link>
+                <Link to="/advertise" className="dropdown-link" style={{ padding: '8px 12px', fontSize: '13px' }}>
+                  Sponsorship Placements
+                </Link>
+              </div>
+            )}
+          </div>
         </nav>
 
         {/* Right Action stack: Outlined Login, Prominent Get Started, Visually distinct Submit Tool */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }} className="desktop-actions">
+          {/* Bookmark Icon */}
+          <Link 
+            to={user ? "/dashboard?tab=saved" : "/login"} 
+            className="header-icon-btn" 
+            title="Saved Favorites"
+            style={iconBtnStyle}
+          >
+            <Bookmark size={18} />
+          </Link>
+
+          {/* Globe Icon (Claim listing) */}
+          <Link 
+            to="/claim-listing" 
+            className="header-icon-btn" 
+            title="Claim your tool"
+            style={iconBtnStyle}
+          >
+            <GlobeIcon size={18} />
+          </Link>
+
           {/* Theme Selector */}
           <button
             onClick={toggleTheme}
-            className="btn-icon theme-btn"
-            title="Toggle theme"
-            style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            className="header-icon-btn theme-btn"
+            title="Toggle light/dark theme"
+            style={iconBtnStyle}
           >
             {theme === 'dark' ? (
               <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
@@ -132,7 +228,7 @@ export const Header: React.FC = () => {
           {/* Conditional actions based on auth state */}
           {user ? (
             /* Logged In State */
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }} className="desktop-actions">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               {/* If builder/admin role: show quick admin navigation inline as a cohesive group */}
               {(isOwner() || isAdmin()) && (
                 <div 
@@ -140,7 +236,6 @@ export const Header: React.FC = () => {
                     display: 'flex', 
                     alignItems: 'center',
                     gap: '2px', 
-                    marginRight: '8px',
                     padding: '3px',
                     backgroundColor: 'rgba(255, 255, 255, 0.02)',
                     border: '1px solid var(--border-color)',
@@ -171,16 +266,6 @@ export const Header: React.FC = () => {
                   </Link>
                 </div>
               )}
-
-              {/* + Submit Your AI Tool primary CTA */}
-              <Link
-                to="/submit-tool"
-                className="btn btn-primary btn-sm submit-action-btn"
-                title="List your AI tool on AIFynest"
-                style={{ padding: '8px 16px', gap: '4px' }}
-              >
-                <span>+ Submit Tool</span>
-              </Link>
 
               {/* Profile Avatar Dropdown */}
               <div style={{ position: 'relative' }} ref={dropdownRef}>
@@ -254,29 +339,16 @@ export const Header: React.FC = () => {
             </div>
           ) : (
             /* Logged Out State */
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }} className="desktop-actions">
-              {/* Outlined Login with icon */}
-              <Link to="/login" className="btn btn-outline btn-sm login-header-btn" style={loginBtnStyle}>
-                <User size={14} />
-                <span>Log in</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <Link to="/login" style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-secondary)', textDecoration: 'none' }} className="login-text-link">
+                Log in
               </Link>
-
-              {/* Visually prominent Filled Sign Up (Get Started) */}
-              <Link to="/signup" className="btn btn-primary btn-sm signup-header-btn" style={signUpBtnStyle}>
-                <span>Get Started</span>
-              </Link>
-
-              {/* Visually distinct + Submit Your AI Tool business CTA */}
-              <Link
-                to="/submit-tool"
-                className="btn btn-sm submit-action-btn"
-                title="List your AI tool on AIFynest"
-                style={submitCtaStyle}
-              >
-                <span>+ Submit Your AI Tool</span>
+              <Link to="/signup" style={cleanSignupBtnStyle} className="clean-signup-btn">
+                Sign up
               </Link>
             </div>
           )}
+        </div>
 
           {/* Tablet/Mobile Hamburger Trigger */}
           <button
@@ -287,7 +359,6 @@ export const Header: React.FC = () => {
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
-      </div>
 
       {/* Responsive Mobile Drawer Menu */}
       {mobileMenuOpen && (
@@ -462,6 +533,28 @@ export const Header: React.FC = () => {
           color: var(--color-primary) !important;
           font-weight: var(--font-bold);
         }
+
+        .header-icon-btn {
+          color: var(--text-secondary) !important;
+          transition: all 0.2s ease;
+        }
+
+        .header-icon-btn:hover {
+          color: var(--text-primary) !important;
+          background-color: var(--bg-tertiary) !important;
+        }
+
+        .login-text-link {
+          transition: color 0.2s ease;
+        }
+
+        .login-text-link:hover {
+          color: var(--text-primary) !important;
+        }
+
+        .clean-signup-btn:hover {
+          background-color: #1d4ed8 !important; /* Muted hover state */
+        }
       `}</style>
     </header>
   );
@@ -469,12 +562,11 @@ export const Header: React.FC = () => {
 
 const navLinkStyle: React.CSSProperties = {
   fontSize: 'var(--text-sm)',
-  fontWeight: 'var(--font-medium)',
+  fontWeight: '600',
   color: 'var(--text-secondary)',
   transition: 'color var(--transition-fast)',
   textDecoration: 'none',
 };
-
 
 const mobileNavLinkStyle: React.CSSProperties = {
   fontSize: 'var(--text-base)',
@@ -485,33 +577,31 @@ const mobileNavLinkStyle: React.CSSProperties = {
   textDecoration: 'none',
 };
 
-
-const loginBtnStyle: React.CSSProperties = {
-  padding: '8px 14px',
-  gap: '6px',
-  borderRadius: 'var(--radius-md)',
-  fontSize: 'var(--text-xs)',
-  fontWeight: 'var(--font-medium)',
+const cleanSignupBtnStyle: React.CSSProperties = {
+  backgroundColor: '#2563eb', // Royal Blue matching screenshot
+  color: '#ffffff',
+  padding: '8px 20px',
+  borderRadius: '8px',
+  fontWeight: '700',
+  fontSize: '14px',
+  textDecoration: 'none',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  transition: 'background-color 0.2s',
+  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
 };
 
-const signUpBtnStyle: React.CSSProperties = {
-  padding: '8px 16px',
-  borderRadius: 'var(--radius-md)',
-  fontSize: 'var(--text-xs)',
-  fontWeight: 'var(--font-bold)',
-  backgroundColor: 'var(--color-primary)',
-  color: 'white',
-  boxShadow: 'var(--shadow-sm)',
-};
-
-const submitCtaStyle: React.CSSProperties = {
-  padding: '8px 16px',
-  borderRadius: 'var(--radius-md)',
-  fontSize: 'var(--text-xs)',
-  fontWeight: 'var(--font-bold)',
-  // Make it distinct: gold or brand-accented gradient outline/fill
-  background: 'linear-gradient(135deg, var(--color-gold) 0%, #d97706 100%)',
-  color: 'white',
+const iconBtnStyle: React.CSSProperties = {
+  background: 'none',
   border: 'none',
-  boxShadow: 'var(--shadow-sm)',
+  color: 'var(--text-secondary)',
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '8px',
+  borderRadius: 'var(--radius-full)',
+  transition: 'color 0.2s, background-color 0.2s',
+  textDecoration: 'none',
 };
