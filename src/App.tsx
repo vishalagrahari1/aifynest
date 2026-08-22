@@ -28,6 +28,7 @@ import { Signup } from './views/Signup';
 import { OwnerDashboard } from './views/dashboard/Overview';
 import { AdminDashboard } from './views/admin/AdminDashboard';
 import { AffiliateRedirect } from './views/AffiliateRedirect';
+import { Alternatives } from './views/Alternatives';
 
 // Import CSS Design system
 import './styles/main.css';
@@ -119,6 +120,22 @@ export const App: React.FC = () => {
                       onCompareToggle={handleCompareToggle}
                       onCompareClear={handleCompareClear}
                     />
+                  }
+                />
+                <Route
+                  path="/compare/:slugs"
+                  element={
+                    <Compare
+                      compareList={compareList}
+                      onCompareToggle={handleCompareToggle}
+                      onCompareClear={handleCompareClear}
+                    />
+                  }
+                />
+                <Route
+                  path="/alternatives/:toolSlug"
+                  element={
+                    <Alternatives />
                   }
                 />
 

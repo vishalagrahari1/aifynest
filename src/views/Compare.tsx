@@ -1,6 +1,6 @@
 /* src/views/Compare.tsx */
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useParams } from 'react-router-dom';
 import { useDatabase } from '../context/DatabaseContext';
 import { ComparisonTable } from '../components/comparison/ComparisonTable';
 import { SEOHead } from '../components/shared/SEOHead';
@@ -19,34 +19,48 @@ export const Compare: React.FC<CompareProps> = ({
 }) => {
   const { tools } = useDatabase();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { slugs } = useParams<{ slugs?: string }>();
 
   // Search input state to add new tools to compare
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<typeof tools>([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  // Sync compare list from url parameters if exists, e.g. /compare?ids=1,2,3
+  // Sync compare list from URL slugs (e.g., /compare/chatgpt-vs-claude) or query parameters (e.g., ?ids=1,2)
   useEffect(() => {
-    const idsParam = searchParams.get('ids');
-    if (idsParam) {
-      const ids = idsParam.split(',');
-      // Update state in parent if they are not already synced
-      ids.forEach((id) => {
-        if (!compareList.includes(id) && tools.some((t) => t.id === id)) {
-          onCompareToggle(id);
-        }
-      });
-    }
-  }, []);
+    if (slugs) {
+      const parsedSlugs = slugs.toLowerCase().split('-vs-');
+      const matchedIds = tools
+        .filter((t) => parsedSlugs.includes(t.slug) && t.status === 'approved')
+        .map((t) => t.id);
 
-  // Update url parameters when compareList changes
-  useEffect(() => {
-    if (compareList.length > 0) {
-      setSearchParams({ ids: compareList.join(',') });
+      onCompareClear();
+      matchedIds.forEach((id) => {
+        onCompareToggle(id);
+      });
     } else {
-      setSearchParams({});
+      const idsParam = searchParams.get('ids');
+      if (idsParam) {
+        onCompareClear();
+        idsParam.split(',').forEach((id) => {
+          if (tools.some((t) => t.id === id)) {
+            onCompareToggle(id);
+          }
+        });
+      }
     }
-  }, [compareList]);
+  }, [slugs]);
+
+  // Update URL query parameters only if NOT using SEO-friendly path slugs
+  useEffect(() => {
+    if (!slugs) {
+      if (compareList.length > 0) {
+        setSearchParams({ ids: compareList.join(',') });
+      } else {
+        setSearchParams({});
+      }
+    }
+  }, [compareList, slugs]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;

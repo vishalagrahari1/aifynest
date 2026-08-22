@@ -741,6 +741,57 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
               </div>
             </div>
           </div>
+
+          {/* Alternatives & Comparisons box */}
+          <div
+            style={{
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-lg)',
+              padding: '20px',
+            }}
+          >
+            <h3 style={{ fontSize: 'var(--text-xs)', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', marginBottom: '16px', margin: 0, paddingBottom: '8px', borderBottom: '1px solid var(--border-color)' }}>
+              Alternatives & Compare
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <Link
+                to={`/alternatives/${tool.slug}`}
+                className="btn btn-outline btn-sm"
+                style={{ justifyContent: 'center', width: '100%', fontWeight: 'bold' }}
+              >
+                👥 View {tool.name} Alternatives
+              </Link>
+              
+              {relatedTools.length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 'bold' }}>Side-by-Side Comparisons:</span>
+                  {relatedTools.map((rel) => (
+                    <Link
+                      key={rel.id}
+                      to={`/compare/${tool.slug}-vs-${rel.slug}`}
+                      style={{
+                        fontSize: '11px',
+                        color: 'var(--color-primary)',
+                        textDecoration: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '6px 8px',
+                        backgroundColor: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: 'var(--radius-sm)',
+                        fontWeight: '600'
+                      }}
+                    >
+                      <span>{tool.name} vs {rel.name}</span>
+                      <span>&gt;</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
