@@ -44,6 +44,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
     deleteAffiliateLink,
     markNotificationRead,
     analyticsEvents,
+    seedTenToolsPerCategory,
   } = useDatabase();
   const { user } = useAuth();
 
@@ -259,6 +260,15 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
     setAffUrl('');
     setAffProgName('');
     setAffTrackingId('');
+  };
+
+  const handleBulkSeed = () => {
+    const seededCount = seedTenToolsPerCategory();
+    if (seededCount > 0) {
+      onToast(`Successfully generated and published ${seededCount} mock tools across categories!`, 'success');
+    } else {
+      onToast('Directory is already seeded with generated tools.', 'info');
+    }
   };
 
   // Filtered submissions
@@ -762,9 +772,16 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
           {/* TAB 3: TOOLS GENERAL INDEX LIST */}
           {activeTab === 'tools' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                 <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-bold)', margin: 0 }}>Tools Master Index</h3>
-                <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                  <button 
+                    onClick={handleBulkSeed} 
+                    className="btn btn-primary btn-sm"
+                    style={{ background: 'linear-gradient(135deg, var(--color-gold) 0%, #d97706 100%)', border: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                  >
+                    <span>⚡ Seed 10 Tools per Category</span>
+                  </button>
                   <select className="form-input btn-sm" value={toolsStatusFilter} onChange={(e) => setToolsStatusFilter(e.target.value)} style={{ width: 'auto' }}>
                     <option value="all">All statuses</option>
                     <option value="approved">Approved</option>

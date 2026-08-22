@@ -81,6 +81,9 @@ interface DatabaseContextType {
   // Notifications
   addNotification: (userId: string, title: string, message: string, type: Notification['type']) => void;
   markNotificationRead: (id: string) => void;
+
+  // Bulk Seed Operations
+  seedTenToolsPerCategory: () => number;
 }
 
 const DatabaseContext = createContext<DatabaseContextType | undefined>(undefined);
@@ -678,6 +681,85 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     });
   }, [reviews]);
 
+  const seedTenToolsPerCategory = () => {
+    const generatedTools: Tool[] = [];
+    const dateStr = new Date().toISOString().split('T')[0];
+
+    categories.forEach((cat) => {
+      for (let i = 1; i <= 10; i++) {
+        const id = `bulk-${cat.slug}-${i}`;
+        const prefixes = ['Smart', 'Deep', 'Next', 'Hyper', 'Swift', 'Sync', 'Apex', 'Core', 'Echo', 'Omni'];
+        const suffixes = ['AI', 'Studio', 'Flow', 'Bot', 'Assistant', 'Lab', 'Pro', 'Hub', 'Sense', 'Wizard'];
+        
+        const name = `${prefixes[(i - 1) % prefixes.length]} ${cat.name.replace('AI ', '')} ${suffixes[(i - 1) % suffixes.length]}`;
+        const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+        if (tools.some((t) => t.slug === slug || t.id === id)) {
+          continue;
+        }
+
+        const pricingOptions: Tool['pricing'][] = ['free', 'freemium', 'paid', 'free-trial', 'contact-sales'];
+        const pricing = pricingOptions[(i - 1) % pricingOptions.length];
+
+        const features = [
+          `Real-time ${cat.name.toLowerCase()} automation`,
+          `Semantic contextual analysis`,
+          `Cross-platform workflow synchronization`,
+          `Custom developer API access`,
+        ];
+
+        generatedTools.push({
+          id,
+          name,
+          slug,
+          tagline: `Accelerate your ${cat.name.toLowerCase()} tasks with smart models.`,
+          description: `${name} is an advanced AI application tailored for ${cat.name.toLowerCase()} workflows. Designed to eliminate bottlenecks, it features a responsive user experience, secure enterprise integrations, and precision output optimization. Generation ${i} brings significant boosts in computing speeds and contextual reasoning.`,
+          categorySlug: cat.slug,
+          subCategory: cat.subcategories[(i - 1) % cat.subcategories.length] || 'General',
+          pricing,
+          pricingUrl: `https://${slug}.com/pricing`,
+          platforms: ['Web', 'Windows', 'Mac'],
+          pricingPlans: [
+            { name: 'Starter Plan', price: pricing === 'free' ? '$0' : '$15', billingPeriod: pricing === 'free' ? 'free' : 'monthly', features: ['Core access', '100 generations/mo', 'Community support'] },
+            { name: 'Professional Plan', price: pricing === 'free' ? '$0' : '$45', billingPeriod: pricing === 'free' ? 'free' : 'monthly', features: ['Unlimited models access', '5 team members seats', 'Priority processing speed', 'Full API keys'] }
+          ],
+          features,
+          useCases: [
+            `Standardizing ${cat.name.toLowerCase()} processes`,
+            `Collaborative asset creation and team sharing`,
+            `Scale metrics analysis and reporting`
+          ],
+          pros: ['Intuitive and premium user layout', 'High performance reasoning logic', 'Extensive customizable template parameters'],
+          cons: ['Requires active network connectivity', 'High pricing for custom white-label licenses'],
+          logoUrl: `https://images.unsplash.com/photo-${1550000000000 + (cat.name.charCodeAt(0) + i) * 8000000}?w=100&h=100&fit=crop`,
+          screenshotUrls: [
+            `https://images.unsplash.com/photo-${1550000000000 + (cat.name.charCodeAt(0) + i) * 8000000}?w=800&h=500&fit=crop`
+          ],
+          websiteUrl: `https://${slug}.com`,
+          rating: parseFloat((4.0 + (i % 11) * 0.1).toFixed(1)),
+          reviewCount: i * 8 + 4,
+          isVerified: i % 2 === 0,
+          isFeatured: i === 1,
+          isSponsored: false,
+          status: 'approved',
+          ownerId: null,
+          claimStatus: 'unclaimed',
+          lastUpdated: dateStr,
+          tags: [cat.slug, 'bulk-seed', 'ai-automation'],
+        });
+      }
+    });
+
+    if (generatedTools.length > 0) {
+      const updatedTools = [...tools, ...generatedTools];
+      setTools(updatedTools);
+      localStorage.setItem('ai_tools', JSON.stringify(updatedTools));
+      logAdminAction('admin-id', 'System Admin', 'Bulk Seeding', `Generated and approved ${generatedTools.length} mock tools across ${categories.length} categories.`);
+      return generatedTools.length;
+    }
+    return 0;
+  };
+
   return (
     <DatabaseContext.Provider
       value={{
@@ -720,6 +802,7 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         deleteAffiliateLink,
         addNotification,
         markNotificationRead,
+        seedTenToolsPerCategory,
       }}
     >
       {children}
