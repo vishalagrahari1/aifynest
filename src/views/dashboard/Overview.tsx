@@ -467,7 +467,12 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
 
                 {/* Submissions checklist status */}
                 <div>
-                  <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'bold', marginBottom: '12px' }}>My Managed Listings</h3>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                    <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'bold', margin: 0 }}>My Managed Listings</h3>
+                    <Link to="/submit-tool" className="btn btn-primary btn-xs" style={{ fontSize: '10px' }}>
+                      + Submit New Tool
+                    </Link>
+                  </div>
                   {ownerTools.length > 0 ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       {ownerTools.map((tool) => {
@@ -565,7 +570,12 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
             {/* TAB 2: MY DETAILED LISTINGS EDITOR */}
             {activeTab === 'listings' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'bold', margin: 0 }}>Manage Listings</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'bold', margin: 0 }}>Manage Listings</h3>
+                  <Link to="/submit-tool" className="btn btn-primary btn-sm">
+                    + Submit New Tool
+                  </Link>
+                </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {ownerTools.map((tool) => (
                     <div key={tool.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)' }}>

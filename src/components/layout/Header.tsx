@@ -229,8 +229,8 @@ export const Header: React.FC = () => {
           {user ? (
             /* Logged In State */
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              {/* If builder/admin role: show quick admin navigation inline as a cohesive group */}
-              {(isOwner() || isAdmin()) && (
+              {/* If builder role: show quick admin navigation inline as a cohesive group */}
+              {isOwner() && (
                 <div 
                   style={{ 
                     display: 'flex', 
@@ -298,6 +298,12 @@ export const Header: React.FC = () => {
                       zIndex: 1000,
                     }}
                   >
+                    {isAdmin() && (
+                      <Link to="/admin" className="dropdown-link" style={{ color: 'var(--color-gold)', fontWeight: 'bold' }} onClick={() => setUserDropdownOpen(false)}>
+                        <Layout size={14} style={{ flexShrink: 0, color: 'var(--color-gold)' }} />
+                        <span>System Admin Panel</span>
+                      </Link>
+                    )}
                     <Link to="/dashboard" className={`dropdown-link ${location.pathname === '/dashboard' && !location.search.includes('tab=') ? 'dropdown-link-active' : ''}`} onClick={() => setUserDropdownOpen(false)}>
                       <Layout size={14} style={{ flexShrink: 0 }} />
                       <span>Dashboard</span>
