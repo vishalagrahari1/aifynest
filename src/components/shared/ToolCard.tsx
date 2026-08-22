@@ -184,7 +184,27 @@ export const ToolCard: React.FC<ToolCardProps> = ({
           </span>
         </div>
 
-        <span className="badge badge-pricing">{tool.pricing}</span>
+        <span className="badge badge-pricing" style={{ fontSize: '11px', padding: '3px 8px' }}>
+          {(() => {
+            const plans = tool.pricingPlans || [];
+            const paidPlans = plans.filter(p => p.price && p.price !== '$0');
+            let priceLabel = '';
+            if (paidPlans.length > 0) {
+              const sortedPlans = [...paidPlans].sort((a, b) => {
+                const valA = parseFloat(a.price.replace(/[^0-9.]/g, '')) || 0;
+                const valB = parseFloat(b.price.replace(/[^0-9.]/g, '')) || 0;
+                return valA - valB;
+              });
+              if (sortedPlans[0]) {
+                priceLabel = `• ${sortedPlans[0].price}`;
+                if (sortedPlans[0].billingPeriod === 'monthly') priceLabel += '/mo';
+                else if (sortedPlans[0].billingPeriod === 'yearly') priceLabel += '/yr';
+              }
+            }
+            const typeLabel = tool.pricing.charAt(0).toUpperCase() + tool.pricing.slice(1).replace('-', ' ');
+            return priceLabel ? `${typeLabel} ${priceLabel}` : typeLabel;
+          })()}
+        </span>
       </div>
 
       {/* Platforms and CTA actions */}

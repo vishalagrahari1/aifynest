@@ -20,6 +20,32 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
+  // FAQ Accordion toggles
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  const toggleFaq = (index: number) => {
+    setOpenFaq(openFaq === index ? null : index);
+  };
+
+  const faqs = [
+    {
+      q: 'How does AIFynest curate and review submitted AI tools?',
+      a: 'Every submission is reviewed by our administration editors. We verify the destination URL, product capabilities, pricing plans accuracy, and ensure it meets our guidelines before publishing it to the public directory.'
+    },
+    {
+      q: 'How can I claim my AI tool listing?',
+      a: 'Simply navigate to the tool detail page, click "Claim this listing" link, and fill out the claim form. Our team will verify your ownership email (usually matching the tool domain) within 24-48 hours.'
+    },
+    {
+      q: 'Does AIFynest charge any commission on affiliate referral clicks?',
+      a: 'We do not charge owners for referral clicks. Outbound clicks are tracked to calculate CPC metrics for builder analytics. If you join our sponsor network, we charge flat advertising placements campaign budgets.'
+    },
+    {
+      q: 'Can standard users write reviews and rank tools?',
+      a: 'Yes, any registered user can write ratings and pros/cons feedback on published tools. All reviews are curated by editors to eliminate fake feedback, keeping AIFynest trustworthy and transparent.'
+    }
+  ];
+
   // Load trending and new tools
   const trendingTools = getTrendingTools(4);
   const newTools = tools
@@ -427,6 +453,162 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                     <ArrowRight size={12} />
                   </Link>
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 4.5. Stats Dashboard Deck */}
+      <section className="section" style={{ position: 'relative', zIndex: 1, padding: '40px 0' }}>
+        <div className="container">
+          <div 
+            style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(4, 1fr)', 
+              gap: '24px', 
+              backgroundColor: 'var(--bg-card)', 
+              border: '1px solid var(--border-color)', 
+              borderRadius: 'var(--radius-lg)', 
+              padding: '32px 24px',
+              textAlign: 'center',
+              boxShadow: 'var(--shadow-sm)'
+            }} 
+            className="stats-grid"
+          >
+            <div>
+              <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '4px' }}>12+</div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}>Curated AI Categories</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '4px' }}>1,200+</div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}>Indexed AI Tools</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '4px' }}>45,000+</div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}>Monthly Discoveries</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '4px' }}>24 Hours</div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}>Average Reviews Vetting</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4.6. Comparison Showdowns */}
+      <section className="section" style={{ position: 'relative', zIndex: 1 }}>
+        <div className="container">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px' }}>
+            <div>
+              <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', marginBottom: '8px' }}>
+                Comparison Showdowns
+              </h2>
+              <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: 0 }}>
+                Compare head-to-head parameters of leading artificial intelligence engines side-by-side.
+              </p>
+            </div>
+            <Link to="/compare" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }}>
+              <span>Start Comparison</span>
+              <ArrowRight size={14} />
+            </Link>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }} className="showdowns-grid">
+            <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', border: '1px solid var(--border-color)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '11px', backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)', padding: '2px 8px', borderRadius: '4px', fontWeight: 'bold' }}>AI CHATBOTS</span>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Side-by-Side</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', margin: '10px 0' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <img src="https://images.unsplash.com/photo-1678787150117-cdca2776c5b0?w=100&h=100&fit=crop" style={{ width: '48px', height: '48px', borderRadius: '8px', marginBottom: '8px' }} />
+                  <div style={{ fontWeight: 'bold', fontSize: '13px' }}>ChatGPT</div>
+                </div>
+                <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', color: 'var(--text-muted)' }}>VS</div>
+                <div style={{ textAlign: 'center' }}>
+                  <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop" style={{ width: '48px', height: '48px', borderRadius: '8px', marginBottom: '8px' }} />
+                  <div style={{ fontWeight: 'bold', fontSize: '13px' }}>Claude AI</div>
+                </div>
+              </div>
+              <Link to="/compare?t1=1" className="btn btn-outline btn-sm" style={{ alignSelf: 'stretch', justifyContent: 'center' }}>
+                Compare ChatGPT vs Claude
+              </Link>
+            </div>
+
+            <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', border: '1px solid var(--border-color)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '11px', backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)', padding: '2px 8px', borderRadius: '4px', fontWeight: 'bold' }}>CODE ASSISTANTS</span>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Side-by-Side</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', margin: '10px 0' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=100&h=100&fit=crop" style={{ width: '48px', height: '48px', borderRadius: '8px', marginBottom: '8px' }} />
+                  <div style={{ fontWeight: 'bold', fontSize: '13px' }}>Cursor IDE</div>
+                </div>
+                <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', color: 'var(--text-muted)' }}>VS</div>
+                <div style={{ textAlign: 'center' }}>
+                  <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=100&h=100&fit=crop" style={{ width: '48px', height: '48px', borderRadius: '8px', marginBottom: '8px' }} />
+                  <div style={{ fontWeight: 'bold', fontSize: '13px' }}>Phind</div>
+                </div>
+              </div>
+              <Link to="/compare?t1=4&t2=8" className="btn btn-outline btn-sm" style={{ alignSelf: 'stretch', justifyContent: 'center' }}>
+                Compare Cursor vs Phind
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4.7. Accordion Frequently Asked Questions */}
+      <section className="section" style={{ position: 'relative', zIndex: 1, backgroundColor: 'var(--bg-secondary)', borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)' }}>
+        <div className="container" style={{ maxWidth: '800px' }}>
+          <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'bold', textAlign: 'center', marginBottom: '8px' }}>
+            Frequently Asked Questions
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', textAlign: 'center', marginBottom: '32px' }}>
+            Everything you need to know about submissions, claims, sponsorships, and user curations.
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {faqs.map((faq, idx) => (
+              <div 
+                key={idx} 
+                style={{ 
+                  backgroundColor: 'var(--bg-card)', 
+                  border: '1px solid var(--border-color)', 
+                  borderRadius: 'var(--radius-md)',
+                  overflow: 'hidden',
+                  transition: 'all var(--transition-fast)'
+                }}
+              >
+                <button
+                  onClick={() => toggleFaq(idx)}
+                  style={{
+                    width: '100%',
+                    padding: '16px 20px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    background: 'none',
+                    border: 'none',
+                    textAlign: 'left',
+                    color: 'var(--text-primary)',
+                    fontWeight: 'var(--font-semibold)',
+                    fontSize: 'var(--text-sm)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <span>{faq.q}</span>
+                  <span style={{ fontSize: 'var(--text-lg)', color: 'var(--color-primary)', transform: openFaq === idx ? 'rotate(45deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
+                    ＋
+                  </span>
+                </button>
+                {openFaq === idx && (
+                  <div style={{ padding: '0 20px 16px 20px', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                    {faq.a}
+                  </div>
+                )}
               </div>
             ))}
           </div>
