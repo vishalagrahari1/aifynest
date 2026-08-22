@@ -11,6 +11,7 @@ export interface FilterState {
   rating: number;
   verifiedOnly: boolean;
   openSourceOnly: boolean;
+  featuredOnly?: boolean;
 }
 
 interface SidebarFilterProps {

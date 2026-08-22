@@ -35,6 +35,7 @@ export const Directory: React.FC<DirectoryProps> = ({
   const ratingParam = Number(searchParams.get('rating') || '0');
   const verifiedParam = searchParams.get('verified') === 'true';
   const openSourceParam = searchParams.get('opensource') === 'true';
+  const featuredParam = searchParams.get('featured') === 'true';
   const sortParam = searchParams.get('sort') || 'trending';
   const pageParam = Number(searchParams.get('page') || '1');
 
@@ -62,6 +63,7 @@ export const Directory: React.FC<DirectoryProps> = ({
     rating: ratingParam,
     verifiedOnly: verifiedParam,
     openSourceOnly: openSourceParam,
+    featuredOnly: featuredParam,
   };
 
   // Sync state changes back to search queries (maintains shareable URLs)
@@ -75,6 +77,7 @@ export const Directory: React.FC<DirectoryProps> = ({
     if (newFilters.rating > 0) params.rating = String(newFilters.rating);
     if (newFilters.verifiedOnly) params.verified = 'true';
     if (newFilters.openSourceOnly) params.opensource = 'true';
+    if (newFilters.featuredOnly) params.featured = 'true';
     if (sortParam) params.sort = sortParam;
     params.page = '1'; // Reset to page 1 on filter edits
     setSearchParams(params);
@@ -146,6 +149,9 @@ export const Directory: React.FC<DirectoryProps> = ({
     // Verified matches
     if (filters.verifiedOnly && !tool.isVerified) return false;
 
+    // Featured matches
+    if (filters.featuredOnly && !tool.isFeatured && !tool.isSponsored) return false;
+
     // Open Source matches (checked via tags/description in mock)
     if (filters.openSourceOnly && !tool.tags.includes('open-source') && !tool.description.toLowerCase().includes('open source') && !tool.description.toLowerCase().includes('open-source')) {
       return false;
@@ -216,7 +222,7 @@ export const Directory: React.FC<DirectoryProps> = ({
       updated.platforms = updated.platforms.filter((p) => p !== value);
     } else if (key === 'rating') {
       updated.rating = 0;
-    } else if (key === 'verifiedOnly' || key === 'openSourceOnly') {
+    } else if (key === 'verifiedOnly' || key === 'openSourceOnly' || key === 'featuredOnly') {
       updated[key] = false;
     }
     handleFilterChange(updated);
@@ -229,7 +235,8 @@ export const Directory: React.FC<DirectoryProps> = ({
     filters.platforms.length > 0 ||
     filters.rating > 0 ||
     filters.verifiedOnly ||
-    filters.openSourceOnly;
+    filters.openSourceOnly ||
+    filters.featuredOnly;
 
   return (
     <div className="container section">
@@ -248,6 +255,30 @@ export const Directory: React.FC<DirectoryProps> = ({
           <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: 0, maxWidth: '800px' }}>
             {pageDescription}
           </p>
+          
+          {/* Stats Ribbon inspired by Aixploria */}
+          <div 
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '12px', 
+              fontSize: '11px', 
+              color: 'var(--text-secondary)',
+              backgroundColor: 'rgba(255, 255, 255, 0.02)',
+              padding: '6px 14px',
+              borderRadius: 'var(--radius-full)',
+              width: 'fit-content',
+              border: '1px solid var(--border-color)',
+              marginTop: '4px',
+              flexWrap: 'wrap'
+            }}
+          >
+            <span>📊 <strong>{categories.length}</strong> Categories</span>
+            <span style={{ color: 'var(--border-color)' }}>|</span>
+            <span>🔄 Updated <strong>Daily</strong></span>
+            <span style={{ color: 'var(--border-color)' }}>|</span>
+            <span>🛡️ <strong>100%</strong> Manually Verified</span>
+          </div>
         </div>
 
         {/* Dynamic Toolbar: Search input + Sorting selector */}
@@ -313,9 +344,98 @@ export const Directory: React.FC<DirectoryProps> = ({
           </div>
         </div>
 
+        {/* AIXploria-style Quick Filter Chips Bar */}
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', marginRight: '4px', fontWeight: 'bold' }}>Quick Filters:</span>
+          
+          <button
+            onClick={() => handleFilterChange({ ...filters, featuredOnly: !filters.featuredOnly })}
+            className="chip-filter"
+            style={{
+              padding: '6px 12px',
+              borderRadius: '20px',
+              border: '1px solid var(--border-color)',
+              fontSize: '11px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              backgroundColor: filters.featuredOnly ? 'var(--color-gold-light)' : 'var(--bg-card)',
+              color: filters.featuredOnly ? 'var(--color-gold)' : 'var(--text-secondary)',
+              borderColor: filters.featuredOnly ? 'var(--color-gold)' : 'var(--border-color)',
+              transition: 'all 0.2s',
+            }}
+          >
+            <span>★ Gold Vetted</span>
+          </button>
+
+          <button
+            onClick={() => handleFilterChange({ ...filters, verifiedOnly: !filters.verifiedOnly })}
+            className="chip-filter"
+            style={{
+              padding: '6px 12px',
+              borderRadius: '20px',
+              border: '1px solid var(--border-color)',
+              fontSize: '11px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              backgroundColor: filters.verifiedOnly ? 'var(--color-success-light)' : 'var(--bg-card)',
+              color: filters.verifiedOnly ? 'var(--color-success)' : 'var(--text-secondary)',
+              borderColor: filters.verifiedOnly ? 'var(--color-success)' : 'var(--border-color)',
+              transition: 'all 0.2s',
+            }}
+          >
+            <span>✓ Verified</span>
+          </button>
+
+          {(['free', 'freemium', 'free-trial', 'paid'] as const).map((model) => {
+            const isActive = filters.pricing.includes(model);
+            const label = model === 'free' ? '🆓 100% Free' : model === 'freemium' ? '🎁 Freemium' : model === 'free-trial' ? '⏳ Free Trial' : '💰 Paid';
+            
+            const handleToggleModel = () => {
+              let updatedPricing = [...filters.pricing];
+              if (isActive) {
+                updatedPricing = updatedPricing.filter((p) => p !== model);
+              } else {
+                updatedPricing.push(model);
+              }
+              handleFilterChange({ ...filters, pricing: updatedPricing });
+            };
+
+            return (
+              <button
+                key={model}
+                onClick={handleToggleModel}
+                className="chip-filter"
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: '20px',
+                  border: '1px solid var(--border-color)',
+                  fontSize: '11px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  backgroundColor: isActive ? 'var(--color-primary-light)' : 'var(--bg-card)',
+                  color: isActive ? 'var(--color-primary)' : 'var(--text-secondary)',
+                  borderColor: isActive ? 'var(--color-primary)' : 'var(--border-color)',
+                  transition: 'all 0.2s',
+                }}
+              >
+                <span>{label}</span>
+              </button>
+            );
+          })}
+        </div>
+
         {/* Filter chips listing */}
         {hasActiveFilters && (
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', marginTop: '-8px' }}>
             <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Active Filters:</span>
             {filters.category && (
               <span className="badge badge-pricing" style={chipStyle}>
@@ -357,6 +477,12 @@ export const Directory: React.FC<DirectoryProps> = ({
               <span className="badge badge-pricing" style={chipStyle}>
                 Open Source
                 <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveFilterChip('openSourceOnly')} />
+              </span>
+            )}
+            {filters.featuredOnly && (
+              <span className="badge badge-pricing" style={chipStyle}>
+                Gold Vetted
+                <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveFilterChip('featuredOnly')} />
               </span>
             )}
           </div>

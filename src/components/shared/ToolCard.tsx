@@ -1,5 +1,5 @@
 /* src/components/shared/ToolCard.tsx */
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Tool } from '../../utils/seedData';
 import { StarRating } from './StarRating';
@@ -23,6 +23,35 @@ export const ToolCard: React.FC<ToolCardProps> = ({
   const { toggleFavoriteTool, collections, trackEvent } = useDatabase();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [showShare, setShowShare] = useState(false);
+
+  const handleShareClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowShare(!showShare);
+  };
+
+  const handleShareX = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const shareUrl = encodeURIComponent(`${window.location.origin}/tools/${tool.slug}`);
+    const text = encodeURIComponent(`Check out ${tool.name} — ${tool.tagline} on AIFynest!`);
+    window.open(`https://twitter.com/intent/tweet?url=${shareUrl}&text=${text}`, '_blank');
+    setShowShare(false);
+  };
+
+  const handleShareLinkedIn = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const shareUrl = encodeURIComponent(`${window.location.origin}/tools/${tool.slug}`);
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`, '_blank');
+    setShowShare(false);
+  };
+
+  const handleCopyLink = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const link = `${window.location.origin}/tools/${tool.slug}`;
+    navigator.clipboard.writeText(link);
+    onToast('Link copied to clipboard!', 'success');
+    setShowShare(false);
+  };
 
   // Determine if this tool is currently favorited
   const userFavorites = collections.find((c) => c.userId === user?.id && c.name === 'My Favorites');
@@ -62,6 +91,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({
   return (
     <div
       onClick={handleCardClick}
+      onMouseLeave={() => setShowShare(false)}
       className={`card ${tool.isSponsored ? 'glass' : ''}`}
       style={{
         display: 'flex',
@@ -90,23 +120,79 @@ export const ToolCard: React.FC<ToolCardProps> = ({
           {tool.isFeatured && <span className="badge badge-featured">Featured</span>}
           {tool.isVerified && <span className="badge badge-verified">Verified</span>}
         </div>
-        <button
-          onClick={handleFavoriteClick}
-          className={`btn-icon ${isFavorited ? 'btn-save-active' : ''}`}
-          style={{
-            border: 'none',
-            background: 'none',
-            cursor: 'pointer',
-            marginLeft: 'auto',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 'var(--radius-full)',
-          }}
-          title={isFavorited ? 'Remove from Saved' : 'Save to Favorites'}
-        >
-          <Heart size={18} fill={isFavorited ? 'var(--color-danger)' : 'none'} />
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginLeft: 'auto' }}>
+          {/* Share Trigger */}
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <button
+              onClick={handleShareClick}
+              className="btn-icon"
+              style={{
+                border: 'none',
+                background: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '6px',
+                borderRadius: 'var(--radius-full)',
+                color: 'var(--text-secondary)'
+              }}
+              title="Share this AI Tool"
+            >
+              <ShareIcon size={16} />
+            </button>
+            {showShare && (
+              <div
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  marginTop: '6px',
+                  width: '160px',
+                  backgroundColor: 'var(--bg-card)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-md)',
+                  boxShadow: 'var(--shadow-lg)',
+                  padding: '6px',
+                  zIndex: 100,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '2px',
+                }}
+              >
+                <button onClick={handleShareX} className="dropdown-link" style={{ border: 'none', background: 'none', width: '100%', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', padding: '6px 8px' }}>
+                  <span>🐦 Share on X</span>
+                </button>
+                <button onClick={handleShareLinkedIn} className="dropdown-link" style={{ border: 'none', background: 'none', width: '100%', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', padding: '6px 8px' }}>
+                  <span>💼 Share on LinkedIn</span>
+                </button>
+                <button onClick={handleCopyLink} className="dropdown-link" style={{ border: 'none', background: 'none', width: '100%', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', padding: '6px 8px' }}>
+                  <span>🔗 Copy Link</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Bookmark Trigger */}
+          <button
+            onClick={handleFavoriteClick}
+            className={`btn-icon ${isFavorited ? 'btn-save-active' : ''}`}
+            style={{
+              border: 'none',
+              background: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 'var(--radius-full)',
+              padding: '6px',
+            }}
+            title={isFavorited ? 'Remove from Saved' : 'Save to Favorites'}
+          >
+            <Heart size={18} fill={isFavorited ? 'var(--color-danger)' : 'none'} />
+          </button>
+        </div>
       </div>
 
       {/* Tool Header info */}
@@ -253,3 +339,12 @@ export const ToolCard: React.FC<ToolCardProps> = ({
     </div>
   );
 };
+
+const ShareIcon: React.FC<{ size?: number }> = ({ size = 16 }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+    <polyline points="16 6 12 2 8 6"/>
+    <line x1="12" y1="2" x2="12" y2="15"/>
+  </svg>
+);
+
