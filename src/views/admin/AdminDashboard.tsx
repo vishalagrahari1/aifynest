@@ -27,7 +27,6 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
     categories,
     claims,
     reviews,
-    payments,
     auditLogs,
     affiliateLinks,
     notifications,
@@ -49,7 +48,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
   const { user } = useAuth();
 
   // Navigation state
-  const [activeTab, setActiveTab] = useState<'overview' | 'submissions' | 'tools' | 'affiliates' | 'claims' | 'reviews' | 'analytics' | 'notifications' | 'logs'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'submissions' | 'tools' | 'affiliates' | 'claims' | 'reviews' | 'analytics' | 'notifications' | 'logs' | 'pending_review' | 'changes_requested'>('overview');
 
   // Filters for submissions moderation table
   const [subStatusFilter, setSubStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected' | 'needs_changes'>('all');
@@ -59,6 +58,10 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
   // Filters for tools index list
   const [toolsStatusFilter, setToolsStatusFilter] = useState<string>('all');
   const [toolsSearch, setToolsSearch] = useState<string>('');
+
+  // Filters for Pending Review tab
+  const [pendingSearch, setPendingSearch] = useState('');
+  const [pendingTypeFilter, setPendingTypeFilter] = useState<'all' | 'new' | 'edit'>('all');
 
   // Split-screen Reviewing State
   const [reviewingTool, setReviewingTool] = useState<any | null>(null);
@@ -119,52 +122,132 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
   }
 
   // Pre-seeded lists calculations
-  const pendingTools = tools.filter((t) => t.status === 'pending');
-  const pendingClaims = claims.filter((c) => c.status === 'pending');
   const pendingReviews = reviews.filter((r) => r.status === 'pending' || r.status === 'flagged');
   const unreadNotifs = notifications.filter((n) => !n.read && n.userId === 'admin-id');
-  const totalRevenue = payments.reduce((acc, p) => acc + p.amount, 0);
 
-  // Split screen trigger
+  // Real stats calculation
+  const pendingNewCount = tools.filter((t) => t.status === 'pending').length;
+  const pendingEditsCount = tools.filter((t) => t.status === 'approved' && t.pendingChanges?.status === 'pending').length;
+  const pendingClaimsCount = claims.filter((c) => c.status === 'pending').length;
+  const changesRequestedCount = tools.filter((t) => t.status === 'needs_changes' || (t.status === 'approved' && t.pendingChanges?.status === 'needs_changes')).length;
+  const rejectedCount = tools.filter((t) => t.status === 'rejected' || (t.status === 'approved' && t.pendingChanges?.status === 'rejected')).length;
+
+  const pendingReviewList = tools.filter((t) => 
+    t.status === 'pending' || 
+    (t.status === 'approved' && t.pendingChanges?.status === 'pending')
+  );
+
+  const filteredPendingList = tools.filter((t) => {
+    const isNew = t.status === 'pending';
+    const isEdit = t.status === 'approved' && t.pendingChanges?.status === 'pending';
+    if (!isNew && !isEdit) return false;
+
+    // Type filter
+    if (pendingTypeFilter === 'new' && !isNew) return false;
+    if (pendingTypeFilter === 'edit' && !isEdit) return false;
+
+    // Search filter
+    if (pendingSearch.trim()) {
+      const q = pendingSearch.toLowerCase();
+      return t.name.toLowerCase().includes(q) || t.description.toLowerCase().includes(q);
+    }
+    return true;
+  });
+
+  const filteredChangesRequestedList = tools.filter((t) => {
+    const isNewRequested = t.status === 'needs_changes';
+    const isEditRequested = t.status === 'approved' && t.pendingChanges?.status === 'needs_changes';
+    return isNewRequested || isEditRequested;
+  });
+
+  const isEditReview = reviewingTool && reviewingTool.status === 'approved' && reviewingTool.pendingChanges;
+
+  const renderChangeIndicator = (currentValue: any, proposedValue: any) => {
+    const isDifferent = JSON.stringify(currentValue) !== JSON.stringify(proposedValue);
+    if (isDifferent) {
+      return (
+        <span
+          className="badge"
+          style={{
+            fontSize: '9px',
+            backgroundColor: 'var(--color-warning-light)',
+            color: 'var(--color-warning)',
+            marginLeft: '8px',
+            fontWeight: 'bold',
+            padding: '2px 6px'
+          }}
+        >
+          Changed
+        </span>
+      );
+    }
+    return null;
+  };
+
   const handleOpenReview = (tool: any) => {
     setReviewingTool(tool);
-    setEditName(tool.name);
-    setEditTagline(tool.tagline);
-    setEditDescription(tool.description);
-    setEditCategory(tool.categorySlug);
-    setEditSubCategory(tool.subCategory);
-    setEditPricing(tool.pricing);
-    setEditWebsiteUrl(tool.websiteUrl);
-    setEditLogoUrl(tool.logoUrl);
-    setEditPlatforms(tool.platforms || []);
-    setEditFeatures(tool.features?.join(', ') || '');
-    setEditUseCases(tool.useCases?.join(', ') || '');
-    setEditAffiliateUrl(tool.affiliateUrl || '');
-    setEditSeoTitle(tool.seoTitle || '');
-    setEditMetaDescription(tool.metaDescription || '');
+    const source = tool.pendingChanges || tool;
+    setEditName(source.name);
+    setEditTagline(source.tagline);
+    setEditDescription(source.description);
+    setEditCategory(source.categorySlug);
+    setEditSubCategory(source.subCategory);
+    setEditPricing(source.pricing);
+    setEditWebsiteUrl(source.websiteUrl);
+    setEditLogoUrl(source.logoUrl);
+    setEditPlatforms(source.platforms || []);
+    setEditFeatures(source.features?.join(', ') || '');
+    setEditUseCases(source.useCases?.join(', ') || '');
+    setEditAffiliateUrl(source.affiliateUrl || '');
+    setEditSeoTitle(source.seoTitle || '');
+    setEditMetaDescription(source.metaDescription || '');
   };
 
   const handleSaveReviewDraft = () => {
     if (!reviewingTool) return;
     const cleanList = (str: string) => str.split(',').map((x) => x.trim()).filter((x) => x.length > 0);
     
-    updateTool(reviewingTool.id, {
-      name: editName,
-      tagline: editTagline,
-      description: editDescription,
-      categorySlug: editCategory,
-      subCategory: editSubCategory,
-      pricing: editPricing,
-      websiteUrl: editWebsiteUrl,
-      logoUrl: editLogoUrl,
-      platforms: editPlatforms as any,
-      features: cleanList(editFeatures),
-      useCases: cleanList(editUseCases),
-      affiliateUrl: editAffiliateUrl || undefined,
-      affiliateStatus: editAffiliateUrl ? 'active' : 'inactive',
-      seoTitle: editSeoTitle || undefined,
-      metaDescription: editMetaDescription || undefined,
-    }, user.id);
+    if (isEditReview) {
+      updateTool(reviewingTool.id, {
+        pendingChanges: {
+          ...reviewingTool.pendingChanges,
+          name: editName,
+          tagline: editTagline,
+          description: editDescription,
+          categorySlug: editCategory,
+          subCategory: editSubCategory,
+          pricing: editPricing,
+          websiteUrl: editWebsiteUrl,
+          logoUrl: editLogoUrl,
+          platforms: editPlatforms as any,
+          features: cleanList(editFeatures),
+          useCases: cleanList(editUseCases),
+          affiliateUrl: editAffiliateUrl || undefined,
+          affiliateStatus: editAffiliateUrl ? 'active' : 'inactive',
+          seoTitle: editSeoTitle || undefined,
+          metaDescription: editMetaDescription || undefined,
+          status: 'pending',
+        }
+      }, user.id);
+    } else {
+      updateTool(reviewingTool.id, {
+        name: editName,
+        tagline: editTagline,
+        description: editDescription,
+        categorySlug: editCategory,
+        subCategory: editSubCategory,
+        pricing: editPricing,
+        websiteUrl: editWebsiteUrl,
+        logoUrl: editLogoUrl,
+        platforms: editPlatforms as any,
+        features: cleanList(editFeatures),
+        useCases: cleanList(editUseCases),
+        affiliateUrl: editAffiliateUrl || undefined,
+        affiliateStatus: editAffiliateUrl ? 'active' : 'inactive',
+        seoTitle: editSeoTitle || undefined,
+        metaDescription: editMetaDescription || undefined,
+      }, user.id);
+    }
     
     onToast(`Draft listing parameters updated for "${editName}".`, 'success');
     setReviewingTool(null);
@@ -327,13 +410,14 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
             ADMIN CONTROL DECK
           </div>
           {[
-            { id: 'overview', name: 'Dashboard Home', count: 0 },
-            { id: 'submissions', name: 'Submissions', count: pendingTools.length },
-            { id: 'tools', name: 'Tools Index', count: 0 },
+            { id: 'overview', name: 'Overview', count: 0 },
+            { id: 'tools', name: 'All Tools', count: 0 },
+            { id: 'pending_review', name: 'Pending Review', count: pendingNewCount + pendingEditsCount },
+            { id: 'changes_requested', name: 'Changes Requested', count: changesRequestedCount },
+            { id: 'claims', name: 'Claims', count: pendingClaimsCount },
+            { id: 'submissions', name: 'Submissions', count: 0 },
             { id: 'affiliates', name: 'Affiliates Linker', count: 0 },
-            { id: 'claims', name: 'Claims Queue', count: pendingClaims.length },
             { id: 'reviews', name: 'Moderation', count: pendingReviews.length },
-            { id: 'analytics', name: 'Platform Analytics', count: 0 },
             { id: 'notifications', name: 'Notifications', count: unreadNotifs.length },
             { id: 'logs', name: 'Audit Logs', count: 0 },
           ].map((tab) => (
@@ -416,146 +500,279 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                 animation: 'fade-in-overlay 0.2s ease-out'
               }}
             >
-              {/* Left Pane: Form Editor */}
-              <div style={{ maxHeight: '75vh', overflowY: 'auto', paddingRight: '12px' }}>
-                <h3 style={{ margin: '0 0 16px 0', fontSize: 'var(--text-sm)', fontWeight: 'bold', display: 'flex', justifyContent: 'space-between' }}>
-                  <span>Edit Submission Details</span>
-                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Status: {reviewingTool.status.toUpperCase()}</span>
-                </h3>
+              {/* Left Column Pane */}
+              {!isEditReview ? (
+                /* Left Pane: Form Editor for new tool submission */
+                <div style={{ maxHeight: '75vh', overflowY: 'auto', paddingRight: '12px' }}>
+                  <h3 style={{ margin: '0 0 16px 0', fontSize: 'var(--text-sm)', fontWeight: 'bold', display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Edit Submission Details</span>
+                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Status: {reviewingTool.status.toUpperCase()}</span>
+                  </h3>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                  <div className="form-group">
-                    <label className="form-label">Tool Name</label>
-                    <input type="text" className="form-input" value={editName} onChange={(e) => setEditName(e.target.value)} />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Tagline</label>
-                    <input type="text" className="form-input" value={editTagline} onChange={(e) => setEditTagline(e.target.value)} />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Full Description</label>
-                    <textarea rows={4} className="form-input" value={editDescription} onChange={(e) => setEditDescription(e.target.value)} style={{ resize: 'vertical' }} />
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                     <div className="form-group">
-                      <label className="form-label">Category</label>
-                      <select className="form-input" value={editCategory} onChange={(e) => setEditCategory(e.target.value)}>
-                        {categories.map((c) => (
-                          <option key={c.slug} value={c.slug}>{c.name}</option>
-                        ))}
-                      </select>
+                      <label className="form-label">Tool Name</label>
+                      <input type="text" className="form-input" value={editName} onChange={(e) => setEditName(e.target.value)} />
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Subcategory</label>
-                      <input type="text" className="form-input" value={editSubCategory} onChange={(e) => setEditSubCategory(e.target.value)} />
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                    <div className="form-group">
-                      <label className="form-label">Pricing Type</label>
-                      <select className="form-input" value={editPricing} onChange={(e) => setEditPricing(e.target.value as any)}>
-                        <option value="free">Free</option>
-                        <option value="freemium">Freemium</option>
-                        <option value="paid">Paid</option>
-                        <option value="free-trial">Free Trial</option>
-                        <option value="contact-sales">Contact Sales</option>
-                      </select>
+                      <label className="form-label">Tagline</label>
+                      <input type="text" className="form-input" value={editTagline} onChange={(e) => setEditTagline(e.target.value)} />
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Logo Image URL</label>
-                      <input type="text" className="form-input" value={editLogoUrl} onChange={(e) => setEditLogoUrl(e.target.value)} />
+                      <label className="form-label">Full Description</label>
+                      <textarea rows={4} className="form-input" value={editDescription} onChange={(e) => setEditDescription(e.target.value)} style={{ resize: 'vertical' }} />
                     </div>
-                  </div>
 
-                  <div className="form-group">
-                    <label className="form-label">Original Destination URL</label>
-                    <input type="url" className="form-input" value={editWebsiteUrl} onChange={(e) => setEditWebsiteUrl(e.target.value)} />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Affiliate Referral URL (Assigned Network Target)</label>
-                    <input type="url" className="form-input" value={editAffiliateUrl} onChange={(e) => setEditAffiliateUrl(e.target.value)} placeholder="https://example.com/?ref=aifynest" />
-                  </div>
-
-                  <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '12px', marginTop: '8px' }}>
-                    <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)' }}>SEO Configuration METADATA</span>
-                    <div className="form-group" style={{ marginTop: '8px' }}>
-                      <label className="form-label">SEO Title Tags</label>
-                      <input type="text" className="form-input" value={editSeoTitle} onChange={(e) => setEditSeoTitle(e.target.value)} placeholder="AIFynest custom header override" />
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div className="form-group">
+                        <label className="form-label">Category</label>
+                        <select className="form-input" value={editCategory} onChange={(e) => setEditCategory(e.target.value)}>
+                          {categories.map((c) => (
+                            <option key={c.slug} value={c.slug}>{c.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Subcategory</label>
+                        <input type="text" className="form-input" value={editSubCategory} onChange={(e) => setEditSubCategory(e.target.value)} />
+                      </div>
                     </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div className="form-group">
+                        <label className="form-label">Pricing Type</label>
+                        <select className="form-input" value={editPricing} onChange={(e) => setEditPricing(e.target.value as any)}>
+                          <option value="free">Free</option>
+                          <option value="freemium">Freemium</option>
+                          <option value="paid">Paid</option>
+                          <option value="free-trial">Free Trial</option>
+                          <option value="contact-sales">Contact Sales</option>
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Logo Image URL</label>
+                        <input type="text" className="form-input" value={editLogoUrl} onChange={(e) => setEditLogoUrl(e.target.value)} />
+                      </div>
+                    </div>
+
                     <div className="form-group">
-                      <label className="form-label">Meta Description</label>
-                      <input type="text" className="form-input" value={editMetaDescription} onChange={(e) => setEditMetaDescription(e.target.value)} />
+                      <label className="form-label">Original Destination URL</label>
+                      <input type="url" className="form-input" value={editWebsiteUrl} onChange={(e) => setEditWebsiteUrl(e.target.value)} />
                     </div>
-                  </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                     <div className="form-group">
-                      <label className="form-label">Features list (comma separated)</label>
-                      <input type="text" className="form-input" value={editFeatures} onChange={(e) => setEditFeatures(e.target.value)} />
+                      <label className="form-label">Affiliate Referral URL (Assigned Network Target)</label>
+                      <input type="url" className="form-input" value={editAffiliateUrl} onChange={(e) => setEditAffiliateUrl(e.target.value)} placeholder="https://example.com/?ref=aifynest" />
                     </div>
-                    <div className="form-group">
-                      <label className="form-label">Use Cases list (comma separated)</label>
-                      <input type="text" className="form-input" value={editUseCases} onChange={(e) => setEditUseCases(e.target.value)} />
+
+                    <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '12px', marginTop: '8px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)' }}>SEO Configuration METADATA</span>
+                      <div className="form-group" style={{ marginTop: '8px' }}>
+                        <label className="form-label">SEO Title Tags</label>
+                        <input type="text" className="form-input" value={editSeoTitle} onChange={(e) => setEditSeoTitle(e.target.value)} placeholder="AIFynest custom header override" />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Meta Description</label>
+                        <input type="text" className="form-input" value={editMetaDescription} onChange={(e) => setEditMetaDescription(e.target.value)} />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div className="form-group">
+                        <label className="form-label">Features list (comma separated)</label>
+                        <input type="text" className="form-input" value={editFeatures} onChange={(e) => setEditFeatures(e.target.value)} />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Use Cases list (comma separated)</label>
+                        <input type="text" className="form-input" value={editUseCases} onChange={(e) => setEditUseCases(e.target.value)} />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Right Pane: Live Visual Preview */}
-              <div style={{ borderLeft: '1px solid var(--border-color)', paddingLeft: '24px', maxHeight: '75vh', overflowY: 'auto' }}>
-                <h3 style={{ margin: '0 0 16px 0', fontSize: 'var(--text-sm)', fontWeight: 'bold', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Eye size={16} />
-                  <span>AIFynest Mock Live Profile Preview</span>
-                </h3>
-                
-                {/* Simulating public ToolDetail UI Frame */}
-                <div style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '20px', backgroundColor: 'var(--bg-primary)' }}>
-                  <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
-                    <img src={editLogoUrl || 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100'} alt="logo" style={{ width: '50px', height: '50px', borderRadius: 'var(--radius-sm)', objectFit: 'cover', border: '1px solid var(--border-color)' }} />
+              ) : (
+                /* Left Pane: Read-only current live version for edits comparison */
+                <div style={{ maxHeight: '75vh', overflowY: 'auto', paddingRight: '12px' }}>
+                  <h3 style={{ margin: '0 0 16px 0', fontSize: 'var(--text-sm)', fontWeight: 'bold', color: 'var(--text-secondary)' }}>
+                    CURRENT LIVE VERSION
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: 'var(--text-xs)' }}>
                     <div>
-                      <h2 style={{ fontSize: '18px', fontWeight: 'bold', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span>{editName || 'Tool Title'}</span>
-                        <span style={{ fontSize: '10px', backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)', padding: '2px 6px', borderRadius: '4px' }}>Verified</span>
-                      </h2>
-                      <span className="badge badge-pricing">{editPricing.toUpperCase()}</span>
+                      <strong>Logo:</strong>
+                      <img src={reviewingTool.logoUrl} style={{ width: '40px', height: '40px', borderRadius: '4px', display: 'block', marginTop: '6px', objectFit: 'cover' }} />
+                    </div>
+                    <div><strong>Tool Name:</strong> <p style={{ margin: '4px 0 0 0', fontWeight: 'bold' }}>{reviewingTool.name}</p></div>
+                    <div><strong>Tagline:</strong> <p style={{ margin: '4px 0 0 0' }}>{reviewingTool.tagline}</p></div>
+                    <div><strong>Description:</strong> <p style={{ margin: '4px 0 0 0', whiteSpace: 'pre-wrap' }}>{reviewingTool.description}</p></div>
+                    <div><strong>Website URL:</strong> <p style={{ margin: '4px 0 0 0', color: 'var(--color-primary)' }}>{reviewingTool.websiteUrl}</p></div>
+                    <div><strong>Category:</strong> <p style={{ margin: '4px 0 0 0' }}>{reviewingTool.categorySlug} &gt; {reviewingTool.subCategory}</p></div>
+                    <div><strong>Pricing:</strong> <p style={{ margin: '4px 0 0 0' }}>{reviewingTool.pricing} ({reviewingTool.pricingUrl})</p></div>
+                    <div><strong>Platforms:</strong> <p style={{ margin: '4px 0 0 0' }}>{reviewingTool.platforms?.join(', ')}</p></div>
+                    <div><strong>Features:</strong> <p style={{ margin: '4px 0 0 0' }}>{reviewingTool.features?.join(', ')}</p></div>
+                    <div><strong>Use Cases:</strong> <p style={{ margin: '4px 0 0 0' }}>{reviewingTool.useCases?.join(', ')}</p></div>
+                    {reviewingTool.screenshotUrls && reviewingTool.screenshotUrls.length > 0 && (
+                      <div>
+                        <strong>Screenshots:</strong>
+                        <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', marginTop: '6px' }}>
+                          {reviewingTool.screenshotUrls.map((url: string, i: number) => (
+                            <img key={i} src={url} style={{ height: '50px', borderRadius: '4px', objectFit: 'cover' }} />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Right Column Pane */}
+              {!isEditReview ? (
+                /* Right Pane: Live Visual Preview for new tool submission */
+                <div style={{ borderLeft: '1px solid var(--border-color)', paddingLeft: '24px', maxHeight: '75vh', overflowY: 'auto' }}>
+                  <h3 style={{ margin: '0 0 16px 0', fontSize: 'var(--text-sm)', fontWeight: 'bold', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Eye size={16} />
+                    <span>AIFynest Mock Live Profile Preview</span>
+                  </h3>
+                  
+                  {/* Simulating public ToolDetail UI Frame */}
+                  <div style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '20px', backgroundColor: 'var(--bg-primary)' }}>
+                    <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+                      <img src={editLogoUrl || 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100'} alt="logo" style={{ width: '50px', height: '50px', borderRadius: 'var(--radius-sm)', objectFit: 'cover', border: '1px solid var(--border-color)' }} />
+                      <div>
+                        <h2 style={{ fontSize: '18px', fontWeight: 'bold', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span>{editName || 'Tool Title'}</span>
+                          <span style={{ fontSize: '10px', backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)', padding: '2px 6px', borderRadius: '4px' }}>Verified</span>
+                        </h2>
+                        <span className="badge badge-pricing">{editPricing.toUpperCase()}</span>
+                      </div>
+                    </div>
+
+                    <p style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold', color: 'var(--text-primary)', margin: '0 0 12px 0' }}>{editTagline || 'Tagline placeholder'}</p>
+                    <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', lineHeight: '1.5', margin: '0 0 20px 0' }}>{editDescription || 'No description provided.'}</p>
+
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
+                      <button className="btn btn-primary btn-sm w-full" disabled>Visit Tool ↗</button>
+                      <button className="btn btn-outline btn-sm" disabled>❤</button>
+                    </div>
+                    <span style={{ fontSize: '9px', color: 'var(--text-muted)', textAlign: 'center', display: 'block' }}>AIFynest may earn a commission when you purchase through certain links.</span>
+
+                    <div style={{ borderTop: '1px solid var(--border-color)', marginTop: '20px', paddingTop: '16px' }}>
+                      <h4 style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold', margin: '0 0 8px 0' }}>Integrations & Features</h4>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                        {editFeatures.split(',').map((f, i) => f.trim() && (
+                          <span key={i} style={{ fontSize: '10px', backgroundColor: 'var(--bg-tertiary)', padding: '3px 8px', borderRadius: '4px' }}>{f.trim()}</span>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
-                  <p style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold', color: 'var(--text-primary)', margin: '0 0 12px 0' }}>{editTagline || 'Tagline placeholder'}</p>
-                  <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', lineHeight: '1.5', margin: '0 0 20px 0' }}>{editDescription || 'No description provided.'}</p>
-
-                  <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
-                    <button className="btn btn-primary btn-sm w-full" disabled>Visit Tool ↗</button>
-                    <button className="btn btn-outline btn-sm" disabled>❤</button>
-                  </div>
-                  <span style={{ fontSize: '9px', color: 'var(--text-muted)', textAlign: 'center', display: 'block' }}>AIFynest may earn a commission when you purchase through certain links.</span>
-
-                  <div style={{ borderTop: '1px solid var(--border-color)', marginTop: '20px', paddingTop: '16px' }}>
-                    <h4 style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold', margin: '0 0 8px 0' }}>Integrations & Features</h4>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                      {editFeatures.split(',').map((f, i) => f.trim() && (
-                        <span key={i} style={{ fontSize: '10px', backgroundColor: 'var(--bg-tertiary)', padding: '3px 8px', borderRadius: '4px' }}>{f.trim()}</span>
-                      ))}
+                  <div style={{ marginTop: '20px', padding: '12px', backgroundColor: 'var(--color-primary-light)', border: '1px solid var(--color-primary)', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-xs)' }}>
+                    ⚙️ <strong>Search Engine Preview (SERP)</strong>
+                    <div style={{ color: '#1a0dab', fontSize: '14px', textDecoration: 'underline', marginTop: '6px' }}>
+                      {editSeoTitle || `${editName} | Discover the Best AI Tools on AIFynest`}
+                    </div>
+                    <div style={{ color: '#006621', fontSize: '11px' }}>
+                      https://aifynest.com/tools/{reviewingTool.slug}
+                    </div>
+                    <div style={{ color: 'var(--text-secondary)', fontSize: '11px' }}>
+                      {editMetaDescription || editTagline || 'SERP Meta description snippet preview.'}
                     </div>
                   </div>
                 </div>
+              ) : (
+                /* Right Pane: Proposed Changes Form for edits comparison */
+                <div style={{ borderLeft: '1px solid var(--border-color)', paddingLeft: '24px', maxHeight: '75vh', overflowY: 'auto' }}>
+                  <h3 style={{ margin: '0 0 16px 0', fontSize: 'var(--text-sm)', fontWeight: 'bold', color: 'var(--color-primary)' }}>
+                    PROPOSED CHANGES (EDITABLE)
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <div className="form-group">
+                      <label className="form-label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span>Tool Name</span>
+                        {renderChangeIndicator(reviewingTool.name, editName)}
+                      </label>
+                      <input type="text" className="form-input" value={editName} onChange={(e) => setEditName(e.target.value)} />
+                    </div>
 
-                <div style={{ marginTop: '20px', padding: '12px', backgroundColor: 'var(--color-primary-light)', border: '1px solid var(--color-primary)', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-xs)' }}>
-                  ⚙️ <strong>Search Engine Preview (SERP)</strong>
-                  <div style={{ color: '#1a0dab', fontSize: '14px', textDecoration: 'underline', marginTop: '6px' }}>
-                    {editSeoTitle || `${editName} | Discover the Best AI Tools on AIFynest`}
-                  </div>
-                  <div style={{ color: '#006621', fontSize: '11px' }}>
-                    https://aifynest.com/tools/{reviewingTool.slug}
-                  </div>
-                  <div style={{ color: 'var(--text-secondary)', fontSize: '11px' }}>
-                    {editMetaDescription || editTagline || 'SERP Meta description snippet preview.'}
+                    <div className="form-group">
+                      <label className="form-label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span>Tagline</span>
+                        {renderChangeIndicator(reviewingTool.tagline, editTagline)}
+                      </label>
+                      <input type="text" className="form-input" value={editTagline} onChange={(e) => setEditTagline(e.target.value)} />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span>Full Description</span>
+                        {renderChangeIndicator(reviewingTool.description, editDescription)}
+                      </label>
+                      <textarea rows={4} className="form-input" value={editDescription} onChange={(e) => setEditDescription(e.target.value)} style={{ resize: 'vertical' }} />
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div className="form-group">
+                        <label className="form-label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span>Category</span>
+                          {renderChangeIndicator(reviewingTool.categorySlug, editCategory)}
+                        </label>
+                        <select className="form-input" value={editCategory} onChange={(e) => setEditCategory(e.target.value)}>
+                          {categories.map((c) => (
+                            <option key={c.slug} value={c.slug}>{c.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span>Subcategory</span>
+                          {renderChangeIndicator(reviewingTool.subCategory, editSubCategory)}
+                        </label>
+                        <input type="text" className="form-input" value={editSubCategory} onChange={(e) => setEditSubCategory(e.target.value)} />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div className="form-group">
+                        <label className="form-label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span>Pricing Type</span>
+                          {renderChangeIndicator(reviewingTool.pricing, editPricing)}
+                        </label>
+                        <select className="form-input" value={editPricing} onChange={(e) => setEditPricing(e.target.value as any)}>
+                          <option value="free">Free</option>
+                          <option value="freemium">Freemium</option>
+                          <option value="paid">Paid</option>
+                          <option value="free-trial">Free Trial</option>
+                          <option value="contact-sales">Contact Sales</option>
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span>Logo URL</span>
+                          {renderChangeIndicator(reviewingTool.logoUrl, editLogoUrl)}
+                        </label>
+                        <input type="text" className="form-input" value={editLogoUrl} onChange={(e) => setEditLogoUrl(e.target.value)} />
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span>Destination URL</span>
+                        {renderChangeIndicator(reviewingTool.websiteUrl, editWebsiteUrl)}
+                      </label>
+                      <input type="url" className="form-input" value={editWebsiteUrl} onChange={(e) => setEditWebsiteUrl(e.target.value)} />
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div className="form-group">
+                        <label className="form-label">Features list (comma separated)</label>
+                        <input type="text" className="form-input" value={editFeatures} onChange={(e) => setEditFeatures(e.target.value)} />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Use Cases list (comma separated)</label>
+                        <input type="text" className="form-input" value={editUseCases} onChange={(e) => setEditUseCases(e.target.value)} />
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Bottom Control Bar */}
               <div
@@ -592,26 +809,31 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
           {/* TAB 1: OVERVIEW DASHBOARD INDEX */}
           {activeTab === 'overview' && !reviewingTool && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }} className="stats-box-grid">
-                <div style={adminStatBox}>
-                  <DollarSign size={20} style={{ color: 'var(--color-success)' }} />
-                  <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold' }}>${totalRevenue}</span>
-                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Gross Platform Revenue</span>
-                </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px' }} className="stats-box-grid">
                 <div style={adminStatBox}>
                   <Layout size={20} style={{ color: 'var(--color-primary)' }} />
-                  <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold' }}>{pendingTools.length}</span>
-                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Pending Submissions</span>
-                </div>
-                <div style={adminStatBox}>
-                  <Award size={20} style={{ color: 'var(--color-gold)' }} />
-                  <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold' }}>{pendingClaims.length}</span>
-                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Pending Domain Claims</span>
+                  <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold' }}>{pendingNewCount}</span>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Pending Tools</span>
                 </div>
                 <div style={adminStatBox}>
                   <Settings size={20} style={{ color: 'var(--color-info)' }} />
-                  <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold' }}>{pendingReviews.length}</span>
-                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Reviews Curation Queue</span>
+                  <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold' }}>{pendingEditsCount}</span>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Pending Edits</span>
+                </div>
+                <div style={adminStatBox}>
+                  <Award size={20} style={{ color: 'var(--color-gold)' }} />
+                  <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold' }}>{pendingClaimsCount}</span>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Pending Claims</span>
+                </div>
+                <div style={adminStatBox}>
+                  <TrendingUp size={20} style={{ color: 'var(--color-warning)' }} />
+                  <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold' }}>{changesRequestedCount}</span>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Changes Requested</span>
+                </div>
+                <div style={adminStatBox}>
+                  <Shield size={20} style={{ color: 'var(--color-danger)' }} />
+                  <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold' }}>{rejectedCount}</span>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Rejected</span>
                 </div>
               </div>
 
@@ -619,30 +841,41 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
               <div>
                 <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-bold)', marginBottom: '12px', display: 'flex', justifyContent: 'space-between' }}>
                   <span>Immediate Moderation Alerts</span>
-                  <button onClick={() => setActiveTab('submissions')} className="btn btn-outline btn-xs" style={{ fontSize: '10px' }}>View Moderation Table</button>
+                  <button onClick={() => setActiveTab('pending_review')} className="btn btn-outline btn-xs" style={{ fontSize: '10px' }}>View Pending Queue</button>
                 </h3>
-                {pendingTools.length > 0 ? (
+                {pendingReviewList.length > 0 ? (
                   <div className="table-container">
                     <table className="data-table">
                       <thead>
                         <tr>
                           <th>Tool</th>
-                          <th>Category</th>
+                          <th>Type</th>
                           <th>Pricing</th>
                           <th>Submitted</th>
                           <th>Actions</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {pendingTools.slice(0, 5).map((tool) => (
+                        {pendingReviewList.slice(0, 5).map((tool) => (
                           <tr key={tool.id}>
                             <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <img src={tool.logoUrl} alt={tool.name} style={{ width: '24px', height: '24px', borderRadius: '4px', objectFit: 'cover' }} />
                               <span style={{ fontWeight: 'bold' }}>{tool.name}</span>
                             </td>
-                            <td>{tool.categorySlug.toUpperCase()}</td>
+                            <td>
+                              <span
+                                className="badge"
+                                style={{
+                                  backgroundColor: tool.pendingChanges ? 'var(--color-info-light)' : 'var(--color-primary-light)',
+                                  color: tool.pendingChanges ? 'var(--color-info)' : 'var(--color-primary)',
+                                  fontSize: '10px'
+                                }}
+                              >
+                                {tool.pendingChanges ? 'Listing Edit' : 'New Listing'}
+                              </span>
+                            </td>
                             <td><span className="badge badge-pricing">{tool.pricing}</span></td>
-                            <td>{tool.lastUpdated}</td>
+                            <td>{tool.pendingChanges?.submittedAt ? tool.pendingChanges.submittedAt.split('T')[0] : tool.lastUpdated}</td>
                             <td>
                               <button onClick={() => handleOpenReview(tool)} className="btn btn-primary btn-xs">Review Details</button>
                             </td>
@@ -653,8 +886,33 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                   </div>
                 ) : (
                   <div style={{ padding: '24px', backgroundColor: 'var(--bg-card)', border: '1px dashed var(--border-color)', borderRadius: 'var(--radius-lg)', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                    🟢 Clean Queue. No new tools require moderation reviews.
+                    🟢 Clean Queue. No pending submissions require moderation reviews.
                   </div>
+                )}
+              </div>
+
+              {/* Recent Activity Log */}
+              <div style={{ padding: '20px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
+                <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'bold', margin: '0 0 16px 0' }}>
+                  Recent Moderation Activity
+                </h3>
+                {auditLogs && auditLogs.length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {auditLogs.slice(0, 10).map((log: any) => (
+                      <div key={log.id} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '8px', borderBottom: '1px solid var(--border-color)', fontSize: 'var(--text-xs)' }}>
+                        <div>
+                          <strong style={{ color: 'var(--color-primary)' }}>{log.action}</strong> - {log.details}
+                        </div>
+                        <div style={{ color: 'var(--text-muted)' }}>
+                          {log.timestamp.split('T')[0]} by {log.userName}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p style={{ color: 'var(--text-muted)', fontSize: 'var(--text-xs)', margin: 0 }}>
+                    No moderation actions logged yet.
+                  </p>
                 )}
               </div>
             </div>
@@ -972,37 +1230,229 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
           {/* TAB 5: DOMAIN CLAIMS MODERATION QUEUE */}
           {activeTab === 'claims' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-bold)' }}>Pending Ownership Claims</h3>
-              {pendingClaims.length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {pendingClaims.map((claim) => {
-                    const toolObj = tools.find((t) => t.id === claim.toolId);
-                    return (
-                      <div key={claim.id} style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                          <span style={{ fontWeight: 'bold' }}>Tool ID: {toolObj?.name || claim.toolId}</span>
-                          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{claim.date}</span>
-                        </div>
-                        <p style={{ margin: '0 0 10px 0', fontSize: 'var(--text-xs)' }}>
-                          <strong>Verification Email:</strong> {claim.verificationEmail}
-                        </p>
-                        <p style={{ margin: '0 0 14px 0', fontSize: 'var(--text-xs)' }}>
-                          <strong>Domain URL:</strong> {claim.domain}
-                        </p>
-                        <p style={{ margin: '0 0 14px 0', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
-                          <i>"{claim.message}"</i>
-                        </p>
-                        <div style={{ display: 'flex', gap: '10px' }}>
-                          <button onClick={() => handleApproveClaim(claim.id, toolObj?.name || '')} className="btn btn-primary btn-sm">Approve Claim</button>
-                          <button onClick={() => handleRejectClaim(claim.id)} className="btn btn-outline btn-sm" style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)' }}>Reject</button>
-                        </div>
-                      </div>
-                    );
-                  })}
+              <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', margin: 0 }}>Ownership Claims Console</h3>
+              {claims.length > 0 ? (
+                <div className="table-container">
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th>Tool</th>
+                        <th>Claimant</th>
+                        <th>Company Domain</th>
+                        <th>Verification Email</th>
+                        <th>Proof Details</th>
+                        <th>Submitted</th>
+                        <th>Status</th>
+                        <th style={{ textAlign: 'right' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {claims.map((claim) => {
+                        const toolObj = tools.find((t) => t.id === claim.toolId);
+                        return (
+                          <tr key={claim.id}>
+                            <td style={{ fontWeight: 'bold' }}>{toolObj?.name || 'Unknown Tool'}</td>
+                            <td>{claim.verificationEmail ? claim.verificationEmail.split('@')[0] : 'Unknown'}</td>
+                            <td>{claim.domain || 'N/A'}</td>
+                            <td>{claim.verificationEmail}</td>
+                            <td style={{ fontSize: '10px', color: 'var(--text-secondary)', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {claim.message}
+                            </td>
+                            <td>{claim.date}</td>
+                            <td style={{ textTransform: 'capitalize' }}>
+                              <span
+                                className="badge"
+                                style={{
+                                  fontSize: '10px',
+                                  backgroundColor:
+                                    claim.status === 'approved'
+                                      ? 'var(--color-success-light)'
+                                      : claim.status === 'pending'
+                                      ? 'var(--color-warning-light)'
+                                      : 'var(--color-danger-light)',
+                                  color:
+                                    claim.status === 'approved'
+                                      ? 'var(--color-success)'
+                                      : claim.status === 'pending'
+                                      ? 'var(--color-warning)'
+                                      : 'var(--color-danger)',
+                                }}
+                              >
+                                {claim.status}
+                              </span>
+                            </td>
+                            <td style={{ textAlign: 'right' }}>
+                              {claim.status === 'pending' ? (
+                                <div style={{ display: 'inline-flex', gap: '6px', justifyContent: 'flex-end' }}>
+                                  <button
+                                    onClick={() => handleApproveClaim(claim.id, toolObj?.name || '')}
+                                    className="btn btn-primary btn-xs"
+                                  >
+                                    Approve
+                                  </button>
+                                  <button
+                                    onClick={() => handleRejectClaim(claim.id)}
+                                    className="btn btn-outline btn-xs"
+                                    style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)' }}
+                                  >
+                                    Reject
+                                  </button>
+                                </div>
+                              ) : (
+                                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Vetted</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               ) : (
                 <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)' }}>
-                  No pending ownership claim requests.
+                  No ownership claim requests found.
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'pending_review' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', margin: 0 }}>Pending Review Queue</h3>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={pendingSearch}
+                    onChange={(e) => setPendingSearch(e.target.value)}
+                    placeholder="Search pending items..."
+                    style={{ width: '200px', padding: '6px 12px', fontSize: 'var(--text-xs)' }}
+                  />
+                  <select
+                    className="form-input"
+                    value={pendingTypeFilter}
+                    onChange={(e) => setPendingTypeFilter(e.target.value as any)}
+                    style={{ width: 'auto', padding: '6px 12px', fontSize: 'var(--text-xs)' }}
+                  >
+                    <option value="all">All Types</option>
+                    <option value="new">New Listings</option>
+                    <option value="edit">Listing Edits</option>
+                  </select>
+                </div>
+              </div>
+
+              {filteredPendingList.length > 0 ? (
+                <div className="table-container">
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th>Tool</th>
+                        <th>Owner</th>
+                        <th>Type</th>
+                        <th>Current Status</th>
+                        <th>Last Updated</th>
+                        <th style={{ textAlign: 'right' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredPendingList.map((tool) => (
+                        <tr key={tool.id}>
+                          <td style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>
+                            <img src={tool.logoUrl} alt={tool.name} style={{ width: '24px', height: '24px', borderRadius: '4px', objectFit: 'cover' }} />
+                            <span>{tool.name}</span>
+                          </td>
+                          <td>{tool.ownerId ? `Owner: ${tool.ownerId}` : 'Unclaimed'}</td>
+                          <td>
+                            <span
+                              className="badge"
+                              style={{
+                                backgroundColor: tool.pendingChanges ? 'var(--color-info-light)' : 'var(--color-primary-light)',
+                                color: tool.pendingChanges ? 'var(--color-info)' : 'var(--color-primary)',
+                                fontSize: '10px'
+                              }}
+                            >
+                              {tool.pendingChanges ? 'Listing Edit' : 'New Listing'}
+                            </span>
+                          </td>
+                          <td>
+                            <span style={{ textTransform: 'capitalize', fontSize: '11px' }}>
+                              {tool.pendingChanges ? 'Pending Changes' : 'Pending Review'}
+                            </span>
+                          </td>
+                          <td>{tool.lastUpdated}</td>
+                          <td style={{ textAlign: 'right' }}>
+                            <button onClick={() => handleOpenReview(tool)} className="btn btn-primary btn-xs">
+                              Review
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  No items in the pending review queue.
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'changes_requested' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', margin: 0 }}>Changes Requested Queue</h3>
+              {filteredChangesRequestedList.length > 0 ? (
+                <div className="table-container">
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th>Tool</th>
+                        <th>Type</th>
+                        <th>Feedback / Notes</th>
+                        <th>Last Updated</th>
+                        <th style={{ textAlign: 'right' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredChangesRequestedList.map((tool) => {
+                        const notes = tool.pendingChanges ? tool.pendingChanges.adminNotes : tool.adminNotes;
+                        return (
+                          <tr key={tool.id}>
+                            <td style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>
+                              <img src={tool.logoUrl} alt={tool.name} style={{ width: '24px', height: '24px', borderRadius: '4px', objectFit: 'cover' }} />
+                              <span>{tool.name}</span>
+                            </td>
+                            <td>
+                              <span
+                                className="badge"
+                                style={{
+                                  backgroundColor: tool.pendingChanges ? 'var(--color-info-light)' : 'var(--color-primary-light)',
+                                  color: tool.pendingChanges ? 'var(--color-info)' : 'var(--color-primary)',
+                                  fontSize: '10px'
+                                }}
+                              >
+                                {tool.pendingChanges ? 'Listing Edit' : 'New Listing'}
+                              </span>
+                            </td>
+                            <td style={{ color: 'var(--text-secondary)', fontSize: '11px', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {notes || 'No notes specified.'}
+                            </td>
+                            <td>{tool.lastUpdated}</td>
+                            <td style={{ textAlign: 'right' }}>
+                              <button onClick={() => handleOpenReview(tool)} className="btn btn-outline btn-xs">
+                                Inspect / Edit
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  No listings currently in changes requested state.
                 </div>
               )}
             </div>
