@@ -6,14 +6,14 @@ import { useDatabase } from '../context/DatabaseContext';
 import { ToolCard } from '../components/shared/ToolCard';
 import { CategoryCard } from '../components/shared/CategoryCard';
 import { SEOHead } from '../components/shared/SEOHead';
-import { Search, Sparkles, ArrowRight } from '../components/shared/Icons';
+import { Search, Sparkles, ArrowRight, Award, DollarSign, MousePointer } from '../components/shared/Icons';
 
 interface HomeProps {
   onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
 }
 
 export const Home: React.FC<HomeProps> = ({ onToast }) => {
-  const { tools, categories, collections, getTrendingTools, trackEvent } = useDatabase();
+  const { tools, categories, collections, trackEvent } = useDatabase();
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -46,12 +46,6 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
     }
   ];
 
-  // Load trending and new tools
-  const trendingTools = getTrendingTools(4);
-  const newTools = tools
-    .filter((t) => t.status === 'approved')
-    .sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime())
-    .slice(0, 4);
 
   // Suggested keywords to match
   const keywordSuggestions = [
@@ -144,20 +138,20 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
 
       {/* Hero Glowing background effect */}
       <div className="hero-glow" style={{ top: '-100px', left: '5%' }}></div>
-      <div className="hero-glow" style={{ top: '150px', right: '5%', background: 'radial-gradient(circle, rgba(245, 158, 11, 0.08) 0%, rgba(99, 102, 241, 0.02) 60%, rgba(0, 0, 0, 0) 100%)' }}></div>
+      <div className="hero-glow" style={{ top: '150px', right: '5%', background: 'radial-gradient(circle, rgba(160, 68, 244, 0.08) 0%, rgba(99, 102, 241, 0.02) 60%, rgba(0, 0, 0, 0) 100%)' }}></div>
 
-      {/* Hero Search Section */}
+      {/* Hero Search Section - Redesigned to ToolboxAI Premium style */}
       <section
         style={{
           background: 'var(--gradient-hero)',
-          padding: '80px 0 60px 0',
+          padding: '100px 0 80px 0',
           borderBottom: '1px solid var(--border-color)',
           textAlign: 'center',
           position: 'relative',
           zIndex: 1,
         }}
       >
-        <div className="container" style={{ maxWidth: '800px' }}>
+        <div className="container" style={{ maxWidth: '850px' }}>
           <div
             style={{
               display: 'inline-flex',
@@ -169,47 +163,47 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
               borderRadius: 'var(--radius-full)',
               fontSize: 'var(--text-xs)',
               fontWeight: 'var(--font-semibold)',
-              marginBottom: '20px',
+              marginBottom: '24px',
             }}
           >
             <Sparkles size={14} />
-            <span>Discover the AI Revolution</span>
+            <span>Discover the Latest AI Tools</span>
           </div>
 
           <h1
             style={{
-              fontSize: 'clamp(2.25rem, 5vw, 3.5rem)',
-              lineHeight: '1.15',
+              fontSize: 'clamp(2.5rem, 6vw, 3.8rem)',
+              lineHeight: '1.1',
               fontWeight: 'var(--font-bold)',
-              letterSpacing: '-0.02em',
+              letterSpacing: '-0.03em',
               marginBottom: '20px',
               color: 'var(--text-primary)',
             }}
           >
-            Discover the Best <span style={{ background: 'var(--gradient-brand)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>AI Tools</span> for Every Job
+            Discover the Best <span style={{ background: 'var(--gradient-brand)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>AI Tools</span> For Every Job
           </h1>
 
           <p
             style={{
               fontSize: 'var(--text-lg)',
               color: 'var(--text-secondary)',
-              maxWidth: '600px',
+              maxWidth: '650px',
               margin: '0 auto 40px auto',
               lineHeight: '1.6',
             }}
           >
-            Search, compare, and discover over 1,000+ vetted AI tools to optimize your creative writing, coding, marketing, audio design, and SaaS productivity.
+            Your daily-updated hub for AI tools: <strong>1,200+ entries</strong> in <strong>12+ categories</strong>, including models, coding assistants, and voice generators.
           </p>
 
           {/* Interactive Search Bar wrapper */}
-          <div ref={suggestionsRef} style={{ position: 'relative', maxWidth: '640px', margin: '0 auto' }}>
+          <div ref={suggestionsRef} style={{ position: 'relative', maxWidth: '680px', margin: '0 auto' }}>
             <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '8px' }}>
               <div style={{ position: 'relative', flex: 1 }}>
                 <Search
                   size={20}
                   style={{
                     position: 'absolute',
-                    left: '16px',
+                    left: '18px',
                     top: '50%',
                     transform: 'translateY(-50%)',
                     color: 'var(--text-muted)',
@@ -217,18 +211,18 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                 />
                 <input
                   type="text"
-                  placeholder="Search AI tools, categories, features, or use cases..."
+                  placeholder="Search over 1,200+ AI tools, categories, or use cases..."
                   value={searchQuery}
                   onChange={handleSearchChange}
                   onFocus={() => setShowSuggestions(suggestions.length > 0)}
                   style={{
-                    padding: '16px 16px 16px 48px',
+                    padding: '18px 18px 18px 52px',
                     fontSize: 'var(--text-base)',
                     borderRadius: 'var(--radius-lg)',
                     border: '1px solid var(--border-color)',
                     backgroundColor: 'var(--bg-secondary)',
                     color: 'var(--text-primary)',
-                    boxShadow: 'var(--shadow-lg)',
+                    boxShadow: 'var(--shadow-xl)',
                     width: '100%',
                     outline: 'none',
                     transition: 'all var(--transition-normal)',
@@ -283,7 +277,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
           </div>
 
           {/* Quick links tag helpers */}
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center', marginTop: '20px' }}>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center', marginTop: '24px' }}>
             <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', alignSelf: 'center' }}>Popular:</span>
             {['chatgpt', 'cursor', 'elevenlabs', 'midjourney'].map((tag) => (
               <Link
@@ -293,8 +287,10 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                   fontSize: 'var(--text-xs)',
                   color: 'var(--text-secondary)',
                   backgroundColor: 'var(--bg-tertiary)',
-                  padding: '4px 10px',
+                  padding: '5px 12px',
                   borderRadius: 'var(--radius-full)',
+                  fontWeight: '500',
+                  border: '1px solid var(--border-color)',
                 }}
               >
                 {tag.toUpperCase()}
@@ -330,72 +326,169 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
         </div>
       </section>
 
-      {/* Trending Tools list */}
+      {/* Featured Sponsored Tools */}
       <section className="section" style={{ backgroundColor: 'var(--bg-secondary)', borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)', position: 'relative', zIndex: 1 }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px' }}>
             <div>
-              <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', marginBottom: '8px' }}>
-                Trending AI Tools
-              </h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <span className="badge badge-sponsored" style={{ margin: 0, textTransform: 'uppercase', fontSize: '9px', letterSpacing: '0.05em' }}>Ad Campaign</span>
+                <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', margin: 0 }}>
+                  Sponsored Featured Tools
+                </h2>
+              </div>
               <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: 0 }}>
-                Ranked organically based on recent views, reviews growth, and click activity.
+                Handpicked innovations running sponsored campaigns.
               </p>
             </div>
-            <Link to="/trending" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }}>
-              <span>View Trending</span>
+            <Link to="/advertise" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }}>
+              <span>Advertise Here</span>
               <ArrowRight size={14} />
             </Link>
           </div>
 
           <div className="grid grid-cols-4">
-            {trendingTools.map((tool) => (
-              <ToolCard key={tool.id} tool={tool} onToast={onToast} />
-            ))}
+            {tools
+              .filter(t => t.isSponsored && t.status === 'approved')
+              .concat(tools.filter(t => !t.isSponsored && t.status === 'approved'))
+              .slice(0, 4)
+              .map((tool) => (
+                <ToolCard key={tool.id} tool={{ ...tool, isSponsored: true }} onToast={onToast} />
+              ))}
           </div>
         </div>
       </section>
 
-      {/* New Tools section */}
+      {/* Tools Sorted by Categories Grid Blocks */}
+      <section className="section" style={{ position: 'relative', zIndex: 1 }}>
+        <div className="container" style={{ display: 'flex', flexDirection: 'column', gap: '56px' }}>
+          
+          {/* Block 1: AI Chatbots & Models */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px', borderBottom: '2px solid var(--border-color)', paddingBottom: '12px' }}>
+              <h3 style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '24px' }}>🤖</span> AI Chatbots & Models
+              </h3>
+              <Link to="/categories/chatbots" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }}>
+                View All &gt;
+              </Link>
+            </div>
+            <div className="grid grid-cols-4">
+              {tools
+                .filter(t => t.categorySlug === 'chatbots' && t.status === 'approved')
+                .slice(0, 4)
+                .map((tool) => (
+                  <ToolCard key={tool.id} tool={tool} onToast={onToast} />
+                ))}
+            </div>
+          </div>
+
+          {/* Block 2: Coding & Development Tools */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px', borderBottom: '2px solid var(--border-color)', paddingBottom: '12px' }}>
+              <h3 style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '24px' }}>💻</span> Coding & Tech Assistants
+              </h3>
+              <Link to="/categories/coding" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }}>
+                View All &gt;
+              </Link>
+            </div>
+            <div className="grid grid-cols-4">
+              {tools
+                .filter(t => t.categorySlug === 'coding' && t.status === 'approved')
+                .slice(0, 4)
+                .map((tool) => (
+                  <ToolCard key={tool.id} tool={tool} onToast={onToast} />
+                ))}
+            </div>
+          </div>
+
+          {/* Block 3: Design & Video Generators */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px', borderBottom: '2px solid var(--border-color)', paddingBottom: '12px' }}>
+              <h3 style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '24px' }}>🎨</span> Design, Art & Image Editors
+              </h3>
+              <Link to="/categories/design" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }}>
+                View All &gt;
+              </Link>
+            </div>
+            <div className="grid grid-cols-4">
+              {tools
+                .filter(t => t.categorySlug === 'design' && t.status === 'approved')
+                .slice(0, 4)
+                .map((tool) => (
+                  <ToolCard key={tool.id} tool={tool} onToast={onToast} />
+                ))}
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* Key Platform Features / Benefits Deck */}
+      <section className="section" style={{ backgroundColor: 'var(--bg-secondary)', borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)', position: 'relative', zIndex: 1 }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+            <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'bold', marginBottom: '12px' }}>
+              The Ultimate Hub for AI Finders
+            </h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', maxWidth: '500px', margin: '0 auto' }}>
+              Designed to help builders list innovations and let users search, compare, and bookmark tools seamlessly.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-3">
+            {/* Benefit 1 */}
+            <div className="card" style={{ padding: '30px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+              <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <MousePointer size={28} />
+              </div>
+              <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'bold', margin: 0 }}>One-Click Access</h3>
+              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', lineHeight: '1.6', margin: 0 }}>
+                Instantly redirect to official AI tools dashboards. Our links are vetted continuously to prevent broken pathways.
+              </p>
+            </div>
+
+            {/* Benefit 2 */}
+            <div className="card" style={{ padding: '30px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+              <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Award size={28} />
+              </div>
+              <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'bold', margin: 0 }}>Trusted Vetted Reviews</h3>
+              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', lineHeight: '1.6', margin: 0 }}>
+                Every single rating, review commentary, and pros/cons report is manually validated by directory admins to rule out spam.
+              </p>
+            </div>
+
+            {/* Benefit 3 */}
+            <div className="card" style={{ padding: '30px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+              <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <DollarSign size={28} />
+              </div>
+              <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'bold', margin: 0 }}>Tailored Tool Finder</h3>
+              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', lineHeight: '1.6', margin: 0 }}>
+                Easily filter systems by Gold Vetted tags, Pricing plans tiers, or direct compatibility platforms with zero delay.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Curated Stacks */}
       <section className="section" style={{ position: 'relative', zIndex: 1 }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px' }}>
             <div>
               <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', marginBottom: '8px' }}>
-                Newest Listings
+                Curated AI Stacks
               </h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: 0 }}>
-                Recently reviewed and approved submissions from our curation editors.
-              </p>
-            </div>
-            <Link to="/new" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }}>
-              <span>View All New</span>
-              <ArrowRight size={14} />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-4">
-            {newTools.map((tool) => (
-              <ToolCard key={tool.id} tool={tool} onToast={onToast} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Popular Collections Grid */}
-      <section className="section" style={{ backgroundColor: 'var(--bg-secondary)', borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)', position: 'relative', zIndex: 1 }}>
-        <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px' }}>
-            <div>
-              <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', marginBottom: '8px' }}>
-                Popular Curated Collections
-              </h2>
-              <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: 0 }}>
-                Explore handpicked AI toolsets configured for student, dev, and content stack operations.
+                Discover handpicked combinations optimized for dev, student, and creator tasks.
               </p>
             </div>
             <Link to="/collections" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }}>
-              <span>View All Collections</span>
+              <span>All Collections</span>
               <ArrowRight size={14} />
             </Link>
           </div>
@@ -459,7 +552,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
         </div>
       </section>
 
-      {/* 4.5. Stats Dashboard Deck */}
+      {/* Stats Dashboard Deck */}
       <section className="section" style={{ position: 'relative', zIndex: 1, padding: '40px 0' }}>
         <div className="container">
           <div 
@@ -496,7 +589,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
         </div>
       </section>
 
-      {/* 4.6. Comparison Showdowns */}
+      {/* Comparison Showdowns */}
       <section className="section" style={{ position: 'relative', zIndex: 1 }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px' }}>
@@ -531,7 +624,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                   <div style={{ fontWeight: 'bold', fontSize: '13px' }}>Claude AI</div>
                 </div>
               </div>
-              <Link to="/compare?t1=1" className="btn btn-outline btn-sm" style={{ alignSelf: 'stretch', justifyContent: 'center' }}>
+              <Link to="/compare/chatgpt-vs-claude" className="btn btn-outline btn-sm" style={{ alignSelf: 'stretch', justifyContent: 'center' }}>
                 Compare ChatGPT vs Claude
               </Link>
             </div>
@@ -552,7 +645,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                   <div style={{ fontWeight: 'bold', fontSize: '13px' }}>Phind</div>
                 </div>
               </div>
-              <Link to="/compare?t1=4&t2=8" className="btn btn-outline btn-sm" style={{ alignSelf: 'stretch', justifyContent: 'center' }}>
+              <Link to="/compare/cursor-vs-phind" className="btn btn-outline btn-sm" style={{ alignSelf: 'stretch', justifyContent: 'center' }}>
                 Compare Cursor vs Phind
               </Link>
             </div>
@@ -560,7 +653,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
         </div>
       </section>
 
-      {/* 4.7. Accordion Frequently Asked Questions */}
+      {/* FAQ Accordion */}
       <section className="section" style={{ position: 'relative', zIndex: 1, backgroundColor: 'var(--bg-secondary)', borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)' }}>
         <div className="container" style={{ maxWidth: '800px' }}>
           <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'bold', textAlign: 'center', marginBottom: '8px' }}>
@@ -615,7 +708,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
         </div>
       </section>
 
-      {/* 5. Homepage Submit Tool CTA Section */}
+      {/* Building an AI Tool CTA Section */}
       <section className="section bg-secondary" style={{ borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)', padding: '60px 0', marginTop: '40px' }}>
         <div className="container" style={{ textAlign: 'center', maxWidth: '700px' }}>
           <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'bold', margin: '0 0 12px 0' }}>
