@@ -260,47 +260,87 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const approveTool = (id: string, adminId: string, adminName: string) => {
-    updateTool(id, {
-      status: 'approved',
-      approvedAt: new Date().toISOString(),
-      approvedBy: adminName,
-    });
     const tool = tools.find((t) => t.id === id);
-    if (tool && tool.ownerId) {
+    if (!tool) return;
+
+    if (tool.pendingChanges) {
+      const { status, adminNotes, rejectionReason, submittedAt, ...changes } = tool.pendingChanges;
+      updateTool(id, {
+        ...changes,
+        status: 'approved',
+        approvedAt: new Date().toISOString(),
+        approvedBy: adminName,
+        pendingChanges: undefined, // Clear pending changes
+      });
+    } else {
+      updateTool(id, {
+        status: 'approved',
+        approvedAt: new Date().toISOString(),
+        approvedBy: adminName,
+      });
+    }
+
+    if (tool.ownerId) {
       addNotification(
         tool.ownerId,
         'Tool Listing Approved! 🎉',
-        `Your submission "${tool.name}" has been approved and published to AIFynest.`,
+        `Your updates or submission for "${tool.name}" have been approved and published to AIFynest.`,
         'submission'
       );
     }
-    logAdminAction(adminId, adminName, 'Approve Tool', `Approved tool listing: ${tool?.name || 'Unknown'}`);
+    logAdminAction(adminId, adminName, 'Approve Tool', `Approved tool listing: ${tool.name}`);
   };
 
   const rejectTool = (id: string, adminId: string, adminName: string, reason: string) => {
-    updateTool(id, {
-      status: 'rejected',
-      rejectionReason: reason,
-    });
     const tool = tools.find((t) => t.id === id);
-    if (tool && tool.ownerId) {
+    if (!tool) return;
+
+    if (tool.status === 'approved') {
+      updateTool(id, {
+        pendingChanges: {
+          ...tool.pendingChanges,
+          status: 'rejected',
+          rejectionReason: reason,
+        }
+      });
+    } else {
+      updateTool(id, {
+        status: 'rejected',
+        rejectionReason: reason,
+      });
+    }
+
+    if (tool.ownerId) {
       addNotification(
         tool.ownerId,
         'Tool Submission Rejected ❌',
-        `Your submission "${tool.name}" was not approved. Reason: "${reason}".`,
+        `Your updates or submission for "${tool.name}" was not approved. Reason: "${reason}".`,
         'submission'
       );
     }
-    logAdminAction(adminId, adminName, 'Reject Tool', `Rejected tool listing: ${tool?.name || 'Unknown'}. Reason: ${reason}`);
+    logAdminAction(adminId, adminName, 'Reject Tool', `Rejected tool listing updates: ${tool.name}. Reason: ${reason}`);
   };
 
   const requestChanges = (id: string, adminId: string, adminName: string, notes: string) => {
-    updateTool(id, {
-      status: 'needs_changes',
-      adminNotes: notes,
-    });
     const tool = tools.find((t) => t.id === id);
-    if (tool && tool.ownerId) {
+    if (!tool) return;
+
+    if (tool.status === 'approved') {
+      updateTool(id, {
+        pendingChanges: {
+          ...tool.pendingChanges,
+          status: 'needs_changes',
+          adminNotes: notes,
+        }
+      });
+    } else {
+      updateTool(id, {
+        status: 'needs_changes',
+        adminNotes: notes,
+      });
+    }
+
+    if (tool.ownerId) {
       addNotification(
         tool.ownerId,
         'Changes Requested ⚠️',
@@ -308,7 +348,7 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         'submission'
       );
     }
-    logAdminAction(adminId, adminName, 'Request Revisions', `Requested revisions for tool: ${tool?.name || 'Unknown'}. Notes: ${notes}`);
+    logAdminAction(adminId, adminName, 'Request Revisions', `Requested revisions for tool: ${tool.name}. Notes: ${notes}`);
   };
 
   // --- CLAIM MANAGEMENT ---

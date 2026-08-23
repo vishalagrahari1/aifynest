@@ -63,6 +63,12 @@ export interface Tool {
   affiliateStatus?: 'active' | 'inactive';
   affiliateNetwork?: string;
   affiliateProgramName?: string;
+  pendingChanges?: Partial<Tool> & {
+    status?: 'draft' | 'pending' | 'needs_changes' | 'rejected' | 'approved';
+    adminNotes?: string;
+    rejectionReason?: string;
+    submittedAt?: string;
+  };
 }
 
 export interface AffiliateLink {

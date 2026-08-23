@@ -106,14 +106,101 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
   const ownerTools = getOwnedTools(user.id);
   const ownerToolIds = ownerTools.map((t) => t.id);
 
-  const getStatusLabel = (status: Tool['status']) => {
-    switch (status) {
+  const getStatusLabel = (tool: Tool) => {
+    if (tool.status === 'approved') {
+      const editStatus = tool.pendingChanges?.status;
+      if (editStatus === 'pending') return 'Approved (Pending Edits)';
+      if (editStatus === 'needs_changes') return 'Approved (Revisions Requested)';
+      if (editStatus === 'rejected') return 'Approved (Edits Rejected)';
+      if (editStatus === 'draft') return 'Approved (Draft Edits)';
+      return 'Approved';
+    }
+    switch (tool.status) {
       case 'draft': return 'Draft';
       case 'pending': return 'Pending Review';
       case 'needs_changes': return 'Changes Requested';
-      case 'approved': return 'Approved';
       case 'rejected': return 'Rejected';
-      default: return status.toUpperCase();
+      default: return tool.status.toUpperCase();
+    }
+  };
+
+  const renderStatusActions = (tool: Tool) => {
+    const isApproved = tool.status === 'approved';
+    const editStatus = tool.pendingChanges?.status;
+
+    if (isApproved) {
+      if (editStatus === 'pending') {
+        return (
+          <>
+            <Link to={`/tools/${tool.slug}`} className="btn btn-outline btn-xs" style={{ textDecoration: 'none' }}>View Live</Link>
+            <button onClick={() => navigate(`/dashboard/tools/${tool.id}/edit`)} className="btn btn-outline btn-xs">View Sub</button>
+          </>
+        );
+      }
+      if (editStatus === 'needs_changes') {
+        return (
+          <>
+            <Link to={`/tools/${tool.slug}`} className="btn btn-outline btn-xs" style={{ textDecoration: 'none' }}>View Live</Link>
+            <button onClick={() => navigate(`/dashboard/tools/${tool.id}/edit`)} className="btn btn-primary btn-xs">Edit & Resubmit</button>
+          </>
+        );
+      }
+      if (editStatus === 'rejected') {
+        return (
+          <>
+            <Link to={`/tools/${tool.slug}`} className="btn btn-outline btn-xs" style={{ textDecoration: 'none' }}>View Live</Link>
+            <button onClick={() => navigate(`/dashboard/tools/${tool.id}/edit`)} className="btn btn-primary btn-xs">Edit & Resubmit</button>
+          </>
+        );
+      }
+      if (editStatus === 'draft') {
+        return (
+          <>
+            <Link to={`/tools/${tool.slug}`} className="btn btn-outline btn-xs" style={{ textDecoration: 'none' }}>View Live</Link>
+            <button onClick={() => navigate(`/dashboard/tools/${tool.id}/edit`)} className="btn btn-primary btn-xs">Resume Draft</button>
+          </>
+        );
+      }
+      return (
+        <>
+          <Link to={`/tools/${tool.slug}`} className="btn btn-outline btn-xs" style={{ textDecoration: 'none' }}>View Live</Link>
+          <button onClick={() => navigate(`/dashboard/tools/${tool.id}/edit`)} className="btn btn-primary btn-xs">Edit Listing</button>
+        </>
+      );
+    }
+
+    switch (tool.status) {
+      case 'draft':
+        return (
+          <>
+            <button onClick={() => navigate(`/dashboard/tools/${tool.id}/edit`)} className="btn btn-primary btn-xs">Edit / Submit</button>
+          </>
+        );
+      case 'pending':
+        return (
+          <>
+            <button onClick={() => navigate(`/dashboard/tools/${tool.id}/edit`)} className="btn btn-outline btn-xs">View Submission</button>
+          </>
+        );
+      case 'needs_changes':
+        return (
+          <>
+            <button onClick={() => navigate(`/dashboard/tools/${tool.id}/edit`)} className="btn btn-primary btn-xs">Edit & Resubmit</button>
+          </>
+        );
+      case 'rejected':
+        return (
+          <>
+            <button onClick={() => navigate(`/dashboard/tools/${tool.id}/edit`)} className="btn btn-primary btn-xs">Edit & Resubmit</button>
+          </>
+        );
+      default:
+        return (
+          <>
+            <Link to={`/tools/${tool.slug}`} className="btn btn-outline btn-xs" style={{ textDecoration: 'none' }}>View</Link>
+            <button onClick={() => navigate(`/dashboard/tools/${tool.id}/edit`)} className="btn btn-outline btn-xs">Edit</button>
+          </>
+        );
     }
   };
 
@@ -578,7 +665,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
                                       : 'var(--color-danger)',
                                 }}
                               >
-                                {getStatusLabel(tool.status)}
+                                {getStatusLabel(tool)}
                               </span>
                             </div>
 
@@ -670,7 +757,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
                                         : 'var(--color-danger)',
                                   }}
                                 >
-                                  {getStatusLabel(tool.status)}
+                                  {getStatusLabel(tool)}
                                 </span>
                               </td>
                               <td style={{ padding: '12px 16px', textTransform: 'capitalize' }}>
@@ -689,15 +776,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
                               </td>
                               <td style={{ padding: '12px 16px', textAlign: 'right' }}>
                                 <div style={{ display: 'inline-flex', gap: '6px', justifyContent: 'flex-end' }}>
-                                  <Link to={`/tools/${tool.slug}`} className="btn btn-outline btn-xs" style={{ textDecoration: 'none' }}>
-                                    View
-                                  </Link>
-                                  <button onClick={() => handleEditClick(tool.id)} className="btn btn-outline btn-xs">
-                                    Edit
-                                  </button>
-                                  <button onClick={() => navigate(`/dashboard/tools/${tool.id}/edit`)} className="btn btn-primary btn-xs">
-                                    Manage
-                                  </button>
+                                  {renderStatusActions(tool)}
                                 </div>
                               </td>
                             </tr>
