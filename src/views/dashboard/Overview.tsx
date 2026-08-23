@@ -1,6 +1,6 @@
 /* src/views/dashboard/Overview.tsx */
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useDatabase } from '../../context/DatabaseContext';
 import { useAuth } from '../../context/AuthContext';
 import { SEOHead } from '../../components/shared/SEOHead';
@@ -10,7 +10,8 @@ import {
   Heart,
   Eye,
   MousePointer,
-  TrendingUp
+  TrendingUp,
+  Shield
 } from '../../components/shared/Icons';
 
 interface OwnerDashboardProps {
@@ -30,6 +31,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
     collections,
     analyticsEvents,
     markNotificationRead,
+    getOwnedTools,
   } = useDatabase();
   const { user } = useAuth();
 
@@ -63,20 +65,25 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
 
   // Authentication check
   if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  const isBuilder = user.role === 'owner' || user.role === 'admin';
+
+  if (!isBuilder) {
     return (
-      <div className="container section text-center">
-        <h2>Authentication Required</h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '20px' }}>
-          Please log in to manage your AI tools, saved items, reviews, and analytics.
+      <div className="container section text-center" style={{ maxWidth: '480px', padding: '60px 0' }}>
+        <Shield size={48} style={{ color: 'var(--color-danger)', margin: '0 auto 16px auto' }} />
+        <h2>Access Denied</h2>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
+          You do not have permission to access the Developer Dashboard. This area is reserved for AI tool owners and partners.
         </p>
-        <Link to="/login" className="btn btn-primary">
-          Go to Login
+        <Link to="/" className="btn btn-primary">
+          Back to Homepage
         </Link>
       </div>
     );
   }
-
-  const isBuilder = user.role === 'owner' || user.role === 'admin';
 
   // For Regular Users: Fetch bookmarked favorites, reviews
   const userFavoritesCollection = collections.find((c) => c.userId === user.id && c.name === 'My Favorites');
@@ -85,7 +92,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
 
 
   // For Builders: Fetch claimed/submitted tools
-  const ownerTools = tools.filter((t) => t.ownerId === user.id);
+  const ownerTools = getOwnedTools(user.id);
   const ownerToolIds = ownerTools.map((t) => t.id);
 
   // Analytics Dynamic Calculations
@@ -148,7 +155,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
       websiteUrl: editWebsiteUrl,
       // Whenever owner edits, keep status as pending so admins re-review if approved, or flag draft
       status: 'pending',
-    });
+    }, user.id);
     setIsEditModalOpen(false);
     onToast('Listing revised and submitted back for moderator approval!', 'success');
   };

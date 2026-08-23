@@ -1,6 +1,6 @@
 /* src/views/admin/AdminDashboard.tsx */
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useDatabase } from '../../context/DatabaseContext';
 import { useAuth } from '../../context/AuthContext';
 import { SEOHead } from '../../components/shared/SEOHead';
@@ -99,7 +99,11 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
   const [analyticsSort, setAnalyticsSort] = useState<'views' | 'clicks' | 'ctr' | 'saves'>('views');
 
   // Verify access privileges
-  if (!user || user.role !== 'admin') {
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user.role !== 'admin') {
     return (
       <div className="container section text-center" style={{ maxWidth: '480px' }}>
         <Shield size={48} style={{ color: 'var(--color-danger)', margin: '0 auto 16px auto' }} />
@@ -160,7 +164,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
       affiliateStatus: editAffiliateUrl ? 'active' : 'inactive',
       seoTitle: editSeoTitle || undefined,
       metaDescription: editMetaDescription || undefined,
-    });
+    }, user.id);
     
     onToast(`Draft listing parameters updated for "${editName}".`, 'success');
     setReviewingTool(null);
@@ -187,7 +191,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
         affiliateStatus: editAffiliateUrl ? 'active' : 'inactive',
         seoTitle: editSeoTitle || undefined,
         metaDescription: editMetaDescription || undefined,
-      });
+      }, user.id);
 
       approveTool(reviewingTool.id, user.id, user.name);
       onToast(`Tool approved and published successfully at /tools/${reviewingTool.slug}`, 'success');
@@ -825,7 +829,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                         <td>⭐ {tool.rating} ({tool.reviewCount})</td>
                         <td>
                           <button
-                            onClick={() => updateTool(tool.id, { isVerified: !tool.isVerified })}
+                            onClick={() => updateTool(tool.id, { isVerified: !tool.isVerified }, user.id)}
                             className={`btn btn-xs ${tool.isVerified ? 'btn-primary' : 'btn-outline'}`}
                           >
                             {tool.isVerified ? 'Verified' : 'Verify'}
@@ -833,7 +837,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                         </td>
                         <td>
                           <button
-                            onClick={() => updateTool(tool.id, { isSponsored: !tool.isSponsored })}
+                            onClick={() => updateTool(tool.id, { isSponsored: !tool.isSponsored }, user.id)}
                             className={`btn btn-xs ${tool.isSponsored ? 'btn-gold' : 'btn-outline'}`}
                           >
                             {tool.isSponsored ? 'Sponsored' : 'Boost'}
@@ -842,7 +846,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                         <td>
                           <select
                             value={tool.status}
-                            onChange={(e) => updateTool(tool.id, { status: e.target.value as any })}
+                            onChange={(e) => updateTool(tool.id, { status: e.target.value as any }, user.id)}
                             className="form-input btn-xs"
                             style={{ width: 'auto', padding: '2px' }}
                           >
@@ -856,7 +860,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                         <td>
                           <div style={{ display: 'flex', gap: '6px' }}>
                             <button onClick={() => handleOpenReview(tool)} className="btn btn-outline btn-xs">Edit</button>
-                            <button onClick={() => { if (window.confirm('Delete permanently?')) deleteTool(tool.id); }} className="btn btn-outline btn-xs" style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)' }}>
+                            <button onClick={() => { if (window.confirm('Delete permanently?')) deleteTool(tool.id, user.id); }} className="btn btn-outline btn-xs" style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)' }}>
                               Delete
                             </button>
                           </div>

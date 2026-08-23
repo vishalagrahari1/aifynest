@@ -43,8 +43,8 @@ interface DatabaseContextType {
   notifications: Notification[];
   
   addTool: (tool: Omit<Tool, 'id' | 'rating' | 'reviewCount' | 'isVerified' | 'isFeatured' | 'isSponsored' | 'status' | 'claimStatus' | 'lastUpdated'> & { status?: Tool['status'] }) => Tool;
-  updateTool: (id: string, updatedFields: Partial<Tool>) => void;
-  deleteTool: (id: string) => void;
+  updateTool: (id: string, updatedFields: Partial<Tool>, actorId?: string) => void;
+  deleteTool: (id: string, actorId?: string) => void;
   approveTool: (id: string, adminId: string, adminName: string) => void;
   rejectTool: (id: string, adminId: string, adminName: string, reason: string) => void;
   requestChanges: (id: string, adminId: string, adminName: string, notes: string) => void;
@@ -84,6 +84,11 @@ interface DatabaseContextType {
 
   // Bulk Seed Operations
   seedTenToolsPerCategory: () => number;
+
+  // Security & Data Access Helpers
+  getOwnedTools: (userId: string) => Tool[];
+  getOwnedTool: (toolId: string, userId: string) => Tool | null;
+  canManageTool: (toolId: string, userId: string) => boolean;
 }
 
 const DatabaseContext = createContext<DatabaseContextType | undefined>(undefined);
@@ -197,7 +202,39 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return newTool;
   };
 
-  const updateTool = (id: string, updatedFields: Partial<Tool>) => {
+  const canManageTool = (toolId: string, userId: string): boolean => {
+    const tool = tools.find((t) => t.id === toolId);
+    if (!tool) return false;
+    const users = JSON.parse(localStorage.getItem('ai_users') || '[]');
+    const actor = users.find((u: any) => u.id === userId);
+    return actor?.role === 'admin' || tool.ownerId === userId;
+  };
+
+  const getOwnedTools = (userId: string): Tool[] => {
+    const users = JSON.parse(localStorage.getItem('ai_users') || '[]');
+    const actor = users.find((u: any) => u.id === userId);
+    if (actor?.role === 'admin') {
+      return tools;
+    }
+    return tools.filter((t) => t.ownerId === userId);
+  };
+
+  const getOwnedTool = (toolId: string, userId: string): Tool | null => {
+    const tool = tools.find((t) => t.id === toolId);
+    if (!tool) return null;
+    const users = JSON.parse(localStorage.getItem('ai_users') || '[]');
+    const actor = users.find((u: any) => u.id === userId);
+    if (actor?.role === 'admin' || tool.ownerId === userId) {
+      return tool;
+    }
+    return null;
+  };
+
+  const updateTool = (id: string, updatedFields: Partial<Tool>, actorId?: string) => {
+    if (actorId && !canManageTool(id, actorId)) {
+      console.warn(`Unauthorized update attempt on tool ${id} by user ${actorId}`);
+      return;
+    }
     const updated = tools.map((t) => {
       if (t.id === id) {
         return {
@@ -212,7 +249,11 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     saveToStorage('ai_tools', updated);
   };
 
-  const deleteTool = (id: string) => {
+  const deleteTool = (id: string, actorId?: string) => {
+    if (actorId && !canManageTool(id, actorId)) {
+      console.warn(`Unauthorized delete attempt on tool ${id} by user ${actorId}`);
+      return;
+    }
     const updated = tools.filter((t) => t.id !== id);
     setTools(updated);
     saveToStorage('ai_tools', updated);
@@ -803,6 +844,9 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         addNotification,
         markNotificationRead,
         seedTenToolsPerCategory,
+        getOwnedTools,
+        getOwnedTool,
+        canManageTool,
       }}
     >
       {children}
