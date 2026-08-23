@@ -33,6 +33,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
     analyticsEvents,
     markNotificationRead,
     getOwnedTools,
+    getOwnerAnalytics,
   } = useDatabase();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -53,7 +54,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
   const [activeToolId, setActiveToolId] = useState<string>('all');
 
   // Analytics Timeframe range
-  const [analyticsTimeframe, setAnalyticsTimeframe] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
+  const [analyticsTimeframe, setAnalyticsTimeframe] = useState<'7d' | '30d' | '90d' | '1y' | 'all'>('30d');
 
   // Respond review ID state
   const [replyReviewId, setReplyReviewId] = useState<string | null>(null);
@@ -215,30 +216,118 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
 
   // Analytics Dynamic Calculations
   const getSelectedAnalytics = (toolId: string) => {
+    // 1. Data isolation: Fetch events for the owner's tools only
+    const ownerEvents = getOwnerAnalytics(user.id, user.id);
+    
+    // Filter by tool selection
     let listIds = ownerToolIds;
     if (toolId !== 'all') {
       listIds = [toolId];
     }
+    let filteredEvents = ownerEvents.filter((e: any) => e.toolId && listIds.includes(e.toolId));
 
-    const viewsEvents = analyticsEvents.filter((e) => e.eventType === 'tool_view' && listIds.includes(e.toolId || ''));
-    const directClicks = analyticsEvents.filter((e) => e.eventType === 'tool_click' && listIds.includes(e.toolId || ''));
-    const affiliateClicks = analyticsEvents.filter((e) => e.eventType === 'affiliate_click' && listIds.includes(e.toolId || ''));
-    
-    const views = viewsEvents.length || (ownerTools.length * 314 + 120);
-    const clicks = directClicks.length + affiliateClicks.length || (ownerTools.length * 42 + 25);
-    const affClicks = affiliateClicks.length || (ownerTools.length * 15 + 8);
-    const ctr = views > 0 ? Math.round((clicks / views) * 1000) / 10 : 0;
-    const saves = collections.filter((c) => c.name === 'My Favorites').reduce((acc, col) => {
-      return acc + col.tools.filter((id) => listIds.includes(id)).length;
-    }, 0) || (ownerTools.length * 8 + 4);
-    
-    const ratingCount = reviews.filter((r) => listIds.includes(r.toolId) && r.status === 'approved').length;
-    const impressions = views * 8 + 240;
+    // 2. Date Filtering
+    const now = new Date();
+    if (analyticsTimeframe !== 'all') {
+      let daysLimit = 30;
+      if (analyticsTimeframe === '7d') daysLimit = 7;
+      if (analyticsTimeframe === '90d') daysLimit = 90;
+      if (analyticsTimeframe === '1y') daysLimit = 365;
 
-    return { views, clicks, affClicks, ctr, saves, ratingCount, impressions };
+      const limitDate = new Date();
+      limitDate.setDate(now.getDate() - daysLimit);
+      filteredEvents = filteredEvents.filter((e: any) => new Date(e.timestamp) >= limitDate);
+    }
+
+    // 3. Metric Calculations (REAL DATA ONLY, fallback to 0)
+    const viewsEvents = filteredEvents.filter((e: any) => e.eventType === 'tool_view');
+    const clicksEvents = filteredEvents.filter((e: any) => e.eventType === 'website_click' || e.eventType === 'tool_click' || e.eventType === 'affiliate_click');
+    const favoritesEvents = filteredEvents.filter((e: any) => e.eventType === 'favorite');
+    const reviewsEvents = filteredEvents.filter((e: any) => e.eventType === 'review_submitted');
+    const searchImpressionsEvents = filteredEvents.filter((e: any) => e.eventType === 'search_impression');
+
+    const views = viewsEvents.length;
+    const clicks = clicksEvents.length;
+    const favorites = favoritesEvents.length;
+    const reviewsCount = reviewsEvents.length;
+    const impressions = searchImpressionsEvents.length;
+
+    // Unique Visitors count
+    const uniqueSessionIds = new Set(viewsEvents.map((e: any) => e.sessionId).filter(Boolean));
+    const uniqueVisitors = uniqueSessionIds.size;
+
+    // CTR Calculation: website_clicks / tool_views * 100
+    const ctr = views > 0 ? parseFloat(((clicks / views) * 100).toFixed(2)) : 0;
+
+    return { 
+      views, 
+      clicks, 
+      ctr, 
+      saves: favorites,
+      ratingCount: reviewsCount,
+      impressions, 
+      uniqueVisitors 
+    };
   };
 
   const activeAnalytics = getSelectedAnalytics(activeToolId);
+
+  const getTrafficSources = () => {
+    const ownerEvents = getOwnerAnalytics(user.id, user.id);
+    let listIds = ownerToolIds;
+    if (activeToolId !== 'all') {
+      listIds = [activeToolId];
+    }
+    const events = ownerEvents.filter((e: any) => e.toolId && listIds.includes(e.toolId));
+
+    const counts = { Google: 0, 'Directory Search': 0, Direct: 0, Social: 0, Referral: 0, Other: 0 };
+    events.forEach((e: any) => {
+      const ref = (e.referrer || '').toLowerCase();
+      if (ref.includes('google')) counts.Google++;
+      else if (ref.includes('directory')) counts['Directory Search']++;
+      else if (ref.includes('direct') || ref === '') counts.Direct++;
+      else if (ref.includes('facebook') || ref.includes('twitter') || ref.includes('linkedin') || ref.includes('instagram')) counts.Social++;
+      else if (ref.includes('referral') || ref.includes('.') || ref.includes('http')) counts.Referral++;
+      else counts.Other++;
+    });
+
+    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+    return Object.entries(counts).map(([name, val]) => ({
+      name,
+      percentage: total > 0 ? Math.round((val / total) * 100) : 0,
+    }));
+  };
+
+  const getDeviceDistribution = () => {
+    const ownerEvents = getOwnerAnalytics(user.id, user.id);
+    let listIds = ownerToolIds;
+    if (activeToolId !== 'all') {
+      listIds = [activeToolId];
+    }
+    const events = ownerEvents.filter((e: any) => e.toolId && listIds.includes(e.toolId));
+
+    const counts = { desktop: 0, mobile: 0, tablet: 0 };
+    events.forEach((e: any) => {
+      if (e.device === 'desktop') counts.desktop++;
+      else if (e.device === 'mobile') counts.mobile++;
+      else if (e.device === 'tablet') counts.tablet++;
+    });
+
+    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+    return {
+      desktop: total > 0 ? Math.round((counts.desktop / total) * 100) : 0,
+      mobile: total > 0 ? Math.round((counts.mobile / total) * 100) : 0,
+      tablet: total > 0 ? Math.round((counts.tablet / total) * 100) : 0,
+    };
+  };
+
+  const ownerToolsBreakdown = ownerTools.map((tool) => {
+    const stats = getSelectedAnalytics(tool.id);
+    return {
+      tool,
+      stats,
+    };
+  });
 
   const builderNotifs = notifications.filter((n) => n.userId === user.id);
 
@@ -362,27 +451,67 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
   // Chart Coordinates calculation for Views vs Clicks graph
   const getGraphCoordinates = () => {
     const days = analyticsTimeframe === '7d' ? 7 : analyticsTimeframe === '30d' ? 30 : analyticsTimeframe === '90d' ? 90 : 12;
+    const ownerEvents = getOwnerAnalytics(user.id, user.id);
+    let listIds = ownerToolIds;
+    if (activeToolId !== 'all') {
+      listIds = [activeToolId];
+    }
+    const toolEvents = ownerEvents.filter((e: any) => e.toolId && listIds.includes(e.toolId));
+
+    const now = new Date();
     const viewsPoints: string[] = [];
     const clicksPoints: string[] = [];
     const stepX = 420 / (days - 1);
-    
-    // Simulate curves based on active tool metrics
-    const seedViews = activeAnalytics.views;
-    const seedClicks = activeAnalytics.clicks;
 
-    for (let i = 0; i < days; i++) {
-      const x = i * stepX;
-      const wave = Math.sin(i * 0.5) * 0.4 + 0.6;
-      const rand = Math.random() * 0.2 + 0.9;
-      
-      const curViews = Math.round((seedViews / days) * wave * rand);
-      const curClicks = Math.round((seedClicks / days) * wave * rand);
-      
-      const yViews = 150 - Math.min(130, curViews * 12);
-      const yClicks = 150 - Math.min(130, curClicks * 12);
+    if (analyticsTimeframe === '1y' || analyticsTimeframe === 'all') {
+      const monthsCount = 12;
+      const stepXMonth = 420 / (monthsCount - 1);
+      const viewsArray: number[] = new Array(monthsCount).fill(0);
+      const clicksArray: number[] = new Array(monthsCount).fill(0);
 
-      viewsPoints.push(`${x},${yViews}`);
-      clicksPoints.push(`${x},${yClicks}`);
+      toolEvents.forEach((e: any) => {
+        const eventDate = new Date(e.timestamp);
+        const monthsDiff = (now.getFullYear() - eventDate.getFullYear()) * 12 + (now.getMonth() - eventDate.getMonth());
+        if (monthsDiff >= 0 && monthsDiff < monthsCount) {
+          const index = monthsCount - 1 - monthsDiff;
+          if (e.eventType === 'tool_view') viewsArray[index]++;
+          else if (e.eventType === 'website_click' || e.eventType === 'tool_click' || e.eventType === 'affiliate_click') clicksArray[index]++;
+        }
+      });
+
+      const maxVal = Math.max(...viewsArray, ...clicksArray, 1);
+
+      for (let i = 0; i < monthsCount; i++) {
+        const x = i * stepXMonth;
+        const yViews = 140 - (viewsArray[i] / maxVal) * 110;
+        const yClicks = 140 - (clicksArray[i] / maxVal) * 110;
+        viewsPoints.push(`${x},${yViews}`);
+        clicksPoints.push(`${x},${yClicks}`);
+      }
+    } else {
+      const viewsArray: number[] = new Array(days).fill(0);
+      const clicksArray: number[] = new Array(days).fill(0);
+
+      toolEvents.forEach((e: any) => {
+        const eventDate = new Date(e.timestamp);
+        const timeDiff = now.getTime() - eventDate.getTime();
+        const dayIndex = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+        if (dayIndex >= 0 && dayIndex < days) {
+          const index = days - 1 - dayIndex;
+          if (e.eventType === 'tool_view') viewsArray[index]++;
+          else if (e.eventType === 'website_click' || e.eventType === 'tool_click' || e.eventType === 'affiliate_click') clicksArray[index]++;
+        }
+      });
+
+      const maxVal = Math.max(...viewsArray, ...clicksArray, 1);
+
+      for (let i = 0; i < days; i++) {
+        const x = i * stepX;
+        const yViews = 140 - (viewsArray[i] / maxVal) * 110;
+        const yClicks = 140 - (clicksArray[i] / maxVal) * 110;
+        viewsPoints.push(`${x},${yViews}`);
+        clicksPoints.push(`${x},${yClicks}`);
+      }
     }
 
     return {
@@ -802,89 +931,174 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
             {/* TAB 3: DETAILED PERFORMANCE ANALYTICS */}
             {activeTab === 'analytics' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                   <div>
                     <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'bold', margin: 0 }}>Traffic & Referral Analytics</h3>
-                    <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Outbound clicks history metrics</span>
+                    <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Real-time outbound clicks and profile views tracking metrics.</span>
                   </div>
-                  <div style={{ display: 'flex', gap: '6px' }}>
-                    {(['7d', '30d', '90d', '1y'] as const).map((range) => (
-                      <button
-                        key={range}
-                        onClick={() => setAnalyticsTimeframe(range)}
-                        className={`btn btn-xs ${analyticsTimeframe === range ? 'btn-primary' : 'btn-outline'}`}
-                      >
-                        {range === '7d' ? '7 Days' : range === '30d' ? '30 Days' : range === '90d' ? '90 Days' : '1 Year'}
-                      </button>
-                    ))}
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <select
+                      className="form-input btn-sm"
+                      value={activeToolId}
+                      onChange={(e) => setActiveToolId(e.target.value)}
+                      style={{ width: 'auto', padding: '6px 12px' }}
+                    >
+                      <option value="all">All Tools</option>
+                      {ownerTools.map((t) => (
+                        <option key={t.id} value={t.id}>{t.name}</option>
+                      ))}
+                    </select>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      {(['7d', '30d', '90d', '1y', 'all'] as const).map((range) => (
+                        <button
+                          key={range}
+                          onClick={() => setAnalyticsTimeframe(range)}
+                          className={`btn btn-xs ${analyticsTimeframe === range ? 'btn-primary' : 'btn-outline'}`}
+                        >
+                          {range === '7d' ? '7 Days' : range === '30d' ? '30 Days' : range === '90d' ? '90 Days' : range === '1y' ? '12 Months' : 'All Time'}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                {/* SVG Line Graph */}
-                <div style={{ padding: '24px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-                    <span style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold' }}>Weekly Trends: Views vs Clicks</span>
-                    <div style={{ display: 'flex', gap: '12px', fontSize: '10px' }}>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <span style={{ display: 'inline-block', width: '8px', height: '8px', backgroundColor: 'var(--color-primary)', borderRadius: '50%' }}></span>
-                        Views
-                      </span>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <span style={{ display: 'inline-block', width: '8px', height: '8px', backgroundColor: 'var(--color-success)', borderRadius: '50%' }}></span>
-                        Referrals
-                      </span>
-                    </div>
+                {/* Overview cards */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '16px' }} className="stats-box-grid">
+                  <div style={{ padding: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'center' }}>
+                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Total Views</span>
+                    <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold' }}>{activeAnalytics.views}</span>
                   </div>
-                  
-                  <svg viewBox="0 0 420 150" style={{ width: '100%', height: '180px', overflow: 'visible' }}>
-                    {/* Grid lines */}
-                    <line x1="0" y1="30" x2="420" y2="30" stroke="var(--border-color)" strokeWidth="0.5" strokeDasharray="3" />
-                    <line x1="0" y1="90" x2="420" y2="90" stroke="var(--border-color)" strokeWidth="0.5" strokeDasharray="3" />
-                    <line x1="0" y1="140" x2="420" y2="140" stroke="var(--border-color)" strokeWidth="0.5" strokeDasharray="3" />
-
-                    {/* Views path */}
-                    <path d={chartPaths.viewsPath} fill="none" stroke="var(--color-primary)" strokeWidth="2.5" />
-                    {/* Clicks path */}
-                    <path d={chartPaths.clicksPath} fill="none" stroke="var(--color-success)" strokeWidth="2" />
-                  </svg>
+                  <div style={{ padding: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'center' }}>
+                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Unique Visitors</span>
+                    <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold' }}>{activeAnalytics.uniqueVisitors}</span>
+                  </div>
+                  <div style={{ padding: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'center' }}>
+                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Website Clicks</span>
+                    <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold' }}>{activeAnalytics.clicks}</span>
+                  </div>
+                  <div style={{ padding: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'center' }}>
+                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>CTR</span>
+                    <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold' }}>{activeAnalytics.ctr}%</span>
+                  </div>
+                  <div style={{ padding: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'center' }}>
+                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Favorites</span>
+                    <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold' }}>{activeAnalytics.saves}</span>
+                  </div>
+                  <div style={{ padding: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'center' }}>
+                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Reviews</span>
+                    <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold' }}>{activeAnalytics.ratingCount}</span>
+                  </div>
                 </div>
 
-                {/* Break-down details */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                  <div style={{ padding: '20px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)' }}>
-                    <h4 style={{ margin: '0 0 12px 0', fontSize: 'var(--text-xs)', fontWeight: 'bold' }}>Top Traffic Referrers</h4>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: 'var(--text-xs)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span>Google Search</span>
-                        <strong>48%</strong>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span>AIFynest Category Directories</span>
-                        <strong>32%</strong>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span>Direct Referrals / Newsletter</span>
-                        <strong>20%</strong>
-                      </div>
-                    </div>
+                {activeAnalytics.views === 0 && activeAnalytics.clicks === 0 ? (
+                  <div style={{ padding: '80px 24px', textAlign: 'center', backgroundColor: 'var(--bg-card)', border: '1px dashed var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
+                    <h4 style={{ margin: '0 0 8px 0', fontSize: 'var(--text-base)', fontWeight: 'bold' }}>No analytics data yet</h4>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', margin: 0 }}>
+                      Traffic events will be populated in real-time as users visit your tool listings.
+                    </p>
                   </div>
+                ) : (
+                  <>
+                    {/* SVG Line Graph */}
+                    <div style={{ padding: '24px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+                        <span style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold' }}>Traffic Trends: Views vs Clicks</span>
+                        <div style={{ display: 'flex', gap: '12px', fontSize: '10px' }}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <span style={{ display: 'inline-block', width: '8px', height: '8px', backgroundColor: 'var(--color-primary)', borderRadius: '50%' }}></span>
+                            Views
+                          </span>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <span style={{ display: 'inline-block', width: '8px', height: '8px', backgroundColor: 'var(--color-success)', borderRadius: '50%' }}></span>
+                            Website Clicks
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <svg viewBox="0 0 420 150" style={{ width: '100%', height: '180px', overflow: 'visible' }}>
+                        {/* Grid lines */}
+                        <line x1="0" y1="30" x2="420" y2="30" stroke="var(--border-color)" strokeWidth="0.5" strokeDasharray="3" />
+                        <line x1="0" y1="90" x2="420" y2="90" stroke="var(--border-color)" strokeWidth="0.5" strokeDasharray="3" />
+                        <line x1="0" y1="140" x2="420" y2="140" stroke="var(--border-color)" strokeWidth="0.5" strokeDasharray="3" />
 
-                  <div style={{ padding: '20px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)' }}>
-                    <h4 style={{ margin: '0 0 12px 0', fontSize: 'var(--text-xs)', fontWeight: 'bold' }}>Device Distributions</h4>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: 'var(--text-xs)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span>💻 Desktop Computer</span>
-                        <strong>64%</strong>
+                        {/* Views path */}
+                        <path d={chartPaths.viewsPath} fill="none" stroke="var(--color-primary)" strokeWidth="2.5" />
+                        {/* Clicks path */}
+                        <path d={chartPaths.clicksPath} fill="none" stroke="var(--color-success)" strokeWidth="2" />
+                      </svg>
+                    </div>
+
+                    {/* Break-down details */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                      <div style={{ padding: '20px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)' }}>
+                        <h4 style={{ margin: '0 0 12px 0', fontSize: 'var(--text-xs)', fontWeight: 'bold' }}>Top Traffic Referrers</h4>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: 'var(--text-xs)' }}>
+                          {getTrafficSources().map((src) => (
+                            <div key={src.name} style={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <span>{src.name}</span>
+                              <strong>{src.percentage}%</strong>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span>📱 Mobile Phones</span>
-                        <strong>30%</strong>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span>📟 Tablet Devices</span>
-                        <strong>6%</strong>
+
+                      <div style={{ padding: '20px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)' }}>
+                        <h4 style={{ margin: '0 0 12px 0', fontSize: 'var(--text-xs)', fontWeight: 'bold' }}>Device Distributions</h4>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: 'var(--text-xs)' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span>💻 Desktop Computer</span>
+                            <strong>{getDeviceDistribution().desktop}%</strong>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span>📱 Mobile Phones</span>
+                            <strong>{getDeviceDistribution().mobile}%</strong>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span>📟 Tablet Devices</span>
+                            <strong>{getDeviceDistribution().tablet}%</strong>
+                          </div>
+                        </div>
                       </div>
                     </div>
+                  </>
+                )}
+
+                {/* Country and Compliance Notes */}
+                <div style={{ padding: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', fontSize: '11px', color: 'var(--text-muted)' }}>
+                  🗺️ <strong>Country & Geolocation Note:</strong> Geolocation coordinates mapping is configured as <em>"Not available yet"</em> (null) under current client-side local database structures to satisfy user privacy directives. This column is fully prepared to link database IP geolocation tables upon remote migration.
+                </div>
+
+                {/* Tools Performance List */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <h4 style={{ margin: 0, fontSize: 'var(--text-xs)', fontWeight: 'bold' }}>Tool-by-Tool Performance Breakdown</h4>
+                  <div className="table-container">
+                    <table className="data-table">
+                      <thead>
+                        <tr>
+                          <th>Tool</th>
+                          <th style={{ textAlign: 'center' }}>Views</th>
+                          <th style={{ textAlign: 'center' }}>Clicks</th>
+                          <th style={{ textAlign: 'center' }}>CTR</th>
+                          <th style={{ textAlign: 'center' }}>Favorites</th>
+                          <th style={{ textAlign: 'center' }}>Reviews</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {ownerToolsBreakdown.map(({ tool, stats }) => (
+                          <tr key={tool.id}>
+                            <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <img src={tool.logoUrl} alt={tool.name} style={{ width: '24px', height: '24px', borderRadius: '4px', objectFit: 'cover' }} />
+                              <strong>{tool.name}</strong>
+                            </td>
+                            <td style={{ textAlign: 'center' }}>{stats.views}</td>
+                            <td style={{ textAlign: 'center' }}>{stats.clicks}</td>
+                            <td style={{ textAlign: 'center' }}>{stats.ctr}%</td>
+                            <td style={{ textAlign: 'center' }}>{stats.saves}</td>
+                            <td style={{ textAlign: 'center' }}>{stats.ratingCount}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>

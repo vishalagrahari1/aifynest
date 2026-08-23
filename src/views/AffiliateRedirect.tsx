@@ -36,6 +36,7 @@ export const AffiliateRedirect: React.FC<AffiliateRedirectProps> = ({ onToast })
     const eventType = isAffiliateActive ? 'affiliate_click' : 'tool_click';
 
     trackEvent(eventType, toolObj.id, toolObj.categorySlug, undefined, document.referrer);
+    trackEvent('website_click', toolObj.id, toolObj.categorySlug, undefined, document.referrer);
 
     // Redirect timeout to ensure visual wow & compliance exposure
     const timer = setTimeout(() => {

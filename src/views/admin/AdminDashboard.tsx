@@ -30,7 +30,6 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
     auditLogs,
     affiliateLinks,
     notifications,
-    collections,
     approveTool,
     rejectTool,
     requestChanges,
@@ -42,7 +41,8 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
     addAffiliateLink,
     deleteAffiliateLink,
     markNotificationRead,
-    analyticsEvents,
+    getPlatformAnalytics,
+    getToolAnalytics,
     seedTenToolsPerCategory,
   } = useDatabase();
   const { user } = useAuth();
@@ -100,6 +100,8 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
 
   // Sorting rank columns inside Platform Analytics
   const [analyticsSort, setAnalyticsSort] = useState<'views' | 'clicks' | 'ctr' | 'saves'>('views');
+  const [adminTimeframe, setAdminTimeframe] = useState<'7d' | '30d' | '90d' | '1y' | 'all'>('30d');
+  const [adminSelectedToolId, setAdminSelectedToolId] = useState<string>('');
 
   // Verify access privileges
   if (!user) {
@@ -382,22 +384,166 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
     return true;
   });
 
+  // Platform event filtering by timeframe
+  const getFilteredPlatformEvents = () => {
+    const events = getPlatformAnalytics(user.id);
+    if (adminTimeframe === 'all') return events;
+
+    const now = new Date();
+    let daysLimit = 30;
+    if (adminTimeframe === '7d') daysLimit = 7;
+    if (adminTimeframe === '90d') daysLimit = 90;
+    if (adminTimeframe === '1y') daysLimit = 365;
+
+    const limitDate = new Date();
+    limitDate.setDate(now.getDate() - daysLimit);
+    return events.filter((e) => new Date(e.timestamp) >= limitDate);
+  };
+  const filteredPlatformEvents = getFilteredPlatformEvents();
+
+  const getAdminOverviewStats = () => {
+    const events = filteredPlatformEvents;
+    const views = events.filter((e) => e.eventType === 'tool_view').length;
+    const clicks = events.filter((e) => e.eventType === 'website_click' || e.eventType === 'tool_click' || e.eventType === 'affiliate_click').length;
+    const ctr = views > 0 ? parseFloat(((clicks / views) * 100).toFixed(2)) : 0;
+    const favorites = events.filter((e) => e.eventType === 'favorite').length;
+    const reviewsSubmitted = events.filter((e) => e.eventType === 'review_submitted').length;
+    const searchImpressions = events.filter((e) => e.eventType === 'search_impression').length;
+
+    const usersList = JSON.parse(localStorage.getItem('ai_users') || '[]');
+    const totalUsers = usersList.length;
+    const totalOwners = usersList.filter((u: any) => u.role === 'owner').length;
+    const totalPublishedTools = tools.filter((t) => t.status === 'approved').length;
+
+    return {
+      views,
+      clicks,
+      ctr,
+      favorites,
+      reviewsSubmitted,
+      searchImpressions,
+      totalUsers,
+      totalOwners,
+      totalPublishedTools,
+    };
+  };
+  const adminStats = getAdminOverviewStats();
+
   // Ranking calculation helper
   const getSortedRankedTools = () => {
+    const events = filteredPlatformEvents;
     return [...tools].map((tool) => {
-      const tEvents = analyticsEvents.filter((e) => e.toolId === tool.id);
+      const tEvents = events.filter((e) => e.toolId === tool.id);
       const views = tEvents.filter((e) => e.eventType === 'tool_view').length;
-      const clicks = tEvents.filter((e) => e.eventType === 'tool_click' || e.eventType === 'affiliate_click').length;
-      const saves = collections.filter((c) => c.name === 'My Favorites' && c.tools.includes(tool.id)).length;
-      const ctr = views > 0 ? Math.round((clicks / views) * 1000) / 10 : 0;
-      return { tool, views, clicks, saves, ctr };
+      const clicks = tEvents.filter((e) => e.eventType === 'website_click' || e.eventType === 'tool_click' || e.eventType === 'affiliate_click').length;
+      const saves = tEvents.filter((e) => e.eventType === 'favorite').length;
+      const reviewsCount = tEvents.filter((e) => e.eventType === 'review_submitted').length;
+      const ctr = views > 0 ? parseFloat(((clicks / views) * 100).toFixed(2)) : 0;
+      return { tool, views, clicks, saves, reviewsCount, ctr };
     }).sort((a, b) => {
       if (analyticsSort === 'views') return b.views - a.views;
       if (analyticsSort === 'clicks') return b.clicks - a.clicks;
       if (analyticsSort === 'saves') return b.saves - a.saves;
-      return b.ctr - a.ctr;
+      if (analyticsSort === 'ctr') return b.ctr - a.ctr;
+      return b.reviewsCount - a.reviewsCount;
     });
   };
+
+  const getTopCategories = () => {
+    const events = filteredPlatformEvents;
+    const categoryStats: Record<string, { views: number; clicks: number; favorites: number }> = {};
+
+    categories.forEach((cat) => {
+      categoryStats[cat.slug] = { views: 0, clicks: 0, favorites: 0 };
+    });
+
+    events.forEach((e) => {
+      if (e.toolId) {
+        const tool = tools.find((t) => t.id === e.toolId);
+        if (tool && tool.categorySlug in categoryStats) {
+          const cat = tool.categorySlug;
+          if (e.eventType === 'tool_view') categoryStats[cat].views++;
+          else if (e.eventType === 'website_click' || e.eventType === 'tool_click' || e.eventType === 'affiliate_click') categoryStats[cat].clicks++;
+          else if (e.eventType === 'favorite') categoryStats[cat].favorites++;
+        }
+      }
+    });
+
+    return Object.entries(categoryStats).map(([slug, stats]) => {
+      const catObj = categories.find((c) => c.slug === slug);
+      return {
+        name: catObj ? catObj.name : slug,
+        slug,
+        ...stats,
+      };
+    }).sort((a, b) => b.views - a.views);
+  };
+
+  const getAdminTrafficSources = () => {
+    const events = filteredPlatformEvents;
+    const counts = { Google: 0, 'Directory Search': 0, Direct: 0, Social: 0, Referral: 0, Other: 0 };
+    events.forEach((e) => {
+      const ref = (e.referrer || '').toLowerCase();
+      if (ref.includes('google')) counts.Google++;
+      else if (ref.includes('directory')) counts['Directory Search']++;
+      else if (ref.includes('direct') || ref === '') counts.Direct++;
+      else if (ref.includes('facebook') || ref.includes('twitter') || ref.includes('linkedin') || ref.includes('instagram')) counts.Social++;
+      else if (ref.includes('referral') || ref.includes('.') || ref.includes('http')) counts.Referral++;
+      else counts.Other++;
+    });
+
+    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+    return Object.entries(counts).map(([name, val]) => ({
+      name,
+      percentage: total > 0 ? Math.round((val / total) * 100) : 0,
+    }));
+  };
+
+  const getSelectedToolAnalyticsData = () => {
+    if (!adminSelectedToolId) return null;
+    const events = getToolAnalytics(adminSelectedToolId, user.id);
+    if (!events) return null;
+
+    const viewsEvents = events.filter((e) => e.eventType === 'tool_view');
+    const clicksEvents = events.filter((e) => e.eventType === 'website_click' || e.eventType === 'tool_click' || e.eventType === 'affiliate_click');
+    const favoritesEvents = events.filter((e) => e.eventType === 'favorite');
+    const reviewsEvents = events.filter((e) => e.eventType === 'review_submitted');
+
+    const views = viewsEvents.length;
+    const clicks = clicksEvents.length;
+    const ctr = views > 0 ? parseFloat(((clicks / views) * 100).toFixed(2)) : 0;
+    const favorites = favoritesEvents.length;
+    const reviewsCount = reviewsEvents.length;
+
+    const trafficCounts = { Google: 0, 'Directory Search': 0, Direct: 0, Social: 0, Referral: 0, Other: 0 };
+    events.forEach((e) => {
+      const ref = (e.referrer || '').toLowerCase();
+      if (ref.includes('google')) trafficCounts.Google++;
+      else if (ref.includes('directory')) trafficCounts['Directory Search']++;
+      else if (ref.includes('direct') || ref === '') trafficCounts.Direct++;
+      else if (ref.includes('facebook') || ref.includes('twitter') || ref.includes('linkedin') || ref.includes('instagram')) trafficCounts.Social++;
+      else if (ref.includes('referral') || ref.includes('.') || ref.includes('http')) trafficCounts.Referral++;
+      else trafficCounts.Other++;
+    });
+
+    const deviceCounts = { desktop: 0, mobile: 0, tablet: 0 };
+    events.forEach((e) => {
+      if (e.device === 'desktop') deviceCounts.desktop++;
+      else if (e.device === 'mobile') deviceCounts.mobile++;
+      else if (e.device === 'tablet') deviceCounts.tablet++;
+    });
+
+    return {
+      views,
+      clicks,
+      ctr,
+      favorites,
+      reviewsCount,
+      traffic: Object.entries(trafficCounts).map(([name, val]) => ({ name, count: val })),
+      devices: deviceCounts,
+    };
+  };
+  const selectedToolStats = getSelectedToolAnalyticsData();
 
   return (
     <div className="container section">
@@ -1496,55 +1642,219 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
           {/* TAB 7: PLATFORM-WIDE ANALYTICS & RANKING */}
           {activeTab === 'analytics' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-bold)', margin: 0 }}>AIFynest Analytics Deck</h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                <div>
+                  <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-bold)', margin: 0 }}>AIFynest Analytics Deck</h3>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Platform-wide traffic tracking and user logs database metrics.</span>
+                </div>
+                
+                {/* Timeframe selector */}
                 <div style={{ display: 'flex', gap: '6px' }}>
-                  {(['views', 'clicks', 'ctr', 'saves'] as const).map((col) => (
+                  {(['7d', '30d', '90d', '1y', 'all'] as const).map((range) => (
                     <button
-                      key={col}
-                      onClick={() => setAnalyticsSort(col)}
-                      className={`btn btn-xs ${analyticsSort === col ? 'btn-primary' : 'btn-outline'}`}
-                      style={{ textTransform: 'uppercase' }}
+                      key={range}
+                      onClick={() => setAdminTimeframe(range)}
+                      className={`btn btn-xs ${adminTimeframe === range ? 'btn-primary' : 'btn-outline'}`}
                     >
-                      Sort: {col}
+                      {range === '7d' ? '7 Days' : range === '30d' ? '30 Days' : range === '90d' ? '90 Days' : range === '1y' ? '12 Months' : 'All Time'}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Analytics Rank Matrix */}
-              <div className="table-container">
-                <table className="data-table">
-                  <thead>
-                    <tr>
-                      <th>Ranking #</th>
-                      <th>AI Tool</th>
-                      <th>Status</th>
-                      <th>Page Views</th>
-                      <th>Outbound Clicks</th>
-                      <th>CTR (%)</th>
-                      <th>Saved (Saves)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {getSortedRankedTools().map((item, idx) => (
-                      <tr key={item.tool.id}>
-                        <td style={{ fontWeight: 'bold', color: 'var(--color-primary)' }}>#{idx + 1}</td>
-                        <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <img src={item.tool.logoUrl} alt="logo" style={{ width: '20px', height: '20px', borderRadius: '3px', objectFit: 'cover' }} />
-                          <strong>{item.tool.name}</strong>
-                        </td>
-                        <td>
-                          <span style={{ fontSize: '9px', textTransform: 'uppercase' }}>{item.tool.status}</span>
-                        </td>
-                        <td style={{ fontWeight: 'bold' }}>{item.views}</td>
-                        <td>{item.clicks}</td>
-                        <td style={{ color: 'var(--color-primary)', fontWeight: 'bold' }}>{item.ctr}%</td>
-                        <td>❤ {item.saves}</td>
-                      </tr>
+              {/* Platform metrics counters cards */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }} className="stats-box-grid">
+                <div style={{ padding: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Platform Views</div>
+                  <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold' }}>{adminStats.views}</div>
+                </div>
+                <div style={{ padding: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Platform Clicks</div>
+                  <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold' }}>{adminStats.clicks}</div>
+                </div>
+                <div style={{ padding: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Platform CTR</div>
+                  <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold' }}>{adminStats.ctr}%</div>
+                </div>
+                <div style={{ padding: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Favorites Logged</div>
+                  <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold' }}>{adminStats.favorites}</div>
+                </div>
+                <div style={{ padding: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Reviews Submitted</div>
+                  <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold' }}>{adminStats.reviewsSubmitted}</div>
+                </div>
+                <div style={{ padding: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Search Impressions</div>
+                  <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold' }}>{adminStats.searchImpressions}</div>
+                </div>
+                <div style={{ padding: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Registered Users</div>
+                  <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold' }}>{adminStats.totalUsers}</div>
+                </div>
+                <div style={{ padding: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Tool Owners</div>
+                  <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold' }}>{adminStats.totalOwners}</div>
+                </div>
+                <div style={{ padding: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Published AI Tools</div>
+                  <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold' }}>{adminStats.totalPublishedTools}</div>
+                </div>
+              </div>
+
+              {/* Drill-down Tool Analytics Selector Section */}
+              <div style={{ padding: '20px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-card)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+                  <h4 style={{ margin: 0, fontSize: 'var(--text-xs)', fontWeight: 'bold' }}>🔍 Drill-down Tool Analytics Inspector</h4>
+                  <select
+                    className="form-input btn-sm"
+                    value={adminSelectedToolId}
+                    onChange={(e) => setAdminSelectedToolId(e.target.value)}
+                    style={{ width: 'auto', padding: '6px 12px' }}
+                  >
+                    <option value="">-- Select an AI Tool --</option>
+                    {tools.map((t) => (
+                      <option key={t.id} value={t.id}>{t.name} (owner-id: {t.ownerId || 'unclaimed'})</option>
                     ))}
-                  </tbody>
-                </table>
+                  </select>
+                </div>
+
+                {selectedToolStats ? (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', fontSize: 'var(--text-xs)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <div style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold', color: 'var(--color-primary)' }}>Performance Summary:</div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)', paddingBottom: '6px' }}>
+                        <span>Profile Views</span>
+                        <strong>{selectedToolStats.views}</strong>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)', paddingBottom: '6px' }}>
+                        <span>Website Redirect Clicks</span>
+                        <strong>{selectedToolStats.clicks}</strong>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)', paddingBottom: '6px' }}>
+                        <span>Outbound CTR</span>
+                        <strong>{selectedToolStats.ctr}%</strong>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)', paddingBottom: '6px' }}>
+                        <span>Favorites Bookmarks</span>
+                        <strong>{selectedToolStats.favorites}</strong>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '6px' }}>
+                        <span>Reviews Count</span>
+                        <strong>{selectedToolStats.reviewsCount}</strong>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <div style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold', color: 'var(--color-primary)' }}>Traffic Sources Breakdown:</div>
+                      {selectedToolStats.traffic.map((src) => (
+                        <div key={src.name} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)', paddingBottom: '4px' }}>
+                          <span>{src.name}</span>
+                          <strong>{src.count} actions</strong>
+                        </div>
+                      ))}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px' }}>
+                        <span>Devices: Desktop / Mobile / Tablet</span>
+                        <strong>{selectedToolStats.devices.desktop} / {selectedToolStats.devices.mobile} / {selectedToolStats.devices.tablet}</strong>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '12px 0', fontSize: 'var(--text-xs)' }}>
+                    Please select a tool listing from the dropdown selector list above to review granular metrics.
+                  </div>
+                )}
+              </div>
+
+              {/* Split Category list & Referral Traffic Column */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div style={{ padding: '20px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-card)' }}>
+                  <h4 style={{ margin: '0 0 16px 0', fontSize: 'var(--text-xs)', fontWeight: 'bold' }}>Top Platform Categories</h4>
+                  <div className="table-container">
+                    <table className="data-table" style={{ fontSize: '11px' }}>
+                      <thead>
+                        <tr>
+                          <th>Category Name</th>
+                          <th style={{ textAlign: 'center' }}>Views</th>
+                          <th style={{ textAlign: 'center' }}>Clicks</th>
+                          <th style={{ textAlign: 'center' }}>Saves</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {getTopCategories().slice(0, 5).map((cat) => (
+                          <tr key={cat.slug}>
+                            <td><strong>{cat.name}</strong></td>
+                            <td style={{ textAlign: 'center' }}>{cat.views}</td>
+                            <td style={{ textAlign: 'center' }}>{cat.clicks}</td>
+                            <td style={{ textAlign: 'center' }}>{cat.favorites}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div style={{ padding: '20px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-card)' }}>
+                  <h4 style={{ margin: '0 0 16px 0', fontSize: 'var(--text-xs)', fontWeight: 'bold' }}>Traffic Referral Distribution</h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: 'var(--text-xs)' }}>
+                    {getAdminTrafficSources().map((src) => (
+                      <div key={src.name} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border-color)' }}>
+                        <span>{src.name}</span>
+                        <strong>{src.percentage}%</strong>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Analytics Rank Matrix */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h4 style={{ margin: 0, fontSize: 'var(--text-xs)', fontWeight: 'bold' }}>AI Listings Ranking Grid</h4>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    {(['views', 'clicks', 'ctr', 'saves'] as const).map((col) => (
+                      <button
+                        key={col}
+                        onClick={() => setAnalyticsSort(col)}
+                        className={`btn btn-xs ${analyticsSort === col ? 'btn-primary' : 'btn-outline'}`}
+                        style={{ textTransform: 'uppercase' }}
+                      >
+                        Sort: {col}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="table-container">
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th>Ranking</th>
+                        <th>AI Tool</th>
+                        <th style={{ textAlign: 'center' }}>Page Views</th>
+                        <th style={{ textAlign: 'center' }}>Clicks</th>
+                        <th style={{ textAlign: 'center' }}>CTR</th>
+                        <th style={{ textAlign: 'center' }}>Favorites</th>
+                        <th style={{ textAlign: 'center' }}>Reviews</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {getSortedRankedTools().map((item, idx) => (
+                        <tr key={item.tool.id}>
+                          <td style={{ fontWeight: 'bold', color: 'var(--color-primary)' }}>#{idx + 1}</td>
+                          <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <img src={item.tool.logoUrl} alt="logo" style={{ width: '20px', height: '20px', borderRadius: '3px', objectFit: 'cover' }} />
+                            <strong>{item.tool.name}</strong>
+                          </td>
+                          <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{item.views}</td>
+                          <td style={{ textAlign: 'center' }}>{item.clicks}</td>
+                          <td style={{ textAlign: 'center', color: 'var(--color-primary)', fontWeight: 'bold' }}>{item.ctr}%</td>
+                          <td style={{ textAlign: 'center' }}>❤ {item.saves}</td>
+                          <td style={{ textAlign: 'center' }}>★ {item.reviewsCount}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}

@@ -170,7 +170,7 @@ export interface Payment {
 
 export interface AnalyticsEvent {
   id: string;
-  eventType: 'tool_view' | 'tool_click' | 'tool_save' | 'search' | 'compare' | 'sponsored_impression' | 'sponsored_click' | 'category_view' | 'affiliate_click';
+  eventType: 'tool_view' | 'tool_click' | 'tool_save' | 'search' | 'compare' | 'sponsored_impression' | 'sponsored_click' | 'category_view' | 'affiliate_click' | 'website_click' | 'favorite' | 'review_submitted' | 'search_impression' | 'tool_share';
   toolId?: string;
   categorySlug?: string;
   query?: string;
@@ -182,6 +182,11 @@ export interface AnalyticsEvent {
   value?: string;
   revenue?: number;
   commission?: number;
+  // Future postgresql/supabase session/security mapping parameters
+  sessionId?: string;
+  userId?: string;
+  browser?: string;
+  path?: string;
 }
 
 export interface Claim {

@@ -42,14 +42,18 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
   // Track page view event
   useEffect(() => {
     if (tool) {
-      trackEvent('tool_view', tool.id);
-      
-      // If sponsored tool, track sponsored impression
-      if (tool.isSponsored) {
-        trackEvent('sponsored_impression', tool.id);
+      const viewedKey = `viewed_${tool.id}`;
+      if (!(window as any)[viewedKey]) {
+        (window as any)[viewedKey] = true;
+        trackEvent('tool_view', tool.id);
+        
+        // If sponsored tool, track sponsored impression
+        if (tool.isSponsored) {
+          trackEvent('sponsored_impression', tool.id);
+        }
       }
     }
-  }, [slug]);
+  }, [slug, tool]);
 
   // Verify access privileges for drafts/moderation queues
   const canAccess =
@@ -94,6 +98,7 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
 
   const handleShareClick = () => {
     navigator.clipboard.writeText(window.location.href);
+    trackEvent('tool_share', tool.id);
     onToast('URL copied to clipboard! Share it with your friends.', 'success');
   };
 

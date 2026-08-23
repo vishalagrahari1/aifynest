@@ -202,6 +202,19 @@ export const Directory: React.FC<DirectoryProps> = ({
   const startIdx = (pageParam - 1) * itemsPerPage;
   const paginatedTools = filteredTools.slice(startIdx, startIdx + itemsPerPage);
 
+  // Track search impressions on current page view
+  useEffect(() => {
+    if (paginatedTools.length > 0) {
+      paginatedTools.forEach((tool) => {
+        const impressionKey = `imp_${tool.id}_${qParam || 'organic'}`;
+        if (!(window as any)[impressionKey]) {
+          (window as any)[impressionKey] = true;
+          trackEvent('search_impression', tool.id);
+        }
+      });
+    }
+  }, [paginatedTools.map((t) => t.id).join(','), qParam]);
+
   // Dynamic Page Title descriptions
   const currentCategory = categories.find((c) => c.slug === filters.category);
   const pageTitle = currentCategory ? `Best AI ${currentCategory.name} Tools` : 'AI Tools Directory';

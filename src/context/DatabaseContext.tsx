@@ -72,6 +72,9 @@ interface DatabaseContextType {
   trackEvent: (eventType: AnalyticsEvent['eventType'], toolId?: string, categorySlug?: string, query?: string, referrer?: string, campaignId?: string) => void;
   getTrendingTools: (limit?: number) => Tool[];
   logAdminAction: (userId: string, userName: string, action: string, details: string) => void;
+  getToolAnalytics: (toolId: string, actorId: string) => AnalyticsEvent[] | null;
+  getOwnerAnalytics: (ownerId: string, actorId: string) => AnalyticsEvent[];
+  getPlatformAnalytics: (actorId: string) => AnalyticsEvent[];
 
   // Affiliate link management
   addAffiliateLink: (link: Omit<AffiliateLink, 'id' | 'clicks' | 'conversions' | 'revenue'>) => AffiliateLink;
@@ -445,6 +448,7 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const updatedReviews = [newReview, ...reviews];
     setReviews(updatedReviews);
     saveToStorage('ai_reviews', updatedReviews);
+    trackEvent('review_submitted', toolId);
 
     // Notify Owner
     const toolObj = tools.find((t) => t.id === toolId);
@@ -528,6 +532,7 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const updated = [...collections, newColl];
       setCollections(updated);
       saveToStorage('ai_collections', updated);
+      trackEvent('favorite', toolId);
     } else {
       const alreadySaved = favoritesList.tools.includes(toolId);
       const newTools = alreadySaved
@@ -535,6 +540,9 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         : [...favoritesList.tools, toolId];
       
       updateCollection(favoritesList.id, { tools: newTools });
+      if (!alreadySaved) {
+        trackEvent('favorite', toolId);
+      }
     }
   };
 
@@ -607,6 +615,42 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     referrer?: string,
     campaignId?: string
   ) => {
+    // Resolve lightweight session ID
+    let sessionId = localStorage.getItem('analytics_session_id');
+    if (!sessionId) {
+      sessionId = 'sess_' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('analytics_session_id', sessionId);
+    }
+
+    // Resolve logged in user ID from local auth session
+    let userId: string | undefined = undefined;
+    const sessionRaw = localStorage.getItem('ai_user_session');
+    if (sessionRaw) {
+      try {
+        const parsed = JSON.parse(sessionRaw);
+        if (parsed && parsed.id) {
+          userId = parsed.id;
+        }
+      } catch (_) {}
+    }
+
+    // Resolve browser name
+    const getBrowserName = () => {
+      const ua = navigator.userAgent;
+      if (ua.includes('Firefox')) return 'Firefox';
+      if (ua.includes('SamsungBrowser')) return 'Samsung Browser';
+      if (ua.includes('Opera') || ua.includes('OPR')) return 'Opera';
+      if (ua.includes('Trident')) return 'Internet Explorer';
+      if (ua.includes('Edge') || ua.includes('Edg')) return 'Edge';
+      if (ua.includes('Chrome')) return 'Chrome';
+      if (ua.includes('Safari')) return 'Safari';
+      return 'Other';
+    };
+    const browser = getBrowserName();
+
+    // Resolve pathname
+    const path = window.location.pathname;
+
     const isSponsorImpression = eventType === 'sponsored_impression';
     const isSponsorClick = eventType === 'sponsored_click' || eventType === 'tool_click' || eventType === 'affiliate_click';
 
@@ -617,10 +661,14 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       categorySlug,
       query,
       timestamp: new Date().toISOString(),
-      referrer: referrer || document.referrer || 'Direct Search',
+      referrer: referrer || document.referrer || 'Direct',
       device: window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop',
-      country: ['US', 'IN', 'GB', 'CA', 'DE', 'FR'][Math.floor(Math.random() * 6)] as any,
+      country: undefined, // Leave as optional/null to be resolved by future geolocation backend
       campaignId,
+      sessionId,
+      userId,
+      browser,
+      path,
     };
 
     const updated = [newEvent, ...analyticsEvents];
@@ -662,6 +710,45 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setAffiliateLinks(links);
       saveToStorage('ai_affiliates', links);
     }
+  };
+
+  /*
+   * Clean Analytics Query Helpers designed to support future database migrations.
+   * Operations are isolated at data layer; owner metrics enforce credentials validation.
+   */
+  const getToolAnalytics = (toolId: string, actorId: string): AnalyticsEvent[] | null => {
+    const tool = tools.find((t) => t.id === toolId);
+    if (!tool) return null;
+
+    const users = JSON.parse(localStorage.getItem('ai_users') || '[]');
+    const actor = users.find((u: any) => u.id === actorId);
+    const isAdmin = actor && actor.role === 'admin';
+    const isOwner = tool.ownerId === actorId;
+
+    if (!isAdmin && !isOwner) {
+      throw new Error('Access Denied: Unauthorized request for tool analytics.');
+    }
+
+    return analyticsEvents.filter((e) => e.toolId === toolId);
+  };
+
+  const getOwnerAnalytics = (ownerId: string, actorId: string): AnalyticsEvent[] => {
+    if (ownerId !== actorId) {
+      throw new Error('Access Denied: Owner ID mismatch.');
+    }
+
+    const ownedToolIds = tools.filter((t) => t.ownerId === ownerId).map((t) => t.id);
+    return analyticsEvents.filter((e) => e.toolId && ownedToolIds.includes(e.toolId));
+  };
+
+  const getPlatformAnalytics = (actorId: string): AnalyticsEvent[] => {
+    const users = JSON.parse(localStorage.getItem('ai_users') || '[]');
+    const actor = users.find((u: any) => u.id === actorId);
+    if (!actor || actor.role !== 'admin') {
+      throw new Error('Access Denied: Administrative rights required.');
+    }
+
+    return analyticsEvents;
   };
 
   const getTrendingTools = (limit = 4): Tool[] => {
@@ -878,6 +965,9 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         trackEvent,
         getTrendingTools,
         logAdminAction,
+        getToolAnalytics,
+        getOwnerAnalytics,
+        getPlatformAnalytics,
         addAffiliateLink,
         updateAffiliateLink,
         deleteAffiliateLink,
