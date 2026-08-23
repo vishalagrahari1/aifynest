@@ -28,6 +28,7 @@ import { Signup } from './views/Signup';
 import { OwnerDashboard } from './views/dashboard/Overview';
 import { AdminDashboard } from './views/admin/AdminDashboard';
 import { AffiliateRedirect } from './views/AffiliateRedirect';
+import { ManageTool } from './views/dashboard/ManageTool';
 import { Alternatives } from './views/Alternatives';
 
 // Import CSS Design system
@@ -186,6 +187,8 @@ export const App: React.FC = () => {
 
                 {/* Dashboard & Admin channels */}
                 <Route path="/dashboard" element={<OwnerDashboard onToast={showToast} />} />
+                <Route path="/dashboard/tools" element={<OwnerDashboard onToast={showToast} />} />
+                <Route path="/dashboard/tools/:id/edit" element={<ManageTool />} />
                 <Route path="/admin" element={<AdminDashboard onToast={showToast} />} />
               </Routes>
             </main>

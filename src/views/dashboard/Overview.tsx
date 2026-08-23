@@ -1,8 +1,9 @@
 /* src/views/dashboard/Overview.tsx */
-import React, { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useDatabase } from '../../context/DatabaseContext';
 import { useAuth } from '../../context/AuthContext';
+import type { Tool } from '../../utils/seedData';
 import { SEOHead } from '../../components/shared/SEOHead';
 import { StarRating } from '../../components/shared/StarRating';
 import { Modal } from '../../components/shared/Modal';
@@ -34,9 +35,19 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
     getOwnedTools,
   } = useDatabase();
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Tab tracker for Builder View: 'overview' | 'listings' | 'analytics' | 'reviews' | 'promotions' | 'billing' | 'settings' | 'notifications'
   const [activeTab, setActiveTab] = useState<'overview' | 'listings' | 'analytics' | 'reviews' | 'promotions' | 'billing' | 'settings' | 'notifications'>('overview');
+
+  useEffect(() => {
+    if (location.pathname.endsWith('/tools')) {
+      setActiveTab('listings');
+    } else {
+      setActiveTab('overview');
+    }
+  }, [location.pathname]);
 
   // Active Selected Tool ID dropdown tracker (supports "all" or specific tool)
   const [activeToolId, setActiveToolId] = useState<string>('all');
@@ -95,6 +106,26 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
   const ownerTools = getOwnedTools(user.id);
   const ownerToolIds = ownerTools.map((t) => t.id);
 
+  const getStatusLabel = (status: Tool['status']) => {
+    switch (status) {
+      case 'draft': return 'Draft';
+      case 'pending': return 'Pending Review';
+      case 'needs_changes': return 'Changes Requested';
+      case 'approved': return 'Approved';
+      case 'rejected': return 'Rejected';
+      default: return status.toUpperCase();
+    }
+  };
+
+  const totalTools = ownerTools.length;
+  const totalViews = analyticsEvents.filter((e) => e.eventType === 'tool_view' && ownerToolIds.includes(e.toolId || '')).length;
+  const totalClicks = analyticsEvents.filter((e) => (e.eventType === 'tool_click' || e.eventType === 'affiliate_click') && ownerToolIds.includes(e.toolId || '')).length;
+  const pendingReviewsCount = reviews.filter((r) => ownerToolIds.includes(r.toolId) && r.status === 'pending').length;
+
+  const recentTools = [...ownerTools]
+    .sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime())
+    .slice(0, 5);
+
   // Analytics Dynamic Calculations
   const getSelectedAnalytics = (toolId: string) => {
     let listIds = ownerToolIds;
@@ -122,9 +153,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
 
   const activeAnalytics = getSelectedAnalytics(activeToolId);
 
-  // Builder alerts
   const builderNotifs = notifications.filter((n) => n.userId === user.id);
-  const unreadCount = builderNotifs.filter((n) => !n.read).length;
 
   // Filter reviews for owner tools
   const ownerReviews = reviews.filter((r) => ownerToolIds.includes(r.toolId));
@@ -383,25 +412,36 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
               AIFynest BUILDER DECK
             </div>
             {[
-              { id: 'overview', name: 'Overview Panel', count: 0 },
-              { id: 'listings', name: `My Tools (${ownerTools.length})`, count: 0 },
-              { id: 'analytics', name: 'Analytics Console', count: 0 },
-              { id: 'reviews', name: 'User Reviews', count: ownerReviews.length },
-              { id: 'promotions', name: 'Sponsored CPC', count: 0 },
-              { id: 'billing', name: 'Billing Invoices', count: 0 },
-              { id: 'notifications', name: 'Alert Center', count: unreadCount },
+              { id: 'overview', name: 'Dashboard', count: 0 },
+              { id: 'listings', name: 'My Tools', count: ownerTools.length },
+              { id: 'analytics', name: 'Analytics', count: 0 },
+              { id: 'reviews', name: 'Reviews', count: ownerReviews.length },
+              { id: 'submit-tool', name: 'Submit Tool', count: 0 },
+              { id: 'promotions', name: 'Promotions', count: 0 },
+              { id: 'billing', name: 'Billing', count: 0 },
+              { id: 'settings', name: 'Settings', count: 0 },
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => {
+                  if (tab.id === 'submit-tool') {
+                    navigate('/submit-tool');
+                  } else if (tab.id === 'listings') {
+                    navigate('/dashboard/tools');
+                  } else if (tab.id === 'overview') {
+                    navigate('/dashboard');
+                  } else {
+                    setActiveTab(tab.id as any);
+                  }
+                }}
                 style={{
                   width: '100%',
                   textAlign: 'left',
                   padding: '10px 14px',
                   fontSize: 'var(--text-xs)',
-                  fontWeight: activeTab === tab.id ? 'var(--font-bold)' : 'var(--font-medium)',
-                  color: activeTab === tab.id ? 'var(--color-primary)' : 'var(--text-secondary)',
-                  backgroundColor: activeTab === tab.id ? 'var(--color-primary-light)' : 'transparent',
+                  fontWeight: activeTab === tab.id || (tab.id === 'listings' && location.pathname.endsWith('/tools')) || (tab.id === 'overview' && location.pathname === '/dashboard') ? 'var(--font-bold)' : 'var(--font-medium)',
+                  color: activeTab === tab.id || (tab.id === 'listings' && location.pathname.endsWith('/tools')) || (tab.id === 'overview' && location.pathname === '/dashboard') ? 'var(--color-primary)' : 'var(--text-secondary)',
+                  backgroundColor: activeTab === tab.id || (tab.id === 'listings' && location.pathname.endsWith('/tools')) || (tab.id === 'overview' && location.pathname === '/dashboard') ? 'var(--color-primary-light)' : 'transparent',
                   border: 'none',
                   borderRadius: 'var(--radius-sm)',
                   cursor: 'pointer',
@@ -451,38 +491,38 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
                 {/* Stats board */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }} className="stats-box-grid">
                   <div style={builderStatBox}>
-                    <Eye size={18} style={{ color: 'var(--color-primary)' }} />
-                    <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold' }}>{activeAnalytics.views}</span>
-                    <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>Listing Page Views</span>
+                    <Shield size={18} style={{ color: 'var(--color-primary)' }} />
+                    <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold' }}>{totalTools}</span>
+                    <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>My Tools</span>
                   </div>
                   <div style={builderStatBox}>
-                    <MousePointer size={18} style={{ color: 'var(--color-success)' }} />
-                    <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold' }}>{activeAnalytics.clicks}</span>
-                    <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>Outbound Click Referrals</span>
+                    <Eye size={18} style={{ color: 'var(--color-success)' }} />
+                    <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold' }}>{totalViews}</span>
+                    <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>Total Views</span>
                   </div>
                   <div style={builderStatBox}>
-                    <TrendingUp size={18} style={{ color: 'var(--color-gold)' }} />
-                    <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold' }}>{activeAnalytics.ctr}%</span>
-                    <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>Referral CTR</span>
+                    <MousePointer size={18} style={{ color: 'var(--color-gold)' }} />
+                    <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold' }}>{totalClicks}</span>
+                    <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>Website Clicks</span>
                   </div>
                   <div style={builderStatBox}>
-                    <Heart size={18} style={{ color: 'var(--color-danger)' }} />
-                    <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold' }}>{activeAnalytics.saves}</span>
-                    <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>User Saves Bookmarks</span>
+                    <TrendingUp size={18} style={{ color: 'var(--color-danger)' }} />
+                    <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold' }}>{pendingReviewsCount}</span>
+                    <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>Pending Reviews</span>
                   </div>
                 </div>
 
-                {/* Submissions checklist status */}
+                {/* Recent Tools section */}
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                    <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'bold', margin: 0 }}>My Managed Listings</h3>
-                    <Link to="/submit-tool" className="btn btn-primary btn-xs" style={{ fontSize: '10px' }}>
-                      + Submit New Tool
-                    </Link>
+                    <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'bold', margin: 0 }}>Recent Tools</h3>
+                    <button onClick={() => navigate('/dashboard/tools')} className="btn btn-outline btn-xs">
+                      View All Tools
+                    </button>
                   </div>
-                  {ownerTools.length > 0 ? (
+                  {recentTools.length > 0 ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                      {ownerTools.map((tool) => {
+                      {recentTools.map((tool) => {
                         const toolStats = getSelectedAnalytics(tool.id);
                         return (
                           <div
@@ -516,12 +556,8 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
                                 <span style={{ display: 'block', fontSize: '11px', fontWeight: 'bold' }}>{toolStats.clicks}</span>
                                 <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>Clicks</span>
                               </div>
-                              <div style={{ textAlign: 'center' }}>
-                                <span style={{ display: 'block', fontSize: '11px', fontWeight: 'bold' }}>{toolStats.ctr}%</span>
-                                <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>CTR</span>
-                              </div>
                               <span
-                                className={`badge`}
+                                className="badge"
                                 style={{
                                   fontSize: '10px',
                                   backgroundColor:
@@ -542,12 +578,12 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
                                       : 'var(--color-danger)',
                                 }}
                               >
-                                {tool.status.toUpperCase()}
+                                {getStatusLabel(tool.status)}
                               </span>
                             </div>
 
                             <div style={{ display: 'flex', gap: '8px' }}>
-                              <Link to={`/tools/${tool.slug}`} className="btn btn-outline btn-xs">View Preview</Link>
+                              <Link to={`/tools/${tool.slug}`} className="btn btn-outline btn-xs">View</Link>
                               <button onClick={() => handleEditClick(tool.id)} className="btn btn-outline btn-xs">Edit</button>
                             </div>
                           </div>
@@ -557,7 +593,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
                   ) : (
                     <div style={{ padding: '30px', textAlign: 'center', backgroundColor: 'var(--bg-card)', border: '1px dashed var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
                       <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', margin: '0 0 16px 0' }}>You haven't submitted any tools to AIFynest yet.</p>
-                      <Link to="/submit-tool" className="btn btn-primary btn-sm">+ Submit Your First Tool</Link>
+                      <button onClick={() => navigate('/submit-tool')} className="btn btn-primary btn-sm">+ Submit Your First Tool</button>
                     </div>
                   )}
                 </div>
@@ -578,28 +614,109 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
             {activeTab === 'listings' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'bold', margin: 0 }}>Manage Listings</h3>
-                  <Link to="/submit-tool" className="btn btn-primary btn-sm">
-                    + Submit New Tool
-                  </Link>
+                  <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', margin: 0 }}>My Tools</h3>
+                  <button onClick={() => navigate('/submit-tool')} className="btn btn-primary btn-sm">
+                    + Add Tool
+                  </button>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {ownerTools.map((tool) => (
-                    <div key={tool.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)' }}>
-                      <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                        <img src={tool.logoUrl} alt="logo" style={{ width: '32px', height: '32px', borderRadius: '4px', objectFit: 'cover' }} />
-                        <div>
-                          <h4 style={{ margin: 0, fontSize: 'var(--text-xs)', fontWeight: 'bold' }}>{tool.name}</h4>
-                          <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Status: <strong>{tool.status.toUpperCase()}</strong></span>
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', gap: '6px' }}>
-                        <button onClick={() => handleEditClick(tool.id)} className="btn btn-outline btn-sm">Edit Listing</button>
-                        <button onClick={() => { setPromoToolId(tool.id); setIsPromoModalOpen(true); }} className="btn btn-gold btn-sm">Sponsor Ads</button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+
+                {ownerTools.length > 0 ? (
+                  <div style={{ overflowX: 'auto', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-card)' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-sm)', textAlign: 'left' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-tertiary)' }}>
+                          <th style={{ padding: '12px 16px', fontWeight: 'bold' }}>Tool</th>
+                          <th style={{ padding: '12px 16px', fontWeight: 'bold' }}>Category</th>
+                          <th style={{ padding: '12px 16px', fontWeight: 'bold' }}>Status</th>
+                          <th style={{ padding: '12px 16px', fontWeight: 'bold' }}>Claim Status</th>
+                          <th style={{ padding: '12px 16px', fontWeight: 'bold', textAlign: 'center' }}>Views</th>
+                          <th style={{ padding: '12px 16px', fontWeight: 'bold', textAlign: 'center' }}>Clicks</th>
+                          <th style={{ padding: '12px 16px', fontWeight: 'bold' }}>Last Updated</th>
+                          <th style={{ padding: '12px 16px', fontWeight: 'bold', textAlign: 'right' }}>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {ownerTools.map((tool) => {
+                          const toolStats = getSelectedAnalytics(tool.id);
+                          return (
+                            <tr key={tool.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                              <td style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <img src={tool.logoUrl} alt={tool.name} style={{ width: '28px', height: '28px', borderRadius: '4px', objectFit: 'cover' }} />
+                                <span style={{ fontWeight: 'bold' }}>{tool.name}</span>
+                              </td>
+                              <td style={{ padding: '12px 16px', textTransform: 'capitalize' }}>
+                                {tool.categorySlug}
+                              </td>
+                              <td style={{ padding: '12px 16px' }}>
+                                <span
+                                  className="badge"
+                                  style={{
+                                    fontSize: '10px',
+                                    backgroundColor:
+                                      tool.status === 'approved'
+                                        ? 'var(--color-success-light)'
+                                        : tool.status === 'pending'
+                                        ? 'var(--color-warning-light)'
+                                        : tool.status === 'needs_changes'
+                                        ? 'var(--color-gold-light)'
+                                        : 'var(--color-danger-light)',
+                                    color:
+                                      tool.status === 'approved'
+                                        ? 'var(--color-success)'
+                                        : tool.status === 'pending'
+                                        ? 'var(--color-warning)'
+                                        : tool.status === 'needs_changes'
+                                        ? 'var(--color-gold)'
+                                        : 'var(--color-danger)',
+                                  }}
+                                >
+                                  {getStatusLabel(tool.status)}
+                                </span>
+                              </td>
+                              <td style={{ padding: '12px 16px', textTransform: 'capitalize' }}>
+                                <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
+                                  {tool.claimStatus}
+                                </span>
+                              </td>
+                              <td style={{ padding: '12px 16px', textAlign: 'center', fontWeight: 'var(--font-medium)' }}>
+                                {toolStats.views}
+                              </td>
+                              <td style={{ padding: '12px 16px', textAlign: 'center', fontWeight: 'var(--font-medium)' }}>
+                                {toolStats.clicks}
+                              </td>
+                              <td style={{ padding: '12px 16px', fontSize: '11px', color: 'var(--text-muted)' }}>
+                                {tool.lastUpdated}
+                              </td>
+                              <td style={{ padding: '12px 16px', textAlign: 'right' }}>
+                                <div style={{ display: 'inline-flex', gap: '6px', justifyContent: 'flex-end' }}>
+                                  <Link to={`/tools/${tool.slug}`} className="btn btn-outline btn-xs" style={{ textDecoration: 'none' }}>
+                                    View
+                                  </Link>
+                                  <button onClick={() => handleEditClick(tool.id)} className="btn btn-outline btn-xs">
+                                    Edit
+                                  </button>
+                                  <button onClick={() => navigate(`/dashboard/tools/${tool.id}/edit`)} className="btn btn-primary btn-xs">
+                                    Manage
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div style={{ padding: '60px 24px', textAlign: 'center', backgroundColor: 'var(--bg-card)', border: '1px dashed var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
+                    <h4 style={{ margin: '0 0 8px 0', fontSize: 'var(--text-base)', fontWeight: 'bold' }}>No tools yet</h4>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', margin: '0 0 24px 0', maxWidth: '380px', marginLeft: 'auto', marginRight: 'auto', lineHeight: '1.5' }}>
+                      Add your AI tool to the directory and start reaching new users.
+                    </p>
+                    <button onClick={() => navigate('/submit-tool')} className="btn btn-primary btn-sm">
+                      Submit a Tool
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -836,7 +953,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
                 <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'bold', margin: 0 }}>Builder Alert Notifications</h3>
                 {builderNotifs.length > 0 ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {builderNotifs.map((notif) => (
+                    {builderNotifs.map((notif: any) => (
                       <div
                         key={notif.id}
                         style={{
