@@ -43,12 +43,15 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
     markNotificationRead,
     getPlatformAnalytics,
     getToolAnalytics,
+    bulkImportTools,
+    bulkUpdateToolsStatus,
+    bulkDeleteTools,
     seedTenToolsPerCategory,
   } = useDatabase();
   const { user } = useAuth();
 
   // Navigation state
-  const [activeTab, setActiveTab] = useState<'overview' | 'submissions' | 'tools' | 'affiliates' | 'claims' | 'reviews' | 'analytics' | 'notifications' | 'logs' | 'pending_review' | 'changes_requested'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'submissions' | 'tools' | 'import' | 'affiliates' | 'claims' | 'reviews' | 'analytics' | 'notifications' | 'logs' | 'pending_review' | 'changes_requested'>('overview');
 
   // Filters for submissions moderation table
   const [subStatusFilter, setSubStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected' | 'needs_changes'>('all');
@@ -102,6 +105,17 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
   const [analyticsSort, setAnalyticsSort] = useState<'views' | 'clicks' | 'ctr' | 'saves'>('views');
   const [adminTimeframe, setAdminTimeframe] = useState<'7d' | '30d' | '90d' | '1y' | 'all'>('30d');
   const [adminSelectedToolId, setAdminSelectedToolId] = useState<string>('');
+
+  // CSV Import states
+  const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
+  const [csvRows, setCsvRows] = useState<string[][]>([]);
+  const [columnMappings, setColumnMappings] = useState<Record<string, string>>({});
+  const [categoryMappings, setCategoryMappings] = useState<Record<string, string>>({});
+  const [importStatusMode, setImportStatusMode] = useState<'draft' | 'pending'>('draft');
+  const [isImporting, setIsImporting] = useState<boolean>(false);
+  const [importResult, setImportResult] = useState<{ success: number; duplicates: number; failed: number; failedRows: any[] } | null>(null);
+  const [selectedImportRows, setSelectedImportRows] = useState<Set<number>>(new Set());
+  const [selectedTools, setSelectedTools] = useState<Set<string>>(new Set());
 
   // Verify access privileges
   if (!user) {
@@ -543,6 +557,278 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
       devices: deviceCounts,
     };
   };
+  // --- BULK IMPORT HELPERS ---
+  const parseCSV = (text: string): string[][] => {
+    const result: string[][] = [];
+    let row: string[] = [];
+    let inQuotes = false;
+    let cell = '';
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      const nextChar = text[i + 1];
+      if (inQuotes) {
+        if (char === '"') {
+          if (nextChar === '"') {
+            cell += '"';
+            i++;
+          } else {
+            inQuotes = false;
+          }
+        } else {
+          cell += char;
+        }
+      } else {
+        if (char === '"') {
+          inQuotes = true;
+        } else if (char === ',') {
+          row.push(cell);
+          cell = '';
+        } else if (char === '\r' || char === '\n') {
+          row.push(cell);
+          cell = '';
+          if (row.length > 1 || row[0] !== '') {
+            result.push(row);
+          }
+          row = [];
+          if (char === '\r' && nextChar === '\n') {
+            i++;
+          }
+        } else {
+          cell += char;
+        }
+      }
+    }
+    if (cell !== '' || row.length > 0) {
+      row.push(cell);
+      result.push(row);
+    }
+    return result;
+  };
+
+  const normalizeDomain = (url: string): string => {
+    let u = (url || '').trim().toLowerCase();
+    u = u.replace(/^(https?:\/\/)?(www\.)?/, '');
+    u = u.replace(/\/$/, '');
+    return u;
+  };
+
+  const handleCSVUpload = (text: string) => {
+    const parsed = parseCSV(text);
+    if (parsed.length === 0) return;
+    const headers = parsed[0].map((h) => h.trim());
+    const rows = parsed.slice(1);
+    setCsvHeaders(headers);
+    setCsvRows(rows);
+
+    const targetFields = [
+      { key: 'name', names: ['name', 'title', 'tool_name', 'tool name'] },
+      { key: 'websiteUrl', names: ['website_url', 'website url', 'url', 'website', 'link'] },
+      { key: 'categorySlug', names: ['category', 'category_slug', 'category slug', 'cat'] },
+      { key: 'description', names: ['description', 'desc', 'full_description'] },
+      { key: 'tagline', names: ['tagline', 'short_description', 'subtitle'] },
+      { key: 'subCategory', names: ['subcategory', 'sub_category', 'sub category'] },
+      { key: 'pricing', names: ['pricing', 'pricing_type', 'pricing type'] },
+      { key: 'logoUrl', names: ['logo', 'logo_url', 'logo url'] },
+      { key: 'features', names: ['features', 'features_list'] },
+      { key: 'useCases', names: ['use_cases', 'use cases'] },
+      { key: 'platforms', names: ['platforms', 'devices'] },
+      { key: 'tags', names: ['tags', 'keywords'] },
+    ];
+
+    const mapping: Record<string, string> = {};
+    targetFields.forEach((f) => {
+      const matchedHeader = headers.find((h) => f.names.includes(h.toLowerCase()));
+      if (matchedHeader) {
+        mapping[f.key] = matchedHeader;
+      }
+    });
+    setColumnMappings(mapping);
+
+    const indices = new Set<number>();
+    rows.forEach((_, idx) => indices.add(idx));
+    setSelectedImportRows(indices);
+    setImportResult(null);
+  };
+
+  const getRowData = (rowIndex: number): Record<string, string> => {
+    const row = csvRows[rowIndex] || [];
+    const data: Record<string, string> = {};
+    Object.entries(columnMappings).forEach(([targetKey, csvHeader]) => {
+      const headerIdx = csvHeaders.indexOf(csvHeader);
+      if (headerIdx !== -1) {
+        data[targetKey] = (row[headerIdx] || '').trim();
+      }
+    });
+    return data;
+  };
+
+  const validateAndAnalyzeCSV = () => {
+    let validCount = 0;
+    let duplicateCount = 0;
+    let invalidCount = 0;
+    const rowsAnalysis: { rowIndex: number; name: string; websiteUrl: string; category: string; validationStatus: 'valid' | 'duplicate' | 'invalid'; errors: string[] }[] = [];
+
+    csvRows.forEach((_, idx) => {
+      const data = getRowData(idx);
+      const name = data.name || '';
+      const url = data.websiteUrl || '';
+      const category = data.categorySlug || '';
+      const description = data.description || '';
+
+      const errors: string[] = [];
+      if (!name) errors.push('Missing Tool Name');
+      if (!url) {
+        errors.push('Missing Website URL');
+      } else if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        errors.push('Invalid URL format');
+      }
+      if (!category) errors.push('Missing Category');
+      if (!description) errors.push('Missing Description');
+
+      // Check category mapping
+      const mappedCategory = categoryMappings[category] || category;
+      const categoryExists = categories.some((c) => c.slug === mappedCategory.toLowerCase());
+      if (category && !categoryExists) {
+        errors.push(`Unknown category: "${category}" (requires mapping)`);
+      }
+
+      // Duplicate Check
+      let isDuplicate = false;
+      if (url) {
+        const normDomain = normalizeDomain(url);
+        const exactMatch = tools.some((t) => normalizeDomain(t.websiteUrl) === normDomain);
+        const possibleMatchName = name ? tools.some((t) => t.name.toLowerCase() === name.toLowerCase()) : false;
+
+        if (exactMatch) {
+          isDuplicate = true;
+          errors.push('Exact Duplicate: Domain already registered.');
+        } else if (possibleMatchName) {
+          isDuplicate = true;
+          errors.push('Possible Duplicate: Matching tool name registered.');
+        }
+      }
+
+      let status: 'valid' | 'duplicate' | 'invalid' = 'valid';
+      if (errors.length > 0 && !isDuplicate) {
+        const categoryErrorsOnly = errors.every((e) => e.includes('Unknown category'));
+        if (categoryErrorsOnly) {
+          status = 'valid';
+        } else {
+          status = 'invalid';
+          invalidCount++;
+        }
+      } else if (isDuplicate) {
+        status = 'duplicate';
+        duplicateCount++;
+      } else {
+        validCount++;
+      }
+
+      rowsAnalysis.push({
+        rowIndex: idx,
+        name,
+        websiteUrl: url,
+        category,
+        validationStatus: status,
+        errors,
+      });
+    });
+
+    return {
+      validCount,
+      duplicateCount,
+      invalidCount,
+      rowsAnalysis,
+    };
+  };
+
+  const executeBulkImport = () => {
+    setIsImporting(true);
+
+    const { rowsAnalysis } = validateAndAnalyzeCSV();
+    const selectedRowsToImport = rowsAnalysis.filter(
+      (r) => selectedImportRows.has(r.rowIndex) && r.validationStatus !== 'invalid'
+    );
+
+    const itemsToImport: any[] = [];
+    const failedRows: any[] = [];
+    let successCount = 0;
+    let duplicateCount = 0;
+
+    const validPricing = ['free', 'freemium', 'paid', 'free-trial', 'contact-sales'];
+
+    selectedRowsToImport.forEach((analysis) => {
+      const data = getRowData(analysis.rowIndex);
+      
+      if (analysis.validationStatus === 'duplicate') {
+        duplicateCount++;
+        return;
+      }
+
+      const mappedCategory = categoryMappings[data.categorySlug] || data.categorySlug;
+      const pricingType = data.pricing ? data.pricing.toLowerCase() : 'free';
+      const finalPricing = validPricing.includes(pricingType) ? pricingType : 'free';
+
+      itemsToImport.push({
+        name: data.name,
+        tagline: data.tagline || '',
+        description: data.description || '',
+        categorySlug: mappedCategory.toLowerCase(),
+        subCategory: data.subCategory || '',
+        pricing: finalPricing,
+        websiteUrl: data.websiteUrl,
+        logoUrl: data.logoUrl || '',
+        status: importStatusMode,
+        tags: data.tags || '',
+        features: data.features || '',
+        useCases: data.useCases || '',
+        platforms: data.platforms || '',
+      });
+
+      successCount++;
+    });
+
+    rowsAnalysis.forEach((r) => {
+      if (r.validationStatus === 'invalid' || !selectedImportRows.has(r.rowIndex)) {
+        failedRows.push(getRowData(r.rowIndex));
+      }
+    });
+
+    if (itemsToImport.length > 0) {
+      bulkImportTools(itemsToImport);
+    }
+
+    setImportResult({
+      success: successCount,
+      duplicates: duplicateCount,
+      failed: failedRows.length,
+      failedRows,
+    });
+    setIsImporting(false);
+    onToast(`Bulk import complete. Imported ${successCount} listings!`, 'success');
+  };
+
+  const exportFailedRows = () => {
+    if (!importResult || importResult.failedRows.length === 0) return;
+    const headers = ['name', 'websiteUrl', 'categorySlug', 'description', 'tagline', 'subCategory', 'pricing', 'logoUrl', 'features', 'useCases', 'platforms', 'tags'];
+    const csvContent = [
+      headers.join(','),
+      ...importResult.failedRows.map((row) => 
+        headers.map((field) => `"${(row[field] || '').replace(/"/g, '""')}"`).join(',')
+      )
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'failed_import_rows.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const selectedToolStats = getSelectedToolAnalyticsData();
 
   return (
@@ -558,6 +844,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
           {[
             { id: 'overview', name: 'Overview', count: 0 },
             { id: 'tools', name: 'All Tools', count: 0 },
+            { id: 'import', name: 'Import CSV', count: 0 },
             { id: 'pending_review', name: 'Pending Review', count: pendingNewCount + pendingEditsCount },
             { id: 'changes_requested', name: 'Changes Requested', count: changesRequestedCount },
             { id: 'claims', name: 'Claims', count: pendingClaimsCount },
@@ -1184,6 +1471,13 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                 <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-bold)', margin: 0 }}>Tools Master Index</h3>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                   <button 
+                    onClick={() => setActiveTab('import')} 
+                    className="btn btn-outline btn-sm"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                  >
+                    <span>📥 Import CSV</span>
+                  </button>
+                  <button 
                     onClick={handleBulkSeed} 
                     className="btn btn-primary btn-sm"
                     style={{ background: 'linear-gradient(135deg, var(--color-gold) 0%, #d97706 100%)', border: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
@@ -1209,10 +1503,92 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                 </div>
               </div>
 
+              {/* Bulk Actions Control Bar */}
+              {selectedTools.size > 0 && (
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '12px 16px',
+                  backgroundColor: 'var(--color-primary-light)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-md)',
+                }}>
+                  <span style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold', color: 'var(--color-primary)' }}>
+                    Selected {selectedTools.size} Tools
+                  </span>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      onClick={() => {
+                        bulkUpdateToolsStatus(Array.from(selectedTools), 'approved');
+                        setSelectedTools(new Set());
+                        onToast(`Successfully published ${selectedTools.size} tools!`, 'success');
+                      }}
+                      className="btn btn-primary btn-xs"
+                    >
+                      Publish
+                    </button>
+                    <button
+                      onClick={() => {
+                        bulkUpdateToolsStatus(Array.from(selectedTools), 'pending');
+                        setSelectedTools(new Set());
+                        onToast(`Submitted ${selectedTools.size} tools for review.`, 'success');
+                      }}
+                      className="btn btn-outline btn-xs"
+                    >
+                      Submit for Review
+                    </button>
+                    <button
+                      onClick={() => {
+                        bulkUpdateToolsStatus(Array.from(selectedTools), 'archived');
+                        setSelectedTools(new Set());
+                        onToast(`Archived ${selectedTools.size} tools.`, 'success');
+                      }}
+                      className="btn btn-outline btn-xs"
+                    >
+                      Archive
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (window.confirm(`Are you sure you want to permanently delete ${selectedTools.size} selected tools?`)) {
+                          bulkDeleteTools(Array.from(selectedTools));
+                          setSelectedTools(new Set());
+                          onToast(`Successfully deleted ${selectedTools.size} tools.`, 'success');
+                        }
+                      }}
+                      className="btn btn-outline btn-xs"
+                      style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)' }}
+                    >
+                      Delete
+                    </button>
+                    <button
+                      onClick={() => setSelectedTools(new Set())}
+                      className="btn btn-outline btn-xs"
+                    >
+                      Cancel Selection
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className="table-container">
                 <table className="data-table">
                   <thead>
                     <tr>
+                      <th style={{ width: '40px', textAlign: 'center' }}>
+                        <input
+                          type="checkbox"
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              const pageIds = filteredTools.map((t) => t.id);
+                              setSelectedTools(new Set(pageIds));
+                            } else {
+                              setSelectedTools(new Set());
+                            }
+                          }}
+                          checked={filteredTools.length > 0 && filteredTools.every((t) => selectedTools.has(t.id))}
+                        />
+                      </th>
                       <th>Tool</th>
                       <th>Slug</th>
                       <th>Rating</th>
@@ -1225,6 +1601,21 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                   <tbody>
                     {filteredTools.map((tool) => (
                       <tr key={tool.id}>
+                        <td style={{ textAlign: 'center' }}>
+                          <input
+                            type="checkbox"
+                            checked={selectedTools.has(tool.id)}
+                            onChange={(e) => {
+                              const newSelection = new Set(selectedTools);
+                              if (e.target.checked) {
+                                newSelection.add(tool.id);
+                              } else {
+                                newSelection.delete(tool.id);
+                              }
+                              setSelectedTools(newSelection);
+                            }}
+                          />
+                        </td>
                         <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <img src={tool.logoUrl} alt={tool.name} style={{ width: '28px', height: '28px', borderRadius: '4px', objectFit: 'cover' }} />
                           <span style={{ fontWeight: 'bold' }}>{tool.name}</span>
@@ -1259,6 +1650,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                             <option value="needs_changes">Needs Changes</option>
                             <option value="rejected">Rejected</option>
                             <option value="suspended">Suspended</option>
+                            <option value="archived">Archived</option>
                           </select>
                         </td>
                         <td>
@@ -1274,6 +1666,288 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                   </tbody>
                 </table>
               </div>
+            </div>
+          )}
+
+          {/* TAB 8: BULK IMPORT WORKSPACE */}
+          {activeTab === 'import' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+              <div>
+                <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-bold)', margin: 0 }}>Bulk AI Tools Importer</h3>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Upload CSV templates to map, validate, and batch import hundreds of AI tool listings as drafts.</span>
+              </div>
+
+              {/* 1. CSV File Upload Section */}
+              <div style={{ padding: '24px', border: '2px dashed var(--border-color)', borderRadius: 'var(--radius-lg)', textAlign: 'center', backgroundColor: 'var(--bg-card)' }}>
+                <input
+                  type="file"
+                  accept=".csv"
+                  id="csv-file-uploader"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        if (event.target?.result) {
+                          handleCSVUpload(event.target.result as string);
+                        }
+                      };
+                      reader.readAsText(file);
+                    }
+                  }}
+                />
+                <label htmlFor="csv-file-uploader" className="btn btn-primary" style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                  <span>📂 Choose CSV File</span>
+                </label>
+                <p style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '10px' }}>
+                  Supported fields: name (req), websiteUrl (req), categorySlug (req), description (req), tagline, subCategory, pricing, logoUrl, features, useCases, platforms, tags.
+                </p>
+                {csvRows.length > 0 && (
+                  <div style={{ marginTop: '14px', fontSize: 'var(--text-xs)', color: 'var(--color-success)', fontWeight: 'bold' }}>
+                    Loaded {csvRows.length} rows from CSV file!
+                  </div>
+                )}
+              </div>
+
+              {/* 2. Column Mapping Block */}
+              {csvHeaders.length > 0 && (
+                <div style={{ padding: '20px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-card)' }}>
+                  <h4 style={{ margin: '0 0 16px 0', fontSize: 'var(--text-xs)', fontWeight: 'bold' }}>Column Mappings</h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+                    {[
+                      { key: 'name', label: 'Tool Name (Required)' },
+                      { key: 'websiteUrl', label: 'Website URL (Required)' },
+                      { key: 'categorySlug', label: 'Category Slug (Required)' },
+                      { key: 'description', label: 'Description (Required)' },
+                      { key: 'tagline', label: 'Tagline' },
+                      { key: 'subCategory', label: 'Subcategory' },
+                      { key: 'pricing', label: 'Pricing Model' },
+                      { key: 'logoUrl', label: 'Logo Image URL' },
+                      { key: 'features', label: 'Features (comma list)' },
+                      { key: 'useCases', label: 'Use Cases (comma list)' },
+                      { key: 'platforms', label: 'Platforms' },
+                      { key: 'tags', label: 'Tags' },
+                    ].map((f) => (
+                      <div key={f.key} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label style={{ fontSize: '10px', fontWeight: 'bold', color: 'var(--text-secondary)' }}>{f.label}</label>
+                        <select
+                          className="form-input btn-xs"
+                          value={columnMappings[f.key] || ''}
+                          onChange={(e) => setColumnMappings({ ...columnMappings, [f.key]: e.target.value })}
+                        >
+                          <option value="">-- Do Not Map --</option>
+                          {csvHeaders.map((h) => (
+                            <option key={h} value={h}>{h}</option>
+                          ))}
+                        </select>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 3. Category Mappings block */}
+              {csvRows.length > 0 && (
+                <div style={{ padding: '20px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-card)' }}>
+                  <h4 style={{ margin: '0 0 8px 0', fontSize: 'var(--text-xs)', fontWeight: 'bold' }}>Category Mapping Deck</h4>
+                  <p style={{ fontSize: '10px', color: 'var(--text-secondary)', marginBottom: '14px' }}>
+                    Map custom text categories found in your CSV file to directory's official slugs.
+                  </p>
+                  
+                  {/* Extract unique categories in CSV rows */}
+                  {(() => {
+                    const uniqueCsvCategories = Array.from(new Set(csvRows.map((_, i) => getRowData(i).categorySlug).filter(Boolean)));
+                    const unknownCsvCategories = uniqueCsvCategories.filter(cat => 
+                      !categories.some(c => c.slug === (categoryMappings[cat] || cat).toLowerCase())
+                    );
+
+                    if (unknownCsvCategories.length === 0) {
+                      return <div style={{ fontSize: '11px', color: 'var(--color-success)', fontWeight: 'bold' }}>All CSV categories mapped successfully!</div>;
+                    }
+
+                    return (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        {unknownCsvCategories.map((csvCat) => (
+                          <div key={csvCat} style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                            <span style={{ fontSize: '11px', fontWeight: 'bold', minWidth: '150px' }}>"{csvCat}" ➔</span>
+                            <select
+                              className="form-input btn-xs"
+                              value={categoryMappings[csvCat] || ''}
+                              onChange={(e) => setCategoryMappings({ ...categoryMappings, [csvCat]: e.target.value })}
+                              style={{ width: '200px' }}
+                            >
+                              <option value="">-- Select Map Target --</option>
+                              {categories.map((c) => (
+                                <option key={c.slug} value={c.slug}>{c.name}</option>
+                              ))}
+                            </select>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+
+              {/* 4. Analysis & Validation Ledger Section */}
+              {csvRows.length > 0 && (() => {
+                const { validCount, duplicateCount, invalidCount, rowsAnalysis } = validateAndAnalyzeCSV();
+                
+                return (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    {/* Summary metrics header */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+                      <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)' }}>
+                        <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px' }}>Total Rows</div>
+                        <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold' }}>{csvRows.length}</div>
+                      </div>
+                      <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)' }}>
+                        <div style={{ fontSize: '10px', color: 'var(--color-success)', marginBottom: '4px' }}>Valid Rows</div>
+                        <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', color: 'var(--color-success)' }}>{validCount}</div>
+                      </div>
+                      <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)' }}>
+                        <div style={{ fontSize: '10px', color: 'var(--color-warning)', marginBottom: '4px' }}>Duplicates Found</div>
+                        <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', color: 'var(--color-warning)' }}>{duplicateCount}</div>
+                      </div>
+                      <div style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)' }}>
+                        <div style={{ fontSize: '10px', color: 'var(--color-danger)', marginBottom: '4px' }}>Invalid Rows</div>
+                        <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', color: 'var(--color-danger)' }}>{invalidCount}</div>
+                      </div>
+                    </div>
+
+                    {/* Import Options Toolbar */}
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '16px 20px',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 'var(--radius-md)',
+                      backgroundColor: 'var(--bg-card)',
+                      flexWrap: 'wrap',
+                      gap: '12px'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ fontSize: '11px', fontWeight: 'bold' }}>Import tools status:</span>
+                          <select
+                            className="form-input btn-sm"
+                            value={importStatusMode}
+                            onChange={(e) => setImportStatusMode(e.target.value as any)}
+                            style={{ width: 'auto' }}
+                          >
+                            <option value="draft">Draft (Recommended)</option>
+                            <option value="pending">Pending Review</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '10px' }}>
+                        <button
+                          disabled={isImporting || selectedImportRows.size === 0}
+                          onClick={executeBulkImport}
+                          className="btn btn-primary"
+                        >
+                          {isImporting ? 'Importing...' : `Confirm & Import (${selectedImportRows.size} rows)`}
+                        </button>
+                        {importResult && importResult.failed > 0 && (
+                          <button
+                            onClick={exportFailedRows}
+                            className="btn btn-outline"
+                          >
+                            📥 Export Failed Rows ({importResult.failed})
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Import results feedback summary card */}
+                    {importResult && (
+                      <div style={{ padding: '16px', border: '1px solid var(--color-success)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--color-primary-light)' }}>
+                        <h5 style={{ margin: '0 0 8px 0', fontSize: 'var(--text-xs)', fontWeight: 'bold', color: 'var(--color-primary)' }}>Import Task Complete</h5>
+                        <ul style={{ fontSize: '11px', margin: 0, paddingLeft: '16px', display: 'flex', gap: '20px' }}>
+                          <li>Success imports: <strong>{importResult.success}</strong></li>
+                          <li>Duplicates skipped: <strong>{importResult.duplicates}</strong></li>
+                          <li>Failed rows: <strong>{importResult.failed}</strong></li>
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Preview Table */}
+                    <div className="table-container">
+                      <table className="data-table">
+                        <thead>
+                          <tr>
+                            <th style={{ width: '40px', textAlign: 'center' }}>
+                              <input
+                                type="checkbox"
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    const allIndices = new Set<number>();
+                                    rowsAnalysis.forEach(r => allIndices.add(r.rowIndex));
+                                    setSelectedImportRows(allIndices);
+                                  } else {
+                                    setSelectedImportRows(new Set());
+                                  }
+                                }}
+                                checked={selectedImportRows.size === rowsAnalysis.length}
+                              />
+                            </th>
+                            <th>Tool Name</th>
+                            <th>Website Url</th>
+                            <th>Category</th>
+                            <th>Pricing</th>
+                            <th>Status</th>
+                            <th>Warnings/Errors</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {rowsAnalysis.map((analysis) => {
+                            const data = getRowData(analysis.rowIndex);
+                            
+                            return (
+                              <tr key={analysis.rowIndex} style={{
+                                opacity: selectedImportRows.has(analysis.rowIndex) ? 1 : 0.6,
+                                backgroundColor: analysis.validationStatus === 'invalid' ? 'rgba(239, 68, 68, 0.05)' : analysis.validationStatus === 'duplicate' ? 'rgba(245, 158, 11, 0.05)' : 'inherit'
+                              }}>
+                                <td style={{ textAlign: 'center' }}>
+                                  <input
+                                    type="checkbox"
+                                    disabled={analysis.validationStatus === 'invalid'}
+                                    checked={selectedImportRows.has(analysis.rowIndex) && analysis.validationStatus !== 'invalid'}
+                                    onChange={(e) => {
+                                      const next = new Set(selectedImportRows);
+                                      if (e.target.checked) {
+                                        next.add(analysis.rowIndex);
+                                      } else {
+                                        next.delete(analysis.rowIndex);
+                                      }
+                                      setSelectedImportRows(next);
+                                    }}
+                                  />
+                                </td>
+                                <td style={{ fontWeight: 'bold' }}>{analysis.name || '(Empty)'}</td>
+                                <td>{analysis.websiteUrl || '(Empty)'}</td>
+                                <td>{analysis.category || '(Empty)'}</td>
+                                <td>{data.pricing || 'free'}</td>
+                                <td>
+                                  <span className={`badge ${analysis.validationStatus === 'valid' ? 'badge-approved' : analysis.validationStatus === 'duplicate' ? 'badge-pending' : 'badge-rejected'}`}>
+                                    {analysis.validationStatus.toUpperCase()}
+                                  </span>
+                                </td>
+                                <td style={{ color: analysis.validationStatus === 'invalid' ? 'var(--color-danger)' : 'var(--text-secondary)', fontSize: '10px' }}>
+                                  {analysis.errors.join(' | ') || 'Passed validation'}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           )}
 

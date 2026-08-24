@@ -75,6 +75,9 @@ interface DatabaseContextType {
   getToolAnalytics: (toolId: string, actorId: string) => AnalyticsEvent[] | null;
   getOwnerAnalytics: (ownerId: string, actorId: string) => AnalyticsEvent[];
   getPlatformAnalytics: (actorId: string) => AnalyticsEvent[];
+  bulkImportTools: (importedToolsData: any[]) => number;
+  bulkUpdateToolsStatus: (ids: string[], newStatus: Tool['status']) => void;
+  bulkDeleteTools: (ids: string[]) => void;
 
   // Affiliate link management
   addAffiliateLink: (link: Omit<AffiliateLink, 'id' | 'clicks' | 'conversions' | 'revenue'>) => AffiliateLink;
@@ -751,6 +754,87 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return analyticsEvents;
   };
 
+  const bulkImportTools = (importedToolsData: any[]): number => {
+    const dateStr = new Date().toISOString().split('T')[0];
+    const generatedSlugs = new Set<string>();
+
+    const newTools: Tool[] = importedToolsData.map((item) => {
+      let baseSlug = item.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+      if (!baseSlug) baseSlug = 'tool';
+
+      let slug = baseSlug;
+      let counter = 2;
+      while (
+        tools.some((t) => t.slug === slug) ||
+        generatedSlugs.has(slug)
+      ) {
+        slug = `${baseSlug}-${counter}`;
+        counter++;
+      }
+      generatedSlugs.add(slug);
+
+      const parsedTags = Array.isArray(item.tags) ? item.tags : typeof item.tags === 'string' ? item.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [];
+      const parsedFeatures = Array.isArray(item.features) ? item.features : typeof item.features === 'string' ? item.features.split(',').map((f: string) => f.trim()).filter(Boolean) : [];
+      const parsedUseCases = Array.isArray(item.useCases) ? item.useCases : typeof item.useCases === 'string' ? item.useCases.split(',').map((u: string) => u.trim()).filter(Boolean) : [];
+      const parsedPlatforms = Array.isArray(item.platforms) ? item.platforms : typeof item.platforms === 'string' ? item.platforms.split(',').map((p: string) => p.trim()).filter(Boolean) : ['Web'];
+
+      return {
+        id: Math.random().toString(36).substr(2, 9),
+        name: item.name,
+        slug,
+        tagline: item.tagline || '',
+        description: item.description || '',
+        categorySlug: item.categorySlug,
+        subCategory: item.subCategory || '',
+        pricing: item.pricing || 'free',
+        pricingUrl: item.pricingUrl || '',
+        platforms: parsedPlatforms,
+        pricingPlans: [],
+        features: parsedFeatures,
+        useCases: parsedUseCases,
+        pros: [],
+        cons: [],
+        logoUrl: item.logoUrl || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=128&auto=format&fit=crop&q=60',
+        screenshotUrls: item.screenshotUrls || [],
+        websiteUrl: item.websiteUrl,
+        rating: 0,
+        reviewCount: 0,
+        isVerified: false,
+        isFeatured: false,
+        isSponsored: false,
+        status: item.status || 'draft',
+        ownerId: null,
+        claimStatus: 'unclaimed',
+        lastUpdated: dateStr,
+        tags: parsedTags,
+      };
+    });
+
+    const updatedTools = [...tools, ...newTools];
+    setTools(updatedTools);
+    saveToStorage('ai_tools', updatedTools);
+
+    logAdminAction('admin-id', 'System Admin', 'Bulk Import', `Imported ${newTools.length} tools via CSV import console.`);
+    return newTools.length;
+  };
+
+  const bulkUpdateToolsStatus = (ids: string[], newStatus: Tool['status']) => {
+    const updated = tools.map((t) => ids.includes(t.id) ? { ...t, status: newStatus, lastUpdated: new Date().toISOString().split('T')[0] } : t);
+    setTools(updated);
+    saveToStorage('ai_tools', updated);
+    logAdminAction('admin-id', 'System Admin', 'Bulk Update Status', `Updated status of ${ids.length} tools to ${newStatus}.`);
+  };
+
+  const bulkDeleteTools = (ids: string[]) => {
+    const updated = tools.filter((t) => !ids.includes(t.id));
+    setTools(updated);
+    saveToStorage('ai_tools', updated);
+    logAdminAction('admin-id', 'System Admin', 'Bulk Delete', `Deleted ${ids.length} tools listings.`);
+  };
+
   const getTrendingTools = (limit = 4): Tool[] => {
     const scores = calculateTrendingScores(tools, analyticsEvents, reviews);
     const sortedTools = [...tools]
@@ -968,6 +1052,9 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         getToolAnalytics,
         getOwnerAnalytics,
         getPlatformAnalytics,
+        bulkImportTools,
+        bulkUpdateToolsStatus,
+        bulkDeleteTools,
         addAffiliateLink,
         updateAffiliateLink,
         deleteAffiliateLink,
