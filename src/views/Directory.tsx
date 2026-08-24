@@ -557,7 +557,7 @@ export const Directory: React.FC<DirectoryProps> = ({
             </div>
 
             {/* Right Tools Grid */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', minWidth: 0 }}>
               {paginatedTools.length > 0 ? (
                 <>
                   <div className="directory-tools-grid">
