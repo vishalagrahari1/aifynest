@@ -194,7 +194,7 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
 -- notifications
 CREATE TABLE IF NOT EXISTS public.notifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
   message TEXT NOT NULL,
   read BOOLEAN DEFAULT false,
@@ -294,7 +294,8 @@ BEGIN
   IF NEW.event_type NOT IN (
     'tool_view', 'website_click', 'favorite', 'review_submitted', 
     'search_impression', 'tool_share', 'sponsored_impression', 
-    'sponsored_click', 'tool_click', 'affiliate_click'
+    'sponsored_click', 'tool_click', 'affiliate_click',
+    'category_view', 'search'
   ) THEN
     RAISE EXCEPTION 'Access Denied: Invalid event type.';
   END IF;
@@ -534,39 +535,3 @@ CREATE INDEX IF NOT EXISTS idx_claims_status ON public.tool_claims(status);
 CREATE INDEX IF NOT EXISTS idx_reviews_tool ON public.reviews(tool_id);
 CREATE INDEX IF NOT EXISTS idx_analytics_tool_type ON public.analytics_events(tool_id, event_type);
 CREATE INDEX IF NOT EXISTS idx_analytics_timestamp ON public.analytics_events(timestamp);
-
--- ----------------------------------------------------
--- 6. SUPABASE STORAGE RLS POLICIES (listings bucket objects)
--- ----------------------------------------------------
--- Note: Applies to storage.objects table where bucket_id = 'listings'
-
--- Enable RLS on storage objects
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
-
--- 1. Select/Read policy: Anyone can download/read files inside 'listings' bucket
-CREATE POLICY "Public read storage assets" ON storage.objects FOR SELECT USING (bucket_id = 'listings');
-
--- 2. Insert/Upload policy: Admin or Owners for their own specific directory only
--- Directory path constraint enforces names starting with: 'owners/' || auth.uid() || '/'
-CREATE POLICY "Owner upload storage assets" ON storage.objects FOR INSERT WITH CHECK (
-  bucket_id = 'listings' AND (
-    public.is_admin(auth.uid()) OR 
-    (position('owners/' || auth.uid()::text || '/') = 1)
-  )
-);
-
--- 3. Update/Overwrite policy: Admin or Owners inside their folder only
-CREATE POLICY "Owner update storage assets" ON storage.objects FOR UPDATE USING (
-  bucket_id = 'listings' AND (
-    public.is_admin(auth.uid()) OR 
-    (position('owners/' || auth.uid()::text || '/') = 1)
-  )
-);
-
--- 4. Delete policy: Admin or Owners inside their folder only
-CREATE POLICY "Owner delete storage assets" ON storage.objects FOR DELETE USING (
-  bucket_id = 'listings' AND (
-    public.is_admin(auth.uid()) OR 
-    (position('owners/' || auth.uid()::text || '/') = 1)
-  )
-);
