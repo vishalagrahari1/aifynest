@@ -750,6 +750,23 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
       (r) => selectedImportRows.has(r.rowIndex) && r.validationStatus !== 'invalid'
     );
 
+    const categorySlugs = new Set(categories.map(c => c.slug));
+    const unmappedCategories = new Set<string>();
+
+    selectedRowsToImport.forEach((analysis) => {
+      const data = getRowData(analysis.rowIndex);
+      const mappedCategory = (categoryMappings[data.categorySlug] || data.categorySlug || '').toLowerCase().trim().replace(/\s+/g, '-');
+      if (!categorySlugs.has(mappedCategory)) {
+        unmappedCategories.add(data.categorySlug || 'unspecified');
+      }
+    });
+
+    if (unmappedCategories.size > 0) {
+      setIsImporting(false);
+      alert('Cannot Import: Please choose a valid target category mapping for: ' + Array.from(unmappedCategories).join(', '));
+      return;
+    }
+
     const itemsToImport: any[] = [];
     const failedRows: any[] = [];
     let successCount = 0;
