@@ -255,20 +255,7 @@ export const Directory: React.FC<DirectoryProps> = ({
     <div style={{ position: 'relative', backgroundColor: 'var(--bg-primary)', minHeight: '100vh', padding: '32px 0 80px 0' }}>
       <SEOHead title={pageTitle} description={pageDescription} />
 
-      <div 
-        className="container" 
-        style={{ 
-          maxWidth: '1240px',
-          width: 'calc(100% - 32px)',
-          margin: '0 auto',
-          backgroundColor: 'var(--bg-card)', 
-          border: '1px solid var(--border-color)', 
-          borderRadius: '16px', 
-          padding: '40px',
-          boxShadow: 'var(--shadow-sm)',
-          boxSizing: 'border-box'
-        }}
-      >
+      <div className="directory-container-box">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
           
           {/* Breadcrumbs */}
@@ -573,7 +560,7 @@ export const Directory: React.FC<DirectoryProps> = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
               {paginatedTools.length > 0 ? (
                 <>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+                  <div className="directory-tools-grid">
                     {paginatedTools.map((tool) => (
                       <ToolCard
                         key={tool.id}
@@ -707,6 +694,30 @@ export const Directory: React.FC<DirectoryProps> = ({
 
       {/* CSS Styles injection for interactive scaling and glows */}
       <style>{`
+        .directory-container-box {
+          max-width: 1240px;
+          width: calc(100% - 32px);
+          margin: 0 auto;
+          background-color: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: 16px;
+          padding: 40px;
+          box-shadow: var(--shadow-sm);
+          box-sizing: border-box;
+        }
+
+        .directory-tools-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+          gap: 24px;
+        }
+
+        @media (max-width: 1200px) {
+          .directory-container-box {
+            padding: 24px !important;
+          }
+        }
+
         @media (max-width: 900px) {
           .directory-layout {
             grid-template-columns: 1fr !important;
