@@ -1423,25 +1423,40 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const bulkImportTools = (importedToolsData: any[]): number => {
     if (useSupabase) {
       const runBatch = async () => {
-        // Enforce draft/pending status security defaults during batch inserts
-        const rows = importedToolsData.map(item => ({
-          name: item.name,
-          tagline: item.tagline,
-          description: item.description,
-          category_slug: item.categorySlug,
-          sub_category: item.subCategory || 'General',
-          pricing: item.pricing || 'free',
-          website_url: item.websiteUrl,
-          logo_url: item.logoUrl || '',
-          status: item.status || 'draft', // Enforce draft default status rule
-          tags: Array.isArray(item.tags) ? item.tags : typeof item.tags === 'string' ? item.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
-          features: Array.isArray(item.features) ? item.features : typeof item.features === 'string' ? item.features.split(',').map((f: string) => f.trim()).filter(Boolean) : [],
-          use_cases: Array.isArray(item.useCases) ? item.useCases : typeof item.useCases === 'string' ? item.useCases.split(',').map((u: string) => u.trim()).filter(Boolean) : [],
-          platforms: Array.isArray(item.platforms) ? item.platforms : typeof item.platforms === 'string' ? item.platforms.split(',').map((p: string) => p.trim()).filter(Boolean) : ['Web'],
-        }));
-        
-        await supabase.from('tools').insert(rows);
-        fetchDatabaseState();
+        try {
+          // Enforce draft/pending status security defaults during batch inserts
+          const rows = importedToolsData.map(item => {
+            // Normalize and sanitize category slug to match database references (lowercase, hyphens instead of spaces)
+            const cleanCategory = (item.categorySlug || '').toLowerCase().trim().replace(/\s+/g, '-');
+            return {
+              name: item.name,
+              tagline: item.tagline || '',
+              description: item.description || '',
+              category_slug: cleanCategory,
+              sub_category: item.subCategory || 'General',
+              pricing: item.pricing || 'free',
+              website_url: item.websiteUrl,
+              logo_url: item.logoUrl || '',
+              status: 'draft', // Enforce draft default status rule
+              tags: Array.isArray(item.tags) ? item.tags : typeof item.tags === 'string' ? item.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
+              features: Array.isArray(item.features) ? item.features : typeof item.features === 'string' ? item.features.split(',').map((f: string) => f.trim()).filter(Boolean) : [],
+              use_cases: Array.isArray(item.useCases) ? item.useCases : typeof item.useCases === 'string' ? item.useCases.split(',').map((u: string) => u.trim()).filter(Boolean) : [],
+              platforms: Array.isArray(item.platforms) ? item.platforms : typeof item.platforms === 'string' ? item.platforms.split(',').map((p: string) => p.trim()).filter(Boolean) : ['Web'],
+            };
+          });
+          
+          const { error } = await supabase.from('tools').insert(rows);
+          if (error) {
+            console.error('Error inserting bulk tools batch:', error.message, error.details);
+            alert('Import Failed: ' + error.message + '\nDetails: ' + (error.details || 'Make sure category slugs match your categories exactly (e.g. "image-generation", "writing")'));
+          } else {
+            fetchDatabaseState();
+            alert('Success! ' + importedToolsData.length + ' tools imported successfully as drafts.');
+          }
+        } catch (err: any) {
+          console.error('Exception during bulk tools import:', err);
+          alert('Import Error: ' + err.message);
+        }
       };
       runBatch();
       return importedToolsData.length;
