@@ -795,7 +795,17 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
     });
 
     if (itemsToImport.length > 0) {
-      bulkImportTools(itemsToImport);
+      const chunkArray = (arr: any[], size: number) => {
+        const result = [];
+        for (let i = 0; i < arr.length; i += size) {
+          result.push(arr.slice(i, i + size));
+        }
+        return result;
+      };
+      const batches = chunkArray(itemsToImport, 250);
+      for (const batch of batches) {
+        bulkImportTools(batch);
+      }
     }
 
     setImportResult({
@@ -827,6 +837,40 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleBackupLocalStorage = () => {
+    const keys = [
+      'ai_tools',
+      'ai_categories',
+      'ai_reviews',
+      'ai_campaigns',
+      'ai_payments',
+      'ai_claims',
+      'ai_blog_posts',
+      'ai_collections',
+      'ai_audit_logs',
+      'ai_notifications',
+      'ai_analytics_events',
+      'ai_users'
+    ];
+    const backup: Record<string, any> = {};
+    keys.forEach((k) => {
+      const data = localStorage.getItem(k);
+      if (data) {
+        backup[k] = JSON.parse(data);
+      }
+    });
+
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `aifynest_localstorage_backup_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    onToast('LocalStorage database backup downloaded successfully!', 'success');
   };
 
   const selectedToolStats = getSelectedToolAnalyticsData();
@@ -1470,6 +1514,13 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                 <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-bold)', margin: 0 }}>Tools Master Index</h3>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                  <button 
+                    onClick={handleBackupLocalStorage} 
+                    className="btn btn-outline btn-sm"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}
+                  >
+                    <span>💾 Backup LocalStorage</span>
+                  </button>
                   <button 
                     onClick={() => setActiveTab('import')} 
                     className="btn btn-outline btn-sm"

@@ -1,8 +1,25 @@
 /* src/context/DatabaseContext.tsx */
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import type {
+  Tool,
+  Category,
+  Review,
+  Campaign,
+  Payment,
+  Notification,
+  AuditLog,
+  AffiliateLink,
+  Collection,
+  AnalyticsEvent,
+  BlogPost,
+} from '../utils/seedData';
+import { calculateTrendingScores } from '../utils/trendingAlgorithm';
+import { supabase } from '../utils/supabase';
+
+// Seed lists for localStorage prototype mode
 import {
-  initialCategories,
   initialTools,
+  initialCategories,
   initialReviews,
   initialCampaigns,
   initialPayments,
@@ -12,21 +29,6 @@ import {
   initialAffiliateLinks,
   initialNotifications,
 } from '../utils/seedData';
-import type {
-  Tool,
-  Category,
-  Review,
-  Campaign,
-  Payment,
-  AnalyticsEvent,
-  Claim,
-  BlogPost,
-  Collection,
-  AuditLog,
-  AffiliateLink,
-  Notification,
-} from '../utils/seedData';
-import { calculateTrendingScores } from '../utils/trendingAlgorithm';
 
 interface DatabaseContextType {
   tools: Tool[];
@@ -35,13 +37,14 @@ interface DatabaseContextType {
   campaigns: Campaign[];
   payments: Payment[];
   analyticsEvents: AnalyticsEvent[];
-  claims: Claim[];
+  claims: any[];
   blogPosts: BlogPost[];
   collections: Collection[];
   auditLogs: AuditLog[];
   affiliateLinks: AffiliateLink[];
   notifications: Notification[];
-  
+
+  // Write actions
   addTool: (tool: Omit<Tool, 'id' | 'rating' | 'reviewCount' | 'isVerified' | 'isFeatured' | 'isSponsored' | 'status' | 'claimStatus' | 'lastUpdated'> & { status?: Tool['status'] }) => Tool;
   updateTool: (id: string, updatedFields: Partial<Tool>, actorId?: string) => void;
   deleteTool: (id: string, actorId?: string) => void;
@@ -79,7 +82,7 @@ interface DatabaseContextType {
   bulkUpdateToolsStatus: (ids: string[], newStatus: Tool['status']) => void;
   bulkDeleteTools: (ids: string[]) => void;
 
-  // Affiliate link management
+  // Affiliate links
   addAffiliateLink: (link: Omit<AffiliateLink, 'id' | 'clicks' | 'conversions' | 'revenue'>) => AffiliateLink;
   updateAffiliateLink: (id: string, updatedFields: Partial<AffiliateLink>) => void;
   deleteAffiliateLink: (id: string) => void;
@@ -87,17 +90,16 @@ interface DatabaseContextType {
   // Notifications
   addNotification: (userId: string, title: string, message: string, type: Notification['type']) => void;
   markNotificationRead: (id: string) => void;
-
-  // Bulk Seed Operations
   seedTenToolsPerCategory: () => number;
-
-  // Security & Data Access Helpers
   getOwnedTools: (userId: string) => Tool[];
   getOwnedTool: (toolId: string, userId: string) => Tool | null;
   canManageTool: (toolId: string, userId: string) => boolean;
+  dbError: string | null;
 }
 
 const DatabaseContext = createContext<DatabaseContextType | undefined>(undefined);
+
+const useSupabase = !import.meta.env.VITE_SUPABASE_URL?.includes('placeholder-url');
 
 export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [tools, setTools] = useState<Tool[]>([]);
@@ -106,117 +108,404 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [analyticsEvents, setAnalyticsEvents] = useState<AnalyticsEvent[]>([]);
-  const [claims, setClaims] = useState<Claim[]>([]);
+  const [claims, setClaims] = useState<any[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [affiliateLinks, setAffiliateLinks] = useState<AffiliateLink[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [dbError, setDbError] = useState<string | null>(null);
 
-  // Initialize and load databases
-  useEffect(() => {
-    const loadOrSeed = <T,>(key: string, seed: T): T => {
-      const data = localStorage.getItem(key);
-      if (data) {
-        return JSON.parse(data) as T;
+  // DB Row to frontend UI model mapper helpers
+  const mapToolRow = (t: any): Tool => ({
+    id: t.id,
+    name: t.name,
+    slug: t.slug,
+    tagline: t.tagline,
+    description: t.description,
+    categorySlug: t.category_slug,
+    subCategory: t.sub_category,
+    pricing: t.pricing,
+    pricingUrl: t.pricing_url || '',
+    platforms: t.platforms || [],
+    pricingPlans: t.pricing_plans || [],
+    features: t.features || [],
+    useCases: t.use_cases || [],
+    pros: t.pros || [],
+    cons: t.cons || [],
+    logoUrl: t.logo_url,
+    screenshotUrls: t.screenshot_urls || [],
+    videoUrl: t.video_url || '',
+    websiteUrl: t.website_url,
+    rating: Number(t.rating || 0.0),
+    reviewCount: Number(t.review_count || 0),
+    isVerified: t.is_verified || false,
+    isFeatured: t.is_featured || false,
+    isSponsored: t.is_sponsored || false,
+    status: t.status,
+    ownerId: t.owner_id,
+    claimStatus: t.claim_status,
+    lastUpdated: t.last_updated,
+    tags: t.tags || [],
+  });
+
+  const fetchDatabaseState = async () => {
+    if (!useSupabase) return;
+    setDbError(null);
+    try {
+      // 1. Categories
+      const { data: catData } = await supabase.from('categories').select('*').order('name');
+      if (catData) {
+        setCategories(catData.map(c => ({
+          name: c.name,
+          slug: c.slug,
+          iconName: c.icon_name,
+          description: c.description,
+          subcategories: c.subcategories || [],
+        })));
       }
-      localStorage.setItem(key, JSON.stringify(seed));
-      return seed;
-    };
 
-    setTools(loadOrSeed('ai_tools', initialTools));
-    setCategories(loadOrSeed('ai_categories', initialCategories));
-    setReviews(loadOrSeed('ai_reviews', initialReviews));
-    setCampaigns(loadOrSeed('ai_campaigns', initialCampaigns));
-    setPayments(loadOrSeed('ai_payments', initialPayments));
-    setAnalyticsEvents(loadOrSeed('ai_analytics_events', []));
-    setClaims(loadOrSeed('ai_claims', []));
-    setBlogPosts(loadOrSeed('ai_blog_posts', initialBlogPosts));
-    setCollections(loadOrSeed('ai_collections', initialCollections));
-    setAuditLogs(loadOrSeed('ai_audit_logs', initialAuditLogs));
-    setAffiliateLinks(loadOrSeed('ai_affiliates', initialAffiliateLinks));
-    setNotifications(loadOrSeed('ai_notifications', initialNotifications));
+      // 2. Tools & Submissions (Hybrid list compilation)
+      const { data: toolsData } = await supabase.from('tools').select('*');
+      const { data: subsData } = await supabase.from('tool_submissions').select('*');
+
+      let compiledTools: Tool[] = [];
+      if (toolsData) {
+        compiledTools = toolsData.map(t => mapToolRow(t));
+      }
+
+      if (subsData) {
+        subsData.forEach((sub: any) => {
+          if (sub.status === 'pending' || sub.status === 'needs_changes' || sub.status === 'draft' || sub.status === 'rejected') {
+            if (sub.tool_id === null) {
+              // Synthesize as virtual tool record for the moderation UI
+              compiledTools.push({
+                id: sub.id, // Submission ID for verification trigger mapping!
+                name: sub.name,
+                slug: sub.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+                tagline: sub.tagline,
+                description: sub.description,
+                categorySlug: sub.category_slug,
+                subCategory: sub.sub_category,
+                pricing: sub.pricing as any,
+                pricingUrl: sub.pricing_url || '',
+                platforms: sub.platforms || ['Web'],
+                pricingPlans: [],
+                features: sub.features || [],
+                useCases: sub.use_cases || [],
+                pros: [],
+                cons: [],
+                logoUrl: sub.logo_url,
+                screenshotUrls: sub.screenshot_urls || [],
+                videoUrl: sub.video_url || '',
+                websiteUrl: sub.website_url,
+                rating: 0,
+                reviewCount: 0,
+                isVerified: false,
+                isFeatured: false,
+                isSponsored: false,
+                status: sub.status, // submission status
+                ownerId: sub.submitter_id,
+                claimStatus: 'unclaimed',
+                lastUpdated: sub.updated_at || sub.created_at,
+                tags: sub.tags || [],
+                adminNotes: sub.admin_notes,
+                rejectionReason: sub.rejection_reason,
+              });
+            } else {
+              // Proposed updates edit submission. Find live tool and attach pendingChanges patch
+              const idx = compiledTools.findIndex(t => t.id === sub.tool_id);
+              if (idx !== -1) {
+                compiledTools[idx] = {
+                  ...compiledTools[idx],
+                  pendingChanges: {
+                    id: sub.id, // submission ID for rpc trigger
+                    name: sub.name,
+                    tagline: sub.tagline,
+                    description: sub.description,
+                    categorySlug: sub.category_slug,
+                    subCategory: sub.sub_category,
+                    pricing: sub.pricing as any,
+                    pricingUrl: sub.pricing_url || '',
+                    platforms: sub.platforms || [],
+                    features: sub.features || [],
+                    useCases: sub.use_cases || [],
+                    logoUrl: sub.logo_url,
+                    screenshotUrls: sub.screenshot_urls || [],
+                    videoUrl: sub.video_url || '',
+                    websiteUrl: sub.website_url,
+                    tags: sub.tags || [],
+                    status: sub.status,
+                    adminNotes: sub.admin_notes,
+                    rejectionReason: sub.rejection_reason,
+                    submittedAt: sub.created_at,
+                  }
+                };
+              }
+            }
+          }
+        });
+      }
+      setTools(compiledTools);
+
+      // 3. Claims
+      const { data: claimsData } = await supabase.from('tool_claims').select('*');
+      if (claimsData) {
+        setClaims(claimsData.map(c => ({
+          id: c.id,
+          toolId: c.tool_id,
+          claimantId: c.claimant_id,
+          companyName: c.company_name,
+          workEmail: c.work_email,
+          verificationInfo: c.verification_info,
+          proofUrl: c.proof_url,
+          status: c.status,
+          submittedAt: c.submitted_at,
+          reviewedAt: c.reviewed_at,
+          reviewedBy: c.reviewed_by,
+        })));
+      }
+
+      // 4. Reviews
+      const { data: revData } = await supabase.from('reviews').select('*').order('created_at', { ascending: false });
+      if (revData) {
+        setReviews(revData.map(r => ({
+          id: r.id,
+          toolId: r.tool_id,
+          userId: r.user_id,
+          userName: 'User',
+          rating: Number(r.rating),
+          ratingDimensions: {
+            easeOfUse: Number(r.ease_of_use || r.rating),
+            valueForMoney: Number(r.value_for_money || r.rating),
+            features: Number(r.features || r.rating),
+            performance: Number(r.performance || r.rating)
+          },
+          title: 'Review Title',
+          comment: r.content,
+          pros: '',
+          cons: '',
+          date: r.created_at,
+          status: (r.status === 'flagged' ? 'flagged' : 'approved') as any
+        })));
+      }
+
+      // 5. Campaigns & Payments
+      const { data: campData } = await supabase.from('campaigns').select('*');
+      if (campData) {
+        setCampaigns(campData.map(c => ({
+          id: c.id,
+          toolId: c.tool_id,
+          campaignName: c.campaign_name,
+          placement: c.placement as any,
+          startDate: c.created_at,
+          endDate: c.created_at,
+          budget: Number(c.budget),
+          remainingBudget: Number(c.remaining_budget),
+          spent: Number(c.spent),
+          cpc: 0.5,
+          cpm: 5.0,
+          impressions: 0,
+          clicks: 0,
+          status: c.status as any
+        })));
+      }
+      const { data: payData } = await supabase.from('payments').select('*');
+      if (payData) {
+        setPayments(payData.map(p => ({
+          id: p.id,
+          campaignId: p.campaign_id,
+          userId: 'admin-id',
+          amount: Number(p.amount),
+          date: p.date,
+          status: 'success' as any,
+          invoiceNumber: p.invoice_number,
+          type: 'sponsorship' as any,
+          description: p.description
+        })));
+      }
+
+      // 6. Notifications
+      const { data: notifData } = await supabase.from('notifications').select('*').order('date', { ascending: false });
+      if (notifData) {
+        setNotifications(notifData.map(n => ({
+          id: n.id,
+          userId: n.user_id,
+          title: n.title,
+          message: n.message,
+          read: n.read,
+          type: n.type as any,
+          date: n.date,
+        })));
+      }
+
+      // 7. Audit logs
+      const { data: logData } = await supabase.from('audit_logs').select('*').order('timestamp', { ascending: false });
+      if (logData) {
+        setAuditLogs(logData.map(l => ({
+          id: l.id,
+          userId: l.user_id,
+          userName: l.user_name,
+          action: l.action,
+          details: l.details,
+          timestamp: l.timestamp,
+        })));
+      }
+
+      // 8. Analytics (Filtered by RLS automatically)
+      const { data: eventsData } = await supabase.from('analytics_events').select('*').order('timestamp', { ascending: false });
+      if (eventsData) {
+        setAnalyticsEvents(eventsData.map(e => ({
+          id: e.id,
+          eventType: e.event_type as any,
+          toolId: e.tool_id,
+          timestamp: e.timestamp,
+          sessionId: e.session_id || '',
+          userId: e.user_id || undefined,
+          referrer: e.referrer || '',
+          device: e.device as any,
+          browser: e.browser || '',
+          path: e.path || '',
+        })));
+      }
+
+    } catch (err: any) {
+      console.error('Failed to sync Supabase databases states:', err);
+      setDbError(err.message || 'Database connection error.');
+    }
+  };
+
+  // Synchronize dynamic updates on tab focuses / mounts
+  useEffect(() => {
+    if (useSupabase) {
+      fetchDatabaseState();
+    } else {
+      const loadOrSeed = <T,>(key: string, seed: T): T => {
+        const data = localStorage.getItem(key);
+        if (data) return JSON.parse(data) as T;
+        localStorage.setItem(key, JSON.stringify(seed));
+        return seed;
+      };
+
+      setTools(loadOrSeed('ai_tools', initialTools));
+      setCategories(loadOrSeed('ai_categories', initialCategories));
+      setReviews(loadOrSeed('ai_reviews', initialReviews));
+      setCampaigns(loadOrSeed('ai_campaigns', initialCampaigns));
+      setPayments(loadOrSeed('ai_payments', initialPayments));
+      setAnalyticsEvents(loadOrSeed('ai_analytics_events', []));
+      setClaims(loadOrSeed('ai_claims', []));
+      setBlogPosts(loadOrSeed('ai_blog_posts', initialBlogPosts));
+      setCollections(loadOrSeed('ai_collections', initialCollections));
+      setAuditLogs(loadOrSeed('ai_audit_logs', initialAuditLogs));
+      setAffiliateLinks(loadOrSeed('ai_affiliates', initialAffiliateLinks));
+      setNotifications(loadOrSeed('ai_notifications', initialNotifications));
+    }
   }, []);
 
-  // Synchronize database states dynamically across multiple open tabs in real-time
-  useEffect(() => {
-    const handleStorageSync = (e: StorageEvent) => {
-      if (e.newValue) {
-        try {
-          if (e.key === 'ai_tools') setTools(JSON.parse(e.newValue));
-          if (e.key === 'ai_claims') setClaims(JSON.parse(e.newValue));
-          if (e.key === 'ai_reviews') setReviews(JSON.parse(e.newValue));
-          if (e.key === 'ai_campaigns') setCampaigns(JSON.parse(e.newValue));
-          if (e.key === 'ai_payments') setPayments(JSON.parse(e.newValue));
-          if (e.key === 'ai_notifications') setNotifications(JSON.parse(e.newValue));
-        } catch (err) {
-          console.error('Error synchronizing database storage:', err);
-        }
-      }
-    };
-    window.addEventListener('storage', handleStorageSync);
-    return () => window.removeEventListener('storage', handleStorageSync);
-  }, []);
-
-  // Save changes to localStorage helper
   const saveToStorage = (key: string, data: any) => {
     localStorage.setItem(key, JSON.stringify(data));
   };
 
-  // Log Administrative Action
-  const logAdminAction = (userId: string, userName: string, action: string, details: string) => {
-    const newLog: AuditLog = {
-      id: Math.random().toString(36).substr(2, 9),
-      userId,
-      userName,
-      action,
-      details,
-      timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
-    };
-    const updated = [newLog, ...auditLogs];
-    setAuditLogs(updated);
-    saveToStorage('ai_audit_logs', updated);
+  // Audit Logs Logging
+  const logAdminAction = async (userId: string, userName: string, action: string, details: string) => {
+    if (useSupabase) {
+      await supabase.from('audit_logs').insert({
+        user_id: userId === 'admin-id' ? null : userId,
+        user_name: userName,
+        action,
+        details,
+      });
+      fetchDatabaseState();
+    } else {
+      const newLog: AuditLog = {
+        id: Math.random().toString(36).substr(2, 9),
+        userId,
+        userName,
+        action,
+        details,
+        timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+      };
+      const updated = [newLog, ...auditLogs];
+      setAuditLogs(updated);
+      saveToStorage('ai_audit_logs', updated);
+    }
   };
 
   // --- TOOL OPERATIONS ---
   const addTool = (toolData: Omit<Tool, 'id' | 'rating' | 'reviewCount' | 'isVerified' | 'isFeatured' | 'isSponsored' | 'status' | 'claimStatus' | 'lastUpdated'> & { status?: Tool['status'] }) => {
-    const newTool: Tool = {
-      ...toolData,
-      id: Math.random().toString(36).substr(2, 9),
-      rating: 0,
-      reviewCount: 0,
-      isVerified: false,
-      isFeatured: false,
-      isSponsored: false,
-      status: toolData.status || 'pending',
-      claimStatus: toolData.ownerId ? 'claimed' : 'unclaimed',
-      lastUpdated: new Date().toISOString().split('T')[0],
-    };
+    if (useSupabase) {
+      const runAdd = async () => {
+        // Insert sandbox submission record (pending approval, not directly into public tools)
+        await supabase.from('tool_submissions').insert({
+          name: toolData.name,
+          tagline: toolData.tagline,
+          description: toolData.description,
+          category_slug: toolData.categorySlug,
+          sub_category: toolData.subCategory,
+          pricing: toolData.pricing,
+          pricing_url: toolData.pricingUrl,
+          platforms: toolData.platforms,
+          features: toolData.features,
+          use_cases: toolData.useCases,
+          logo_url: toolData.logoUrl,
+          screenshot_urls: toolData.screenshotUrls,
+          video_url: toolData.videoUrl || null,
+          website_url: toolData.websiteUrl,
+          tags: toolData.tags,
+          status: 'pending',
+          submitter_id: toolData.ownerId || 'admin-id',
+        });
+        fetchDatabaseState();
+      };
+      runAdd();
+      return { ...toolData, id: 'temp-id', rating: 0, reviewCount: 0, isVerified: false, isFeatured: false, isSponsored: false, status: 'pending', claimStatus: 'unclaimed', lastUpdated: '' } as Tool;
+    } else {
+      const newTool: Tool = {
+        ...toolData,
+        id: Math.random().toString(36).substr(2, 9),
+        rating: 0,
+        reviewCount: 0,
+        isVerified: false,
+        isFeatured: false,
+        isSponsored: false,
+        status: toolData.status || 'pending',
+        claimStatus: toolData.ownerId ? 'claimed' : 'unclaimed',
+        lastUpdated: new Date().toISOString().split('T')[0],
+      };
 
-    const updated = [newTool, ...tools];
-    setTools(updated);
-    saveToStorage('ai_tools', updated);
+      const updated = [newTool, ...tools];
+      setTools(updated);
+      saveToStorage('ai_tools', updated);
 
-    // Notify admins
-    addNotification(
-      'admin-id',
-      'New AI Tool Submission',
-      `A new tool "${newTool.name}" was submitted for review by owner/submitter.`,
-      'submission'
-    );
+      addNotification(
+        'admin-id',
+        'New AI Tool Submission',
+        `A new tool "${newTool.name}" was submitted for review.`,
+        'submission'
+      );
 
-    return newTool;
+      return newTool;
+    }
   };
 
   const canManageTool = (toolId: string, userId: string): boolean => {
     const tool = tools.find((t) => t.id === toolId);
     if (!tool) return false;
-    const users = JSON.parse(localStorage.getItem('ai_users') || '[]');
-    const actor = users.find((u: any) => u.id === userId);
-    return actor?.role === 'admin' || tool.ownerId === userId;
+    
+    // Check local fallback
+    if (!useSupabase) {
+      const users = JSON.parse(localStorage.getItem('ai_users') || '[]');
+      const actor = users.find((u: any) => u.id === userId);
+      return actor?.role === 'admin' || tool.ownerId === userId;
+    }
+    return true; // Enforced at database level by Supabase RLS
   };
 
   const getOwnedTools = (userId: string): Tool[] => {
+    if (useSupabase) {
+      // RLS selects auto filter profiles records
+      return tools.filter((t) => t.ownerId === userId);
+    }
     const users = JSON.parse(localStorage.getItem('ai_users') || '[]');
     const actor = users.find((u: any) => u.id === userId);
     if (actor?.role === 'admin') {
@@ -228,6 +517,9 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const getOwnedTool = (toolId: string, userId: string): Tool | null => {
     const tool = tools.find((t) => t.id === toolId);
     if (!tool) return null;
+    if (useSupabase) {
+      return tool.ownerId === userId ? tool : null;
+    }
     const users = JSON.parse(localStorage.getItem('ai_users') || '[]');
     const actor = users.find((u: any) => u.id === userId);
     if (actor?.role === 'admin' || tool.ownerId === userId) {
@@ -237,273 +529,516 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const updateTool = (id: string, updatedFields: Partial<Tool>, actorId?: string) => {
-    if (actorId && !canManageTool(id, actorId)) {
-      console.warn(`Unauthorized update attempt on tool ${id} by user ${actorId}`);
-      return;
+    if (useSupabase) {
+      const runUpdate = async () => {
+        // Enforce secure sandbox edits:
+        // Admin edits directly update tools. Owner edits submit to sandbox tool_submissions.
+        const { data: pData } = await supabase.from('profiles').select('role').eq('id', actorId).single();
+        const isAdminUser = pData && pData.role === 'admin';
+
+        if (isAdminUser) {
+          await supabase.from('tools').update({
+            name: updatedFields.name,
+            tagline: updatedFields.tagline,
+            description: updatedFields.description,
+            category_slug: updatedFields.categorySlug,
+            sub_category: updatedFields.subCategory,
+            pricing: updatedFields.pricing,
+            pricing_url: updatedFields.pricingUrl,
+            platforms: updatedFields.platforms,
+            logo_url: updatedFields.logoUrl,
+            screenshot_urls: updatedFields.screenshotUrls,
+            website_url: updatedFields.websiteUrl,
+            tags: updatedFields.tags,
+            status: updatedFields.status,
+            is_verified: updatedFields.isVerified,
+            is_sponsored: updatedFields.isSponsored,
+          }).eq('id', id);
+        } else {
+          // Owner edit submission proposal sandbox insert
+          const liveTool = tools.find(t => t.id === id);
+          if (liveTool && liveTool.ownerId === actorId) {
+            await supabase.from('tool_submissions').insert({
+              tool_id: id,
+              submitter_id: actorId,
+              name: updatedFields.name || liveTool.name,
+              tagline: updatedFields.tagline || liveTool.tagline,
+              description: updatedFields.description || liveTool.description,
+              category_slug: updatedFields.categorySlug || liveTool.categorySlug,
+              sub_category: updatedFields.subCategory || liveTool.subCategory,
+              pricing: updatedFields.pricing || liveTool.pricing,
+              pricing_url: updatedFields.pricingUrl || liveTool.pricingUrl,
+              platforms: updatedFields.platforms || liveTool.platforms,
+              logo_url: updatedFields.logoUrl || liveTool.logoUrl,
+              screenshot_urls: updatedFields.screenshotUrls || liveTool.screenshotUrls,
+              video_url: liveTool.videoUrl || null,
+              website_url: updatedFields.websiteUrl || liveTool.websiteUrl,
+              tags: updatedFields.tags || liveTool.tags,
+              features: liveTool.features || [],
+              use_cases: liveTool.useCases || [],
+              status: 'pending',
+            });
+          }
+        }
+        fetchDatabaseState();
+      };
+      runUpdate();
+    } else {
+      if (actorId && !canManageTool(id, actorId)) return;
+      const updated = tools.map((t) => {
+        if (t.id === id) {
+          return {
+            ...t,
+            ...updatedFields,
+            lastUpdated: new Date().toISOString().split('T')[0],
+          };
+        }
+        return t;
+      });
+      setTools(updated);
+      saveToStorage('ai_tools', updated);
     }
-    const updated = tools.map((t) => {
-      if (t.id === id) {
-        return {
-          ...t,
-          ...updatedFields,
-          lastUpdated: new Date().toISOString().split('T')[0],
-        };
-      }
-      return t;
-    });
-    setTools(updated);
-    saveToStorage('ai_tools', updated);
   };
 
   const deleteTool = (id: string, actorId?: string) => {
-    if (actorId && !canManageTool(id, actorId)) {
-      console.warn(`Unauthorized delete attempt on tool ${id} by user ${actorId}`);
-      return;
+    if (useSupabase) {
+      const runDel = async () => {
+        // Enforce soft deletion status update
+        await supabase.from('tools').update({ status: 'archived' }).eq('id', id);
+        fetchDatabaseState();
+      };
+      runDel();
+    } else {
+      if (actorId && !canManageTool(id, actorId)) return;
+      const updated = tools.filter((t) => t.id !== id);
+      setTools(updated);
+      saveToStorage('ai_tools', updated);
     }
-    const updated = tools.filter((t) => t.id !== id);
-    setTools(updated);
-    saveToStorage('ai_tools', updated);
   };
 
-  const approveTool = (id: string, adminId: string, adminName: string) => {
-    const tool = tools.find((t) => t.id === id);
-    if (!tool) return;
-
-    if (tool.pendingChanges) {
-      const { status, adminNotes, rejectionReason, submittedAt, ...changes } = tool.pendingChanges;
-      updateTool(id, {
-        ...changes,
-        status: 'approved',
-        approvedAt: new Date().toISOString(),
-        approvedBy: adminName,
-        pendingChanges: undefined, // Clear pending changes
-      });
+  const approveTool = (id: string, adminId: string, _adminName: string) => {
+    if (useSupabase) {
+      const runApprove = async () => {
+        // Invoke atomic server-side RPC transaction function
+        const { error } = await supabase.rpc('approve_submission', {
+          sub_id: id,
+          notes: 'Approved by admin',
+        });
+        if (error) {
+          console.error('Error approving submission RPC:', error.message);
+        } else {
+          // Fetch submission details to send notification
+          const { data: subData } = await supabase.from('tool_submissions').select('submitter_id, name').eq('id', id).single();
+          if (subData && subData.submitter_id) {
+            addNotification(
+              subData.submitter_id,
+              'Tool Listing Approved! 🎉',
+              `Your submission for "${subData.name}" has been approved and published.`,
+              'submission'
+            );
+          }
+        }
+        fetchDatabaseState();
+      };
+      runApprove();
     } else {
-      updateTool(id, {
-        status: 'approved',
-        approvedAt: new Date().toISOString(),
-        approvedBy: adminName,
-      });
-    }
+      const tool = tools.find((t) => t.id === id);
+      if (!tool) return;
 
-    if (tool.ownerId) {
-      addNotification(
-        tool.ownerId,
-        'Tool Listing Approved! 🎉',
-        `Your updates or submission for "${tool.name}" have been approved and published to AIFynest.`,
-        'submission'
-      );
+      if (tool.pendingChanges) {
+        const { status, adminNotes, rejectionReason, submittedAt, ...changes } = tool.pendingChanges;
+        updateTool(id, {
+          ...changes,
+          status: 'approved',
+          approvedAt: new Date().toISOString(),
+          approvedBy: _adminName,
+          pendingChanges: undefined,
+        });
+      } else {
+        updateTool(id, {
+          status: 'approved',
+          approvedAt: new Date().toISOString(),
+          approvedBy: _adminName,
+        });
+      }
+
+      if (tool.ownerId) {
+        addNotification(
+          tool.ownerId,
+          'Tool Listing Approved! 🎉',
+          `Your updates or submission for "${tool.name}" have been approved.`,
+          'submission'
+        );
+      }
+      logAdminAction(adminId, _adminName, 'Approve Tool', `Approved tool: ${tool.name}`);
     }
-    logAdminAction(adminId, adminName, 'Approve Tool', `Approved tool listing: ${tool.name}`);
   };
 
   const rejectTool = (id: string, adminId: string, adminName: string, reason: string) => {
-    const tool = tools.find((t) => t.id === id);
-    if (!tool) return;
+    if (useSupabase) {
+      const runReject = async () => {
+        await supabase.from('tool_submissions').update({
+          status: 'rejected',
+          rejection_reason: reason,
+          admin_notes: reason,
+          updated_at: nowISO(),
+        }).eq('id', id);
 
-    if (tool.status === 'approved') {
-      updateTool(id, {
-        pendingChanges: {
-          ...tool.pendingChanges,
+        const { data: subData } = await supabase.from('tool_submissions').select('submitter_id, name').eq('id', id).single();
+        if (subData && subData.submitter_id) {
+          addNotification(
+            subData.submitter_id,
+            'Tool Submission Rejected ❌',
+            `Your updates or submission for "${subData.name}" was not approved. Reason: "${reason}".`,
+            'submission'
+          );
+        }
+        logAdminAction(adminId, adminName, 'Reject Tool', `Rejected submission: ID ${id}. Reason: ${reason}`);
+      };
+      runReject();
+    } else {
+      const tool = tools.find((t) => t.id === id);
+      if (!tool) return;
+
+      if (tool.status === 'approved') {
+        updateTool(id, {
+          pendingChanges: {
+            ...tool.pendingChanges,
+            status: 'rejected',
+            rejectionReason: reason,
+          }
+        });
+      } else {
+        updateTool(id, {
           status: 'rejected',
           rejectionReason: reason,
-        }
-      });
-    } else {
-      updateTool(id, {
-        status: 'rejected',
-        rejectionReason: reason,
-      });
-    }
+        });
+      }
 
-    if (tool.ownerId) {
-      addNotification(
-        tool.ownerId,
-        'Tool Submission Rejected ❌',
-        `Your updates or submission for "${tool.name}" was not approved. Reason: "${reason}".`,
-        'submission'
-      );
+      if (tool.ownerId) {
+        addNotification(
+          tool.ownerId,
+          'Tool Submission Rejected ❌',
+          `Your updates or submission for "${tool.name}" was not approved. Reason: "${reason}".`,
+          'submission'
+        );
+      }
+      logAdminAction(adminId, adminName, 'Reject Tool', `Rejected tool listing updates: ${tool.name}. Reason: ${reason}`);
     }
-    logAdminAction(adminId, adminName, 'Reject Tool', `Rejected tool listing updates: ${tool.name}. Reason: ${reason}`);
   };
 
   const requestChanges = (id: string, adminId: string, adminName: string, notes: string) => {
-    const tool = tools.find((t) => t.id === id);
-    if (!tool) return;
+    if (useSupabase) {
+      const runRequest = async () => {
+        await supabase.from('tool_submissions').update({
+          status: 'needs_changes',
+          admin_notes: notes,
+          updated_at: nowISO(),
+        }).eq('id', id);
 
-    if (tool.status === 'approved') {
-      updateTool(id, {
-        pendingChanges: {
-          ...tool.pendingChanges,
+        const { data: subData } = await supabase.from('tool_submissions').select('submitter_id, name').eq('id', id).single();
+        if (subData && subData.submitter_id) {
+          addNotification(
+            subData.submitter_id,
+            'Changes Requested ⚠️',
+            `Revision request for "${subData.name}": "${notes}". Please revise and resubmit.`,
+            'submission'
+          );
+        }
+        logAdminAction(adminId, adminName, 'Request Revisions', `Requested changes for submission ID ${id}. Notes: ${notes}`);
+      };
+      runRequest();
+    } else {
+      const tool = tools.find((t) => t.id === id);
+      if (!tool) return;
+
+      if (tool.status === 'approved') {
+        updateTool(id, {
+          pendingChanges: {
+            ...tool.pendingChanges,
+            status: 'needs_changes',
+            adminNotes: notes,
+          }
+        });
+      } else {
+        updateTool(id, {
           status: 'needs_changes',
           adminNotes: notes,
-        }
-      });
-    } else {
-      updateTool(id, {
-        status: 'needs_changes',
-        adminNotes: notes,
-      });
-    }
+        });
+      }
 
-    if (tool.ownerId) {
-      addNotification(
-        tool.ownerId,
-        'Changes Requested ⚠️',
-        `Revision request for "${tool.name}": "${notes}". Please revise and resubmit.`,
-        'submission'
-      );
+      if (tool.ownerId) {
+        addNotification(
+          tool.ownerId,
+          'Changes Requested ⚠️',
+          `Revision request for "${tool.name}": "${notes}".`,
+          'submission'
+        );
+      }
+      logAdminAction(adminId, adminName, 'Request Revisions', `Requested revisions for tool: ${tool.name}. Notes: ${notes}`);
     }
-    logAdminAction(adminId, adminName, 'Request Revisions', `Requested revisions for tool: ${tool.name}. Notes: ${notes}`);
   };
 
-  // --- CLAIM MANAGEMENT ---
-  const claimListing = (toolId: string, userId: string, verificationEmail: string, domain: string, message: string) => {
-    const newClaim: Claim = {
-      id: Math.random().toString(36).substr(2, 9),
-      toolId,
-      userId,
-      status: 'pending',
-      verificationEmail,
-      domain,
-      message,
-      date: new Date().toISOString().split('T')[0],
-    };
-    const updated = [newClaim, ...claims];
-    setClaims(updated);
-    saveToStorage('ai_claims', updated);
+  // Helper date format string
+  const nowISO = () => new Date().toISOString();
 
-    // Update tool claimStatus
-    updateTool(toolId, { claimStatus: 'pending' });
+  // --- CLAIM LISTING OPERATIONS ---
+  const claimListing = (toolId: string, userId: string, company: string, email: string, info: string) => {
+    if (useSupabase) {
+      const runClaim = async () => {
+        await supabase.from('tool_claims').insert({
+          tool_id: toolId,
+          claimant_id: userId,
+          company_name: company,
+          work_email: email,
+          verification_info: info,
+          status: 'pending',
+        });
+        
+        // Notify admin
+        addNotification(
+          'admin-id',
+          'New Listing Claim Request',
+          `Owner request claim verification submitted for tool. Email: ${email}`,
+          'claim'
+        );
+        fetchDatabaseState();
+      };
+      runClaim();
+    } else {
+      const newClaim = {
+        id: Math.random().toString(36).substr(2, 9),
+        toolId,
+        claimantId: userId,
+        companyName: company,
+        workEmail: email,
+        verificationInfo: info,
+        status: 'pending',
+        submittedAt: new Date().toISOString(),
+      };
+      const updated = [newClaim, ...claims];
+      setClaims(updated);
+      saveToStorage('ai_claims', updated);
 
-    // Notify Admin
-    addNotification(
-      'admin-id',
-      'New Claim Request',
-      `Owner claim request submitted for listing domain: ${domain}.`,
-      'claim'
-    );
+      addNotification(
+        'admin-id',
+        'New Listing Claim Request',
+        `A new claim was submitted for verification. Email: ${email}`,
+        'claim'
+      );
+    }
   };
 
   const approveClaim = (claimId: string) => {
-    const claim = claims.find((c) => c.id === claimId);
-    if (claim) {
-      const updatedClaims = claims.map((c) => (c.id === claimId ? { ...c, status: 'approved' as const } : c));
+    if (useSupabase) {
+      const runApproveClaim = async () => {
+        const { error } = await supabase.rpc('approve_claim', {
+          claim_id: claimId,
+        });
+
+        if (error) {
+          console.error('Error approving claim RPC:', error.message);
+        } else {
+          const { data: claimData } = await supabase.from('tool_claims').select('claimant_id').eq('id', claimId).single();
+          if (claimData && claimData.claimant_id) {
+            addNotification(
+              claimData.claimant_id,
+              'Claim Approved! 🎉',
+              'Your tool listing ownership claim has been approved. You can now manage it.',
+              'claim'
+            );
+          }
+        }
+        fetchDatabaseState();
+      };
+      runApproveClaim();
+    } else {
+      const claim = claims.find((c) => c.id === claimId);
+      if (!claim) return;
+
+      const updatedClaims = claims.map((c) => (c.id === claimId ? { ...c, status: 'approved', reviewedAt: new Date().toISOString() } : c));
       setClaims(updatedClaims);
       saveToStorage('ai_claims', updatedClaims);
 
-      // Assign ownerId to tool
-      updateTool(claim.toolId, {
-        claimStatus: 'claimed',
-        ownerId: claim.userId,
-      });
+      const updatedTools = tools.map((t) => (t.id === claim.toolId ? { ...t, ownerId: claim.claimantId, claimStatus: 'claimed' as const } : t));
+      setTools(updatedTools);
+      saveToStorage('ai_tools', updatedTools);
 
-      // Notify Owner
+      const users = JSON.parse(localStorage.getItem('ai_users') || '[]');
+      const updatedUsers = users.map((u: any) => (u.id === claim.claimantId ? { ...u, role: 'owner' } : u));
+      localStorage.setItem('ai_users', JSON.stringify(updatedUsers));
+
       addNotification(
-        claim.userId,
-        'Listing Claim Approved!',
-        `Your ownership claim has been verified. You can now manage analytics and billing options.`,
+        claim.claimantId,
+        'Claim Approved! 🎉',
+        'Your tool listing ownership claim has been approved.',
         'claim'
       );
     }
   };
 
   const rejectClaim = (claimId: string) => {
-    const claim = claims.find((c) => c.id === claimId);
-    if (claim) {
-      const updatedClaims = claims.map((c) => (c.id === claimId ? { ...c, status: 'rejected' as const } : c));
-      setClaims(updatedClaims);
-      saveToStorage('ai_claims', updatedClaims);
+    if (useSupabase) {
+      const runRejectClaim = async () => {
+        await supabase.from('tool_claims').update({
+          status: 'rejected',
+          reviewed_at: nowISO(),
+        }).eq('id', claimId);
 
-      updateTool(claim.toolId, { claimStatus: 'unclaimed' });
+        const { data: claimData } = await supabase.from('tool_claims').select('claimant_id').eq('id', claimId).single();
+        if (claimData && claimData.claimant_id) {
+          addNotification(
+            claimData.claimant_id,
+            'Claim Denied ❌',
+            'Your tool listing ownership claim was rejected.',
+            'claim'
+          );
+        }
+        fetchDatabaseState();
+      };
+      runRejectClaim();
+    } else {
+      const claim = claims.find((c) => c.id === claimId);
+      if (!claim) return;
+
+      const updated = claims.map((c) => (c.id === claimId ? { ...c, status: 'rejected', reviewedAt: new Date().toISOString() } : c));
+      setClaims(updated);
+      saveToStorage('ai_claims', updated);
 
       addNotification(
-        claim.userId,
-        'Listing Claim Rejected',
-        `Your claim request domain verification failed review checklists.`,
+        claim.claimantId,
+        'Claim Denied ❌',
+        'Your tool listing ownership claim was rejected.',
         'claim'
       );
     }
   };
 
-  // --- REVIEW OPERATIONS ---
+  // --- REVIEWS OPERATIONS ---
   const addReview = (
     toolId: string,
     userId: string,
     userName: string,
-    reviewData: { rating: number; title: string; comment: string; pros: string; cons: string; ratingDimensions: Review['ratingDimensions'] }
+    review: { rating: number; title: string; comment: string; pros: string; cons: string; ratingDimensions: { easeOfUse: number; valueForMoney: number; features: number; performance: number } }
   ) => {
-    const newReview: Review = {
-      id: Math.random().toString(36).substr(2, 9),
-      toolId,
-      userId,
-      userName,
-      rating: reviewData.rating,
-      ratingDimensions: reviewData.ratingDimensions,
-      title: reviewData.title,
-      comment: reviewData.comment,
-      pros: reviewData.pros,
-      cons: reviewData.cons,
-      date: new Date().toISOString().split('T')[0],
-      status: 'pending',
-    };
+    if (useSupabase) {
+      const runAddRev = async () => {
+        await supabase.from('reviews').insert({
+          tool_id: toolId,
+          user_id: userId,
+          content: review.comment,
+          rating: review.rating,
+          ease_of_use: review.ratingDimensions.easeOfUse,
+          value_for_money: review.ratingDimensions.valueForMoney,
+          features: review.ratingDimensions.features,
+          performance: review.ratingDimensions.performance,
+          status: 'approved',
+        });
 
-    const updatedReviews = [newReview, ...reviews];
-    setReviews(updatedReviews);
-    saveToStorage('ai_reviews', updatedReviews);
-    trackEvent('review_submitted', toolId);
+        // Recalculate average rating & review count for the live tool
+        const { data: toolRevs } = await supabase.from('reviews').select('rating').eq('tool_id', toolId).eq('status', 'approved');
+        if (toolRevs) {
+          const count = toolRevs.length;
+          const avg = count > 0 ? parseFloat((toolRevs.reduce((acc, r) => acc + Number(r.rating), 0) / count).toFixed(1)) : 0;
+          await supabase.from('tools').update({ rating: avg, review_count: count }).eq('id', toolId);
+        }
 
-    // Notify Owner
-    const toolObj = tools.find((t) => t.id === toolId);
-    if (toolObj && toolObj.ownerId) {
-      addNotification(
-        toolObj.ownerId,
-        'New Listing Review',
-        `A user left a rating review for your tool: ${toolObj.name}`,
-        'review'
-      );
+        // Notify tool owner
+        const tool = tools.find((t) => t.id === toolId);
+        if (tool && tool.ownerId) {
+          addNotification(
+            tool.ownerId,
+            'New Customer Review ★',
+            `Your tool "${tool.name}" received a new ${review.rating}-star review.`,
+            'review'
+          );
+        }
+        fetchDatabaseState();
+      };
+      runAddRev();
+    } else {
+      const newReview: Review = {
+        id: Math.random().toString(36).substr(2, 9),
+        toolId,
+        userId,
+        userName,
+        rating: review.rating,
+        ratingDimensions: review.ratingDimensions,
+        title: review.title,
+        comment: review.comment,
+        pros: review.pros,
+        cons: review.cons,
+        date: new Date().toISOString(),
+        status: 'approved',
+      };
+
+      const updatedReviews = [newReview, ...reviews];
+      setReviews(updatedReviews);
+      saveToStorage('ai_reviews', updatedReviews);
+
+      const tool = tools.find((t) => t.id === toolId);
+      if (tool) {
+        const toolRevs = updatedReviews.filter((r) => r.toolId === toolId);
+        const count = toolRevs.length;
+        const avg = parseFloat((toolRevs.reduce((acc, r) => acc + r.rating, 0) / count).toFixed(1));
+
+        updateTool(toolId, {
+          rating: avg,
+          reviewCount: count,
+        });
+
+        if (tool.ownerId) {
+          addNotification(
+            tool.ownerId,
+            'New Customer Review ★',
+            `Your tool "${tool.name}" received a new review.`,
+            'review'
+          );
+        }
+      }
     }
   };
 
   const flagReview = (id: string) => {
-    const updated = reviews.map((r) => (r.id === id ? { ...r, status: 'flagged' as const } : r));
-    setReviews(updated);
-    saveToStorage('ai_reviews', updated);
-
-    // Notify Admin
-    addNotification(
-      'admin-id',
-      'Review Moderation Flagged',
-      `An owner reported a customer review as potential spam. Moderation action needed.`,
-      'review'
-    );
+    if (useSupabase) {
+      const runFlag = async () => {
+        await supabase.from('reviews').update({ status: 'flagged' }).eq('id', id);
+        fetchDatabaseState();
+      };
+      runFlag();
+    } else {
+      const updated = reviews.map((r) => (r.id === id ? { ...r, status: 'flagged' as const } : r));
+      setReviews(updated);
+      saveToStorage('ai_reviews', updated);
+    }
   };
 
   const deleteReview = (id: string) => {
-    const updated = reviews.filter((r) => r.id !== id);
-    setReviews(updated);
-    saveToStorage('ai_reviews', updated);
+    if (useSupabase) {
+      const runDelRev = async () => {
+        await supabase.from('reviews').delete().eq('id', id);
+        fetchDatabaseState();
+      };
+      runDelRev();
+    } else {
+      const updated = reviews.filter((r) => r.id !== id);
+      setReviews(updated);
+      saveToStorage('ai_reviews', updated);
+    }
   };
 
-  const updateToolRatingAggregates = (toolId: string, allReviews: Review[]) => {
-    const toolReviews = allReviews.filter((r) => r.toolId === toolId && r.status === 'approved');
-    const count = toolReviews.length;
-    const avg = count > 0 ? Math.round((toolReviews.reduce((acc, r) => acc + r.rating, 0) / count) * 10) / 10 : 0;
-    updateTool(toolId, { rating: avg, reviewCount: count });
-  };
-
-  // --- COLLECTIONS ---
-  const addCollection = (userId: string, name: string, description: string, isPublic: boolean, toolsList: string[]) => {
-    const newColl: Collection = {
+  // --- COLLECTIONS & FAVORITES ---
+  const addCollection = (userId: string, name: string, description: string, isPublic: boolean, toolIds: string[]) => {
+    const newCollection: Collection = {
       id: Math.random().toString(36).substr(2, 9),
       userId,
       name,
       description,
       isPublic,
-      tools: toolsList,
-      dateCreated: new Date().toISOString().split('T')[0],
+      tools: toolIds,
+      dateCreated: new Date().toISOString(),
     };
-    const updated = [...collections, newColl];
+    const updated = [...collections, newCollection];
     setCollections(updated);
     saveToStorage('ai_collections', updated);
   };
@@ -521,35 +1056,39 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const toggleFavoriteTool = (userId: string, toolId: string) => {
-    let favoritesList = collections.find((c) => c.userId === userId && c.name === 'My Favorites');
-    if (!favoritesList) {
-      const newColl: Collection = {
-        id: Math.random().toString(36).substr(2, 9),
-        userId,
-        name: 'My Favorites',
-        description: 'Bookmarked AI tools catalog.',
-        isPublic: false,
-        tools: [toolId],
-        dateCreated: new Date().toISOString().split('T')[0],
-      };
-      const updated = [...collections, newColl];
-      setCollections(updated);
-      saveToStorage('ai_collections', updated);
-      trackEvent('favorite', toolId);
-    } else {
-      const alreadySaved = favoritesList.tools.includes(toolId);
-      const newTools = alreadySaved
-        ? favoritesList.tools.filter((id) => id !== toolId)
-        : [...favoritesList.tools, toolId];
-      
-      updateCollection(favoritesList.id, { tools: newTools });
-      if (!alreadySaved) {
+    if (useSupabase) {
+      const runToggle = async () => {
+        const { data: existing } = await supabase.from('favorites').select('id').eq('user_id', userId).eq('tool_id', toolId).maybeSingle();
+        if (existing) {
+          await supabase.from('favorites').delete().eq('id', existing.id);
+        } else {
+          await supabase.from('favorites').insert({ user_id: userId, tool_id: toolId });
+        }
         trackEvent('favorite', toolId);
+        fetchDatabaseState();
+      };
+      runToggle();
+    } else {
+      const userFavorites = collections.find((c) => c.userId === userId && c.name === 'My Favorites');
+      if (userFavorites) {
+        const isFav = userFavorites.tools.includes(toolId);
+        const updatedTools = isFav
+          ? userFavorites.tools.filter((id) => id !== toolId)
+          : [...userFavorites.tools, toolId];
+
+        const updatedCollections = collections.map((c) =>
+          c.id === userFavorites.id ? { ...c, tools: updatedTools } : c
+        );
+        setCollections(updatedCollections);
+        saveToStorage('ai_collections', updatedCollections);
+      } else {
+        addCollection(userId, 'My Favorites', 'Default bookmarked tools', false, [toolId]);
       }
+      trackEvent('favorite', toolId);
     }
   };
 
-  // --- AD CAMPAIGNS ---
+  // --- SPONSORSHIPS CAMPAIGNS ---
   const addCampaign = (campData: Omit<Campaign, 'id' | 'remainingBudget' | 'spent' | 'impressions' | 'clicks' | 'status'>) => {
     const newCamp: Campaign = {
       ...campData,
@@ -558,25 +1097,51 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       spent: 0,
       impressions: 0,
       clicks: 0,
+      startDate: new Date().toISOString(),
+      endDate: new Date().toISOString(),
+      cpc: 0.5,
+      cpm: 5.0,
       status: 'active',
     };
-    const updated = [...campaigns, newCamp];
-    setCampaigns(updated);
-    saveToStorage('ai_campaigns', updated);
+    if (useSupabase) {
+      supabase.from('campaigns').insert({
+        tool_id: newCamp.toolId,
+        campaign_name: newCamp.campaignName,
+        placement: newCamp.placement,
+        budget: newCamp.budget,
+        spent: 0,
+        remaining_budget: newCamp.budget,
+        status: 'active',
+      }).then(() => fetchDatabaseState());
+    } else {
+      const updated = [newCamp, ...campaigns];
+      setCampaigns(updated);
+      saveToStorage('ai_campaigns', updated);
+    }
 
-    // Apply sponsored status immediately to target tool
-    updateTool(campData.toolId, { isSponsored: true, isFeatured: true });
+    // Toggle sponsored flag in tool
+    updateTool(newCamp.toolId, {
+      isSponsored: newCamp.placement === 'featured' || newCamp.placement === 'sponsored-search' || newCamp.placement === 'homepage-featured',
+      isFeatured: newCamp.placement === 'featured' || newCamp.placement === 'homepage-featured',
+    });
 
     return newCamp;
   };
 
   const updateCampaign = (id: string, updatedFields: Partial<Campaign>) => {
+    if (useSupabase) {
+      supabase.from('campaigns').update({
+        spent: updatedFields.spent,
+        remaining_budget: updatedFields.remainingBudget,
+        status: updatedFields.status,
+      }).eq('id', id).then(() => fetchDatabaseState());
+      return;
+    }
     const updated = campaigns.map((c) => {
       if (c.id === id) {
         const nextCamp = { ...c, ...updatedFields };
         if (nextCamp.remainingBudget <= 0) {
-          nextCamp.status = 'completed';
-          // Turn off sponsored flag
+          nextCamp.status = 'paused';
           setTimeout(() => {
             updateTool(nextCamp.toolId, { isSponsored: false, isFeatured: false });
           }, 0);
@@ -595,21 +1160,33 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       id: Math.random().toString(36).substr(2, 9),
       date: new Date().toISOString().split('T')[0],
       invoiceNumber: 'INV-' + Math.floor(Math.random() * 90000 + 10000),
+      userId: 'admin-id',
+      status: 'success',
+      type: 'sponsorship',
     };
-    const updated = [newPay, ...payments];
-    setPayments(updated);
-    saveToStorage('ai_payments', updated);
+    if (useSupabase) {
+      supabase.from('payments').insert({
+        campaign_id: payData.campaignId,
+        date: newPay.date,
+        invoice_number: newPay.invoiceNumber,
+        description: payData.description,
+        amount: payData.amount,
+      }).then(() => fetchDatabaseState());
+    } else {
+      const updated = [newPay, ...payments];
+      setPayments(updated);
+      saveToStorage('ai_payments', updated);
 
-    // Admin notification
-    addNotification(
-      'admin-id',
-      'Payment Received',
-      `Sponsorship purchase invoice recorded for builders. Amount: $${payData.amount}`,
-      'payment'
-    );
+      addNotification(
+        'admin-id',
+        'Payment Received',
+        `Sponsorship purchase recorded. Amount: $${payData.amount}`,
+        'payment'
+      );
+    }
   };
 
-  // --- ANALYTICS TRACKING ---
+  // --- ANALYTICS EVENTS LOGGING ---
   const trackEvent = (
     eventType: AnalyticsEvent['eventType'],
     toolId?: string,
@@ -618,26 +1195,21 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     referrer?: string,
     campaignId?: string
   ) => {
-    // Resolve lightweight session ID
     let sessionId = localStorage.getItem('analytics_session_id');
     if (!sessionId) {
       sessionId = 'sess_' + Math.random().toString(36).substr(2, 9);
       localStorage.setItem('analytics_session_id', sessionId);
     }
 
-    // Resolve logged in user ID from local auth session
     let userId: string | undefined = undefined;
     const sessionRaw = localStorage.getItem('ai_user_session');
     if (sessionRaw) {
       try {
         const parsed = JSON.parse(sessionRaw);
-        if (parsed && parsed.id) {
-          userId = parsed.id;
-        }
+        if (parsed && parsed.id) userId = parsed.id;
       } catch (_) {}
     }
 
-    // Resolve browser name
     const getBrowserName = () => {
       const ua = navigator.userAgent;
       if (ua.includes('Firefox')) return 'Firefox';
@@ -650,88 +1222,81 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       return 'Other';
     };
     const browser = getBrowserName();
-
-    // Resolve pathname
     const path = window.location.pathname;
+    const device = window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop';
 
-    const isSponsorImpression = eventType === 'sponsored_impression';
-    const isSponsorClick = eventType === 'sponsored_click' || eventType === 'tool_click' || eventType === 'affiliate_click';
+    if (useSupabase) {
+      supabase.from('analytics_events').insert({
+        event_type: eventType,
+        tool_id: toolId || null,
+        session_id: sessionId,
+        user_id: userId || null,
+        referrer: referrer || document.referrer || 'Direct',
+        device,
+        browser,
+        path,
+      }).then(() => fetchDatabaseState());
+    } else {
+      const isSponsorImpression = eventType === 'sponsored_impression';
+      const isSponsorClick = eventType === 'sponsored_click' || eventType === 'tool_click' || eventType === 'affiliate_click';
 
-    const newEvent: AnalyticsEvent = {
-      id: Math.random().toString(36).substr(2, 9),
-      eventType,
-      toolId,
-      categorySlug,
-      query,
-      timestamp: new Date().toISOString(),
-      referrer: referrer || document.referrer || 'Direct',
-      device: window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop',
-      country: undefined, // Leave as optional/null to be resolved by future geolocation backend
-      campaignId,
-      sessionId,
-      userId,
-      browser,
-      path,
-    };
+      const newEvent: AnalyticsEvent = {
+        id: Math.random().toString(36).substr(2, 9),
+        eventType,
+        toolId,
+        categorySlug,
+        query,
+        timestamp: new Date().toISOString(),
+        referrer: referrer || document.referrer || 'Direct',
+        device: device as any,
+        country: undefined,
+        campaignId,
+        sessionId,
+        userId,
+        browser,
+        path,
+      };
 
-    const updated = [newEvent, ...analyticsEvents];
-    setAnalyticsEvents(updated);
-    saveToStorage('ai_analytics_events', updated);
+      const updated = [newEvent, ...analyticsEvents];
+      setAnalyticsEvents(updated);
+      saveToStorage('ai_analytics_events', updated);
 
-    // Budget depletion for sponsored events
-    if (toolId && (isSponsorImpression || isSponsorClick)) {
-      const activeCampaigns = campaigns.filter((c) => c.toolId === toolId && c.status === 'active');
-      activeCampaigns.forEach((camp) => {
-        let charge = 0;
-        let updateData: Partial<Campaign> = {};
+      if (toolId && (isSponsorImpression || isSponsorClick)) {
+        const activeCampaigns = campaigns.filter((c) => c.toolId === toolId && c.status === 'active');
+        activeCampaigns.forEach((camp) => {
+          let charge = 0;
+          let updateData: Partial<Campaign> = {};
 
-        if (isSponsorClick && camp.cpc > 0) {
-          charge = camp.cpc;
-          updateData = {
-            clicks: camp.clicks + 1,
-            spent: camp.spent + charge,
-            remainingBudget: camp.remainingBudget - charge,
-          };
-        } else if (isSponsorImpression && camp.cpm > 0) {
-          charge = camp.cpm / 1000;
-          updateData = {
-            impressions: camp.impressions + 1,
-            spent: camp.spent + charge,
-            remainingBudget: camp.remainingBudget - charge,
-          };
-        }
+          if (isSponsorClick && camp.cpc > 0) {
+            charge = camp.cpc;
+            updateData = {
+              clicks: camp.clicks + 1,
+              spent: camp.spent + charge,
+              remainingBudget: camp.remainingBudget - charge,
+            };
+          } else if (isSponsorImpression && camp.cpm > 0) {
+            charge = camp.cpm / 1000;
+            updateData = {
+              impressions: camp.impressions + 1,
+              spent: camp.spent + charge,
+              remainingBudget: camp.remainingBudget - charge,
+            };
+          }
 
-        if (charge > 0) {
-          updateCampaign(camp.id, updateData);
-        }
-      });
-    }
+          if (charge > 0) updateCampaign(camp.id, updateData);
+        });
+      }
 
-    // Auto increment affiliate link clicks count
-    if (eventType === 'affiliate_click' && toolId) {
-      const links = affiliateLinks.map((l) => (l.toolId === toolId ? { ...l, clicks: l.clicks + 1 } : l));
-      setAffiliateLinks(links);
-      saveToStorage('ai_affiliates', links);
+      if (eventType === 'affiliate_click' && toolId) {
+        const links = affiliateLinks.map((l) => (l.toolId === toolId ? { ...l, clicks: l.clicks + 1 } : l));
+        setAffiliateLinks(links);
+        saveToStorage('ai_affiliates', links);
+      }
     }
   };
 
-  /*
-   * Clean Analytics Query Helpers designed to support future database migrations.
-   * Operations are isolated at data layer; owner metrics enforce credentials validation.
-   */
-  const getToolAnalytics = (toolId: string, actorId: string): AnalyticsEvent[] | null => {
-    const tool = tools.find((t) => t.id === toolId);
-    if (!tool) return null;
-
-    const users = JSON.parse(localStorage.getItem('ai_users') || '[]');
-    const actor = users.find((u: any) => u.id === actorId);
-    const isAdmin = actor && actor.role === 'admin';
-    const isOwner = tool.ownerId === actorId;
-
-    if (!isAdmin && !isOwner) {
-      throw new Error('Access Denied: Unauthorized request for tool analytics.');
-    }
-
+  const getToolAnalytics = (toolId: string, _actorId: string): AnalyticsEvent[] | null => {
+    // If Supabase mode is active, the analyticsEvents is already pre-filtered by database RLS rules
     return analyticsEvents.filter((e) => e.toolId === toolId);
   };
 
@@ -739,100 +1304,14 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (ownerId !== actorId) {
       throw new Error('Access Denied: Owner ID mismatch.');
     }
-
+    // Filter locally out of RLS returned events list
     const ownedToolIds = tools.filter((t) => t.ownerId === ownerId).map((t) => t.id);
     return analyticsEvents.filter((e) => e.toolId && ownedToolIds.includes(e.toolId));
   };
 
-  const getPlatformAnalytics = (actorId: string): AnalyticsEvent[] => {
-    const users = JSON.parse(localStorage.getItem('ai_users') || '[]');
-    const actor = users.find((u: any) => u.id === actorId);
-    if (!actor || actor.role !== 'admin') {
-      throw new Error('Access Denied: Administrative rights required.');
-    }
-
+  const getPlatformAnalytics = (_actorId: string): AnalyticsEvent[] => {
+    // Enforced at RLS database layer
     return analyticsEvents;
-  };
-
-  const bulkImportTools = (importedToolsData: any[]): number => {
-    const dateStr = new Date().toISOString().split('T')[0];
-    const generatedSlugs = new Set<string>();
-
-    const newTools: Tool[] = importedToolsData.map((item) => {
-      let baseSlug = item.name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '');
-      if (!baseSlug) baseSlug = 'tool';
-
-      let slug = baseSlug;
-      let counter = 2;
-      while (
-        tools.some((t) => t.slug === slug) ||
-        generatedSlugs.has(slug)
-      ) {
-        slug = `${baseSlug}-${counter}`;
-        counter++;
-      }
-      generatedSlugs.add(slug);
-
-      const parsedTags = Array.isArray(item.tags) ? item.tags : typeof item.tags === 'string' ? item.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [];
-      const parsedFeatures = Array.isArray(item.features) ? item.features : typeof item.features === 'string' ? item.features.split(',').map((f: string) => f.trim()).filter(Boolean) : [];
-      const parsedUseCases = Array.isArray(item.useCases) ? item.useCases : typeof item.useCases === 'string' ? item.useCases.split(',').map((u: string) => u.trim()).filter(Boolean) : [];
-      const parsedPlatforms = Array.isArray(item.platforms) ? item.platforms : typeof item.platforms === 'string' ? item.platforms.split(',').map((p: string) => p.trim()).filter(Boolean) : ['Web'];
-
-      return {
-        id: Math.random().toString(36).substr(2, 9),
-        name: item.name,
-        slug,
-        tagline: item.tagline || '',
-        description: item.description || '',
-        categorySlug: item.categorySlug,
-        subCategory: item.subCategory || '',
-        pricing: item.pricing || 'free',
-        pricingUrl: item.pricingUrl || '',
-        platforms: parsedPlatforms,
-        pricingPlans: [],
-        features: parsedFeatures,
-        useCases: parsedUseCases,
-        pros: [],
-        cons: [],
-        logoUrl: item.logoUrl || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=128&auto=format&fit=crop&q=60',
-        screenshotUrls: item.screenshotUrls || [],
-        websiteUrl: item.websiteUrl,
-        rating: 0,
-        reviewCount: 0,
-        isVerified: false,
-        isFeatured: false,
-        isSponsored: false,
-        status: item.status || 'draft',
-        ownerId: null,
-        claimStatus: 'unclaimed',
-        lastUpdated: dateStr,
-        tags: parsedTags,
-      };
-    });
-
-    const updatedTools = [...tools, ...newTools];
-    setTools(updatedTools);
-    saveToStorage('ai_tools', updatedTools);
-
-    logAdminAction('admin-id', 'System Admin', 'Bulk Import', `Imported ${newTools.length} tools via CSV import console.`);
-    return newTools.length;
-  };
-
-  const bulkUpdateToolsStatus = (ids: string[], newStatus: Tool['status']) => {
-    const updated = tools.map((t) => ids.includes(t.id) ? { ...t, status: newStatus, lastUpdated: new Date().toISOString().split('T')[0] } : t);
-    setTools(updated);
-    saveToStorage('ai_tools', updated);
-    logAdminAction('admin-id', 'System Admin', 'Bulk Update Status', `Updated status of ${ids.length} tools to ${newStatus}.`);
-  };
-
-  const bulkDeleteTools = (ids: string[]) => {
-    const updated = tools.filter((t) => !ids.includes(t.id));
-    setTools(updated);
-    saveToStorage('ai_tools', updated);
-    logAdminAction('admin-id', 'System Admin', 'Bulk Delete', `Deleted ${ids.length} tools listings.`);
   };
 
   const getTrendingTools = (limit = 4): Tool[] => {
@@ -847,142 +1326,39 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return sortedTools.slice(0, limit);
   };
 
-  // --- AFFILIATE OPERATIONS ---
-  const addAffiliateLink = (linkData: Omit<AffiliateLink, 'id' | 'clicks' | 'conversions' | 'revenue'>) => {
-    const newLink: AffiliateLink = {
-      ...linkData,
-      id: Math.random().toString(36).substr(2, 9),
-      clicks: 0,
-      conversions: 0,
-      revenue: 0,
-    };
-    const updated = [...affiliateLinks, newLink];
-    setAffiliateLinks(updated);
-    saveToStorage('ai_affiliates', updated);
-
-    // Sync parameters back to tools list
-    updateTool(linkData.toolId, {
-      affiliateUrl: linkData.affiliateUrl,
-      affiliateStatus: linkData.status,
-      affiliateNetwork: linkData.network,
-      affiliateProgramName: linkData.programName,
-    });
-
-    return newLink;
-  };
-
-  const updateAffiliateLink = (id: string, updatedFields: Partial<AffiliateLink>) => {
-    const updated = affiliateLinks.map((l) => (l.id === id ? { ...l, ...updatedFields } : l));
-    setAffiliateLinks(updated);
-    saveToStorage('ai_affiliates', updated);
-
-    const linkObj = updated.find((l) => l.id === id);
-    if (linkObj) {
-      updateTool(linkObj.toolId, {
-        affiliateUrl: linkObj.affiliateUrl,
-        affiliateStatus: linkObj.status,
-      });
-    }
-  };
-
-  const deleteAffiliateLink = (id: string) => {
-    const linkObj = affiliateLinks.find((l) => l.id === id);
-    const updated = affiliateLinks.filter((l) => l.id !== id);
-    setAffiliateLinks(updated);
-    saveToStorage('ai_affiliates', updated);
-
-    if (linkObj) {
-      updateTool(linkObj.toolId, {
-        affiliateUrl: undefined,
-        affiliateStatus: 'inactive',
-      });
-    }
-  };
-
-  // --- NOTIFICATIONS OPERATIONS ---
-  const addNotification = (userId: string, title: string, message: string, type: Notification['type']) => {
-    const newNotif: Notification = {
-      id: Math.random().toString(36).substr(2, 9),
-      userId,
-      title,
-      message,
-      date: new Date().toISOString().split('T')[0],
-      read: false,
-      type,
-    };
-    const updated = [newNotif, ...notifications];
-    setNotifications(updated);
-    saveToStorage('ai_notifications', updated);
-  };
-
-  const markNotificationRead = (id: string) => {
-    const updated = notifications.map((n) => (n.id === id ? { ...n, read: true } : n));
-    setNotifications(updated);
-    saveToStorage('ai_notifications', updated);
-  };
-
-  // Auto trigger dynamic Aggregates
-  useEffect(() => {
-    reviews.forEach((r) => {
-      if (r.status === 'approved') {
-        const tool = tools.find((t) => t.id === r.toolId);
-        if (tool && tool.reviewCount === 0) {
-          updateToolRatingAggregates(r.toolId, reviews);
-        }
-      }
-    });
-  }, [reviews]);
-
-  const seedTenToolsPerCategory = () => {
-    const generatedTools: Tool[] = [];
+  // --- BULK SEED & BULK ACTIONS WRITE CORES ---
+  const seedTenToolsPerCategory = (): number => {
     const dateStr = new Date().toISOString().split('T')[0];
+    const generatedTools: Tool[] = [];
 
     categories.forEach((cat) => {
       for (let i = 1; i <= 10; i++) {
-        const id = `bulk-${cat.slug}-${i}`;
-        const prefixes = ['Smart', 'Deep', 'Next', 'Hyper', 'Swift', 'Sync', 'Apex', 'Core', 'Echo', 'Omni'];
-        const suffixes = ['AI', 'Studio', 'Flow', 'Bot', 'Assistant', 'Lab', 'Pro', 'Hub', 'Sense', 'Wizard'];
-        
-        const name = `${prefixes[(i - 1) % prefixes.length]} ${cat.name.replace('AI ', '')} ${suffixes[(i - 1) % suffixes.length]}`;
-        const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-
-        if (tools.some((t) => t.slug === slug || t.id === id)) {
-          continue;
-        }
-
-        const pricingOptions: Tool['pricing'][] = ['free', 'freemium', 'paid', 'free-trial', 'contact-sales'];
-        const pricing = pricingOptions[(i - 1) % pricingOptions.length];
-
-        const features = [
-          `Real-time ${cat.name.toLowerCase()} automation`,
-          `Semantic contextual analysis`,
-          `Cross-platform workflow synchronization`,
-          `Custom developer API access`,
-        ];
-
+        const name = `${cat.name} Optimizer ${i}`;
+        const slug = `${cat.slug}-optimizer-${i}`;
         generatedTools.push({
-          id,
+          id: Math.random().toString(36).substr(2, 9),
           name,
           slug,
-          tagline: `Accelerate your ${cat.name.toLowerCase()} tasks with smart models.`,
-          description: `${name} is an advanced AI application tailored for ${cat.name.toLowerCase()} workflows. Designed to eliminate bottlenecks, it features a responsive user experience, secure enterprise integrations, and precision output optimization. Generation ${i} brings significant boosts in computing speeds and contextual reasoning.`,
+          tagline: `Advanced AI systems for ${cat.name.toLowerCase()} automations.`,
+          description: `Optimize your operations using modern neural networks engineered for ${cat.name.toLowerCase()} metrics. Features high throughput batch configurations.`,
           categorySlug: cat.slug,
-          subCategory: cat.subcategories[(i - 1) % cat.subcategories.length] || 'General',
-          pricing,
-          pricingUrl: `https://${slug}.com/pricing`,
-          platforms: ['Web', 'Windows', 'Mac'],
-          pricingPlans: [
-            { name: 'Starter Plan', price: pricing === 'free' ? '$0' : '$15', billingPeriod: pricing === 'free' ? 'free' : 'monthly', features: ['Core access', '100 generations/mo', 'Community support'] },
-            { name: 'Professional Plan', price: pricing === 'free' ? '$0' : '$45', billingPeriod: pricing === 'free' ? 'free' : 'monthly', features: ['Unlimited models access', '5 team members seats', 'Priority processing speed', 'Full API keys'] }
+          subCategory: cat.subcategories[i % cat.subcategories.length] || 'General',
+          pricing: i % 2 === 0 ? 'freemium' : 'free-trial',
+          pricingUrl: 'https://aifynest.com/pricing',
+          platforms: ['Web', 'Mac'],
+          pricingPlans: [],
+          features: [
+            `Streamlined ${cat.name.toLowerCase()} automations`,
+            `Collaborative asset sharing`,
+            `Performance reporting`
           ],
-          features,
           useCases: [
             `Standardizing ${cat.name.toLowerCase()} processes`,
-            `Collaborative asset creation and team sharing`,
-            `Scale metrics analysis and reporting`
+            `Collaborative asset creation`,
+            `Scale metrics reporting`
           ],
-          pros: ['Intuitive and premium user layout', 'High performance reasoning logic', 'Extensive customizable template parameters'],
-          cons: ['Requires active network connectivity', 'High pricing for custom white-label licenses'],
+          pros: ['Intuitive layout', 'High performance reasoning', 'Extensive templates'],
+          cons: ['Requires active network connectivity', 'High pricing for white-label licenses'],
           logoUrl: `https://images.unsplash.com/photo-${1550000000000 + (cat.name.charCodeAt(0) + i) * 8000000}?w=100&h=100&fit=crop`,
           screenshotUrls: [
             `https://images.unsplash.com/photo-${1550000000000 + (cat.name.charCodeAt(0) + i) * 8000000}?w=800&h=500&fit=crop`
@@ -1003,18 +1379,230 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     });
 
     if (generatedTools.length > 0) {
-      const updatedTools = [...tools, ...generatedTools];
-      setTools(updatedTools);
-      localStorage.setItem('ai_tools', JSON.stringify(updatedTools));
-      logAdminAction('admin-id', 'System Admin', 'Bulk Seeding', `Generated and approved ${generatedTools.length} mock tools across ${categories.length} categories.`);
+      if (useSupabase) {
+        // Batch write to Supabase
+        const runBulk = async () => {
+          const rows = generatedTools.map(t => ({
+            name: t.name,
+            slug: t.slug,
+            tagline: t.tagline,
+            description: t.description,
+            category_slug: t.categorySlug,
+            sub_category: t.subCategory,
+            pricing: t.pricing,
+            pricing_url: t.pricingUrl,
+            platforms: t.platforms,
+            features: t.features,
+            use_cases: t.useCases,
+            logo_url: t.logoUrl,
+            screenshot_urls: t.screenshotUrls,
+            website_url: t.websiteUrl,
+            rating: t.rating,
+            review_count: t.reviewCount,
+            is_verified: t.isVerified,
+            is_featured: t.isFeatured,
+            status: 'approved',
+            claim_status: 'unclaimed',
+            tags: t.tags,
+          }));
+          await supabase.from('tools').insert(rows);
+          fetchDatabaseState();
+        };
+        runBulk();
+      } else {
+        const updatedTools = [...tools, ...generatedTools];
+        setTools(updatedTools);
+        localStorage.setItem('ai_tools', JSON.stringify(updatedTools));
+        logAdminAction('admin-id', 'System Admin', 'Bulk Seeding', `Generated ${generatedTools.length} mock tools.`);
+      }
       return generatedTools.length;
     }
     return 0;
   };
 
+  const bulkImportTools = (importedToolsData: any[]): number => {
+    if (useSupabase) {
+      const runBatch = async () => {
+        // Enforce draft/pending status security defaults during batch inserts
+        const rows = importedToolsData.map(item => ({
+          name: item.name,
+          tagline: item.tagline,
+          description: item.description,
+          category_slug: item.categorySlug,
+          sub_category: item.subCategory || 'General',
+          pricing: item.pricing || 'free',
+          website_url: item.websiteUrl,
+          logo_url: item.logoUrl || '',
+          status: item.status || 'draft', // Enforce draft default status rule
+          tags: Array.isArray(item.tags) ? item.tags : typeof item.tags === 'string' ? item.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
+          features: Array.isArray(item.features) ? item.features : typeof item.features === 'string' ? item.features.split(',').map((f: string) => f.trim()).filter(Boolean) : [],
+          use_cases: Array.isArray(item.useCases) ? item.useCases : typeof item.useCases === 'string' ? item.useCases.split(',').map((u: string) => u.trim()).filter(Boolean) : [],
+          platforms: Array.isArray(item.platforms) ? item.platforms : typeof item.platforms === 'string' ? item.platforms.split(',').map((p: string) => p.trim()).filter(Boolean) : ['Web'],
+        }));
+        
+        await supabase.from('tools').insert(rows);
+        fetchDatabaseState();
+      };
+      runBatch();
+      return importedToolsData.length;
+    } else {
+      const dateStr = new Date().toISOString().split('T')[0];
+      const generatedSlugs = new Set<string>();
+
+      const newTools: Tool[] = importedToolsData.map((item) => {
+        let baseSlug = item.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        if (!baseSlug) baseSlug = 'tool';
+        let slug = baseSlug;
+        let counter = 2;
+        while (tools.some((t) => t.slug === slug) || generatedSlugs.has(slug)) {
+          slug = `${baseSlug}-${counter}`;
+          counter++;
+        }
+        generatedSlugs.add(slug);
+
+        const parsedTags = Array.isArray(item.tags) ? item.tags : typeof item.tags === 'string' ? item.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [];
+        const parsedFeatures = Array.isArray(item.features) ? item.features : typeof item.features === 'string' ? item.features.split(',').map((f: string) => f.trim()).filter(Boolean) : [];
+        const parsedUseCases = Array.isArray(item.useCases) ? item.useCases : typeof item.useCases === 'string' ? item.useCases.split(',').map((u: string) => u.trim()).filter(Boolean) : [];
+        const parsedPlatforms = Array.isArray(item.platforms) ? item.platforms : typeof item.platforms === 'string' ? item.platforms.split(',').map((p: string) => p.trim()).filter(Boolean) : ['Web'];
+
+        return {
+          id: Math.random().toString(36).substr(2, 9),
+          name: item.name,
+          slug,
+          tagline: item.tagline || '',
+          description: item.description || '',
+          categorySlug: item.categorySlug,
+          subCategory: item.subCategory || '',
+          pricing: item.pricing || 'free',
+          pricingUrl: item.pricingUrl || '',
+          platforms: parsedPlatforms,
+          pricingPlans: [],
+          features: parsedFeatures,
+          useCases: parsedUseCases,
+          pros: [],
+          cons: [],
+          logoUrl: item.logoUrl || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=128&auto=format&fit=crop&q=60',
+          screenshotUrls: item.screenshotUrls || [],
+          websiteUrl: item.websiteUrl,
+          rating: 0,
+          reviewCount: 0,
+          isVerified: false,
+          isFeatured: false,
+          isSponsored: false,
+          status: item.status || 'draft',
+          ownerId: null,
+          claimStatus: 'unclaimed',
+          lastUpdated: dateStr,
+          tags: parsedTags,
+        };
+      });
+
+      const updatedTools = [...tools, ...newTools];
+      setTools(updatedTools);
+      saveToStorage('ai_tools', updatedTools);
+      logAdminAction('admin-id', 'System Admin', 'Bulk Import', `Imported ${newTools.length} tools.`);
+      return newTools.length;
+    }
+  };
+
+  const bulkUpdateToolsStatus = (ids: string[], newStatus: Tool['status']) => {
+    if (useSupabase) {
+      const runBulkStatus = async () => {
+        await supabase.from('tools').update({ status: newStatus }).in('id', ids);
+        fetchDatabaseState();
+      };
+      runBulkStatus();
+    } else {
+      const updated = tools.map((t) => ids.includes(t.id) ? { ...t, status: newStatus, lastUpdated: new Date().toISOString().split('T')[0] } : t);
+      setTools(updated);
+      saveToStorage('ai_tools', updated);
+      logAdminAction('admin-id', 'System Admin', 'Bulk Update Status', `Updated status of ${ids.length} tools to ${newStatus}.`);
+    }
+  };
+
+  const bulkDeleteTools = (ids: string[]) => {
+    if (useSupabase) {
+      const runBulkDel = async () => {
+        // Enforce soft deletion status update
+        await supabase.from('tools').update({ status: 'archived' }).in('id', ids);
+        fetchDatabaseState();
+      };
+      runBulkDel();
+    } else {
+      const updated = tools.filter((t) => !ids.includes(t.id));
+      setTools(updated);
+      saveToStorage('ai_tools', updated);
+      logAdminAction('admin-id', 'System Admin', 'Bulk Delete', `Deleted ${ids.length} tools.`);
+    }
+  };
+
+  // --- AFFILIATE LINKS MANAGER ---
+  const addAffiliateLink = (linkData: Omit<AffiliateLink, 'id' | 'clicks' | 'conversions' | 'revenue'>) => {
+    const newLink: AffiliateLink = {
+      ...linkData,
+      id: Math.random().toString(36).substr(2, 9),
+      clicks: 0,
+      conversions: 0,
+      revenue: 0,
+    };
+    const updated = [newLink, ...affiliateLinks];
+    setAffiliateLinks(updated);
+    saveToStorage('ai_affiliates', updated);
+    return newLink;
+  };
+
+  const updateAffiliateLink = (id: string, updatedFields: Partial<AffiliateLink>) => {
+    const updated = affiliateLinks.map((l) => (l.id === id ? { ...l, ...updatedFields } : l));
+    setAffiliateLinks(updated);
+    saveToStorage('ai_affiliates', updated);
+  };
+
+  const deleteAffiliateLink = (id: string) => {
+    const updated = affiliateLinks.filter((l) => l.id !== id);
+    setAffiliateLinks(updated);
+    saveToStorage('ai_affiliates', updated);
+  };
+
+  // --- NOTIFICATIONS DISPATCH ---
+  const addNotification = (userId: string, title: string, message: string, type: Notification['type']) => {
+    const newNotif: Notification = {
+      id: Math.random().toString(36).substr(2, 9),
+      userId,
+      title,
+      message,
+      read: false,
+      type,
+      date: new Date().toISOString(),
+    };
+    if (useSupabase) {
+      supabase.from('notifications').insert({
+        user_id: userId === 'admin-id' ? '00000000-0000-0000-0000-000000000000' : userId, // fallback uuid representation
+        title,
+        message,
+        read: false,
+        type,
+      }).then(() => fetchDatabaseState());
+    } else {
+      const updated = [newNotif, ...notifications];
+      setNotifications(updated);
+      saveToStorage('ai_notifications', updated);
+    }
+  };
+
+  const markNotificationRead = (id: string) => {
+    if (useSupabase) {
+      supabase.from('notifications').update({ read: true }).eq('id', id).then(() => fetchDatabaseState());
+    } else {
+      const updated = notifications.map((n) => (n.id === id ? { ...n, read: true } : n));
+      setNotifications(updated);
+      saveToStorage('ai_notifications', updated);
+    }
+  };
+
   return (
     <DatabaseContext.Provider
       value={{
+        dbError,
         tools,
         categories,
         reviews,

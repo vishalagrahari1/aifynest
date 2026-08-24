@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, User, LogOut, Layout } from '../shared/Icons';
 import { useAuth } from '../../context/AuthContext';
+import { useDatabase } from '../../context/DatabaseContext';
 
 const Bookmark: React.FC<{ size?: number }> = ({ size = 18 }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -26,6 +27,7 @@ const ChevronDown: React.FC<{ size?: number }> = ({ size = 14 }) => (
 
 export const Header: React.FC = () => {
   const { user, logout, isOwner, isAdmin } = useAuth();
+  const { dbError } = useDatabase();
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -72,7 +74,24 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header
+    <>
+      {dbError && (
+        <div style={{
+          backgroundColor: '#ef4444',
+          color: 'white',
+          padding: '10px 20px',
+          textAlign: 'center',
+          fontSize: '13px',
+          fontWeight: 'bold',
+          position: 'sticky',
+          top: 0,
+          zIndex: 101,
+          boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
+        }}>
+          ⚠️ Database Outage Detected: {dbError}. Stored operations are temporarily disabled. Please refresh or try again later.
+        </div>
+      )}
+      <header
       style={{
         position: 'sticky',
         top: 0,
@@ -563,6 +582,7 @@ export const Header: React.FC = () => {
         }
       `}</style>
     </header>
+    </>
   );
 };
 

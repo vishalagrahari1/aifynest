@@ -17,6 +17,32 @@ export interface PricingPlan {
   billingPeriod: 'monthly' | 'yearly' | 'one-time' | 'free';
 }
 
+export interface ToolSubmission {
+  id: string;
+  toolId: string | null;
+  submitterId: string;
+  name: string;
+  tagline: string;
+  description: string;
+  categorySlug: string;
+  subCategory: string;
+  pricing: string;
+  pricingUrl?: string;
+  platforms: string[];
+  features: string[];
+  useCases: string[];
+  logoUrl: string;
+  screenshotUrls: string[];
+  videoUrl?: string;
+  websiteUrl: string;
+  tags: string[];
+  status: 'pending' | 'approved' | 'rejected' | 'needs_changes' | 'draft';
+  adminNotes?: string;
+  rejectionReason?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Tool {
   id: string;
   name: string;
