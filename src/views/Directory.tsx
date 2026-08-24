@@ -259,6 +259,7 @@ export const Directory: React.FC<DirectoryProps> = ({
         className="container" 
         style={{ 
           maxWidth: '1240px',
+          width: 'calc(100% - 32px)',
           margin: '0 auto',
           backgroundColor: 'var(--bg-card)', 
           border: '1px solid var(--border-color)', 
@@ -572,7 +573,7 @@ export const Directory: React.FC<DirectoryProps> = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
               {paginatedTools.length > 0 ? (
                 <>
-                  <div className="grid grid-cols-3">
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
                     {paginatedTools.map((tool) => (
                       <ToolCard
                         key={tool.id}
