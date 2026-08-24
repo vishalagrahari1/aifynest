@@ -251,6 +251,26 @@ export const Directory: React.FC<DirectoryProps> = ({
     filters.openSourceOnly ||
     filters.featuredOnly;
 
+  const getPageNumbers = () => {
+    const pageNumbers: (number | string)[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      pageNumbers.push(1);
+      if (pageParam > 3) pageNumbers.push('...');
+      const start = Math.max(2, pageParam - 1);
+      const end = Math.min(totalPages - 1, pageParam + 1);
+      for (let i = start; i <= end; i++) {
+        pageNumbers.push(i);
+      }
+      if (pageParam < totalPages - 2) pageNumbers.push('...');
+      pageNumbers.push(totalPages);
+    }
+    return pageNumbers;
+  };
+
   return (
     <div style={{ position: 'relative', backgroundColor: 'var(--bg-primary)', minHeight: '100vh', padding: '32px 0 80px 0' }}>
       <SEOHead title={pageTitle} description={pageDescription} />
@@ -583,8 +603,25 @@ export const Directory: React.FC<DirectoryProps> = ({
                       >
                         &lt; Previous
                       </button>
-                      {Array.from({ length: totalPages }).map((_, idx) => {
-                        const pageIdx = idx + 1;
+                      {getPageNumbers().map((pageVal, idx) => {
+                        if (pageVal === '...') {
+                          return (
+                            <span 
+                              key={`dots-${idx}`} 
+                              style={{ 
+                                display: 'inline-flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'center', 
+                                minWidth: '36px', 
+                                color: 'var(--text-muted)',
+                                fontSize: 'var(--text-sm)' 
+                              }}
+                            >
+                              ...
+                            </span>
+                          );
+                        }
+                        const pageIdx = pageVal as number;
                         return (
                           <button
                             key={pageIdx}
