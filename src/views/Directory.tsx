@@ -252,115 +252,97 @@ export const Directory: React.FC<DirectoryProps> = ({
     filters.featuredOnly;
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{ position: 'relative', backgroundColor: 'var(--bg-primary)', minHeight: '100vh', padding: '32px 0 80px 0' }}>
       <SEOHead title={pageTitle} description={pageDescription} />
 
-      {/* Hero Glow Backdrop */}
-      <div className="hero-glow" style={{ top: '-120px', left: '15%', width: '450px', height: '450px' }}></div>
-      <div className="hero-glow" style={{ top: '300px', right: '5%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(160, 68, 244, 0.05) 0%, rgba(0,0,0,0) 70%)' }}></div>
-
-      <div className="container" style={{ paddingTop: '32px', paddingBottom: '80px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+      <div 
+        className="container" 
+        style={{ 
+          maxWidth: '1240px',
+          margin: '0 auto',
+          backgroundColor: 'var(--bg-card)', 
+          border: '1px solid var(--border-color)', 
+          borderRadius: '16px', 
+          padding: '40px',
+          boxShadow: 'var(--shadow-sm)',
+          boxSizing: 'border-box'
+        }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
           
-          {/* Breadcrumbs & Modern Hero Card */}
+          {/* Breadcrumbs */}
           <div 
-            className="directory-hero-card"
-            style={{
-              background: 'var(--gradient-hero)',
-              border: '1px solid var(--border-color)',
-              borderRadius: '24px',
-              padding: '40px 48px',
-              position: 'relative',
-              overflow: 'hidden',
-              boxShadow: 'var(--shadow-md)',
+            style={{ 
+              fontSize: '11px', 
+              color: 'var(--text-secondary)', 
+              fontWeight: '700', 
+              textTransform: 'uppercase', 
+              letterSpacing: '0.08em', 
+              display: 'flex', 
+              gap: '6px',
+              alignItems: 'center'
             }}
           >
-            <div style={{ position: 'relative', zIndex: 2 }}>
-              {/* Breadcrumbs */}
-              <div 
-                style={{ 
-                  fontSize: '11px', 
-                  color: 'var(--text-secondary)', 
-                  fontWeight: '700', 
-                  textTransform: 'uppercase', 
-                  letterSpacing: '0.08em', 
-                  marginBottom: '14px', 
-                  display: 'flex', 
-                  gap: '6px',
-                  alignItems: 'center'
-                }}
-              >
-                <Link to="/" style={{ color: 'var(--color-primary)', textDecoration: 'none', transition: 'color 0.2s' }}>Home</Link>
+            <Link to="/" style={{ color: 'var(--color-primary)', textDecoration: 'none', transition: 'color 0.2s' }}>Home</Link>
+            <span style={{ color: 'var(--text-muted)' }}>/</span>
+            <span style={{ color: 'var(--text-muted)' }}>Discover</span>
+            {currentCategory && (
+              <>
                 <span style={{ color: 'var(--text-muted)' }}>/</span>
-                <span style={{ color: 'var(--text-muted)' }}>Discover</span>
-                {currentCategory && (
-                  <>
-                    <span style={{ color: 'var(--text-muted)' }}>/</span>
-                    <span style={{ color: 'var(--text-secondary)' }}>{currentCategory.name}</span>
-                  </>
-                )}
-              </div>
+                <span style={{ color: 'var(--text-secondary)' }}>{currentCategory.name}</span>
+              </>
+            )}
+          </div>
 
+          {/* Clean Header Grid */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '20px' }}>
+            <div style={{ flex: 1, minWidth: '300px' }}>
               <h1 
                 style={{ 
-                  margin: '0 0 16px 0', 
-                  fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', 
+                  margin: '0 0 12px 0', 
+                  fontSize: '2.2rem', 
                   fontWeight: 800, 
                   letterSpacing: '-0.02em',
-                  lineHeight: '1.2',
                   color: 'var(--text-primary)'
                 }}
               >
                 {pageTitle}
               </h1>
-
               <p 
                 style={{ 
                   color: 'var(--text-secondary)', 
                   fontSize: 'var(--text-sm)', 
-                  margin: '0 0 28px 0', 
+                  margin: 0, 
                   maxWidth: '750px', 
-                  lineHeight: '1.6' 
+                  lineHeight: '1.5' 
                 }}
               >
                 {pageDescription}
               </p>
-
-              {/* Stats Ribbon */}
-              <div 
-                style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '16px', 
-                  fontSize: '11px', 
-                  color: 'var(--text-primary)',
-                  backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                  backdropFilter: 'blur(8px)',
-                  WebkitBackdropFilter: 'blur(8px)',
-                  padding: '8px 18px',
-                  borderRadius: 'var(--radius-full)',
-                  width: 'fit-content',
-                  border: '1px solid var(--border-color)',
-                  flexWrap: 'wrap'
-                }}
-              >
-                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontSize: '13px' }}>📊</span> <strong>{categories.length}</strong> Categories
-                </span>
-                <span style={{ color: 'var(--border-color)' }}>|</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontSize: '13px' }}>⚡</span> Updated <strong>Daily</strong>
-                </span>
-                <span style={{ color: 'var(--border-color)' }}>|</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontSize: '13px' }}>🛡️</span> <strong>100%</strong> Verified Listings
-                </span>
-              </div>
             </div>
-            
-            {/* Ambient decorative glow */}
-            <div className="hero-glow" style={{ bottom: '-150px', right: '-150px', width: '300px', height: '300px', opacity: 0.5 }}></div>
+
+            {/* Simple Boxed Info Badge */}
+            <div 
+              style={{ 
+                display: 'flex', 
+                flexDirection: 'column',
+                gap: '6px',
+                fontSize: '11px', 
+                color: 'var(--text-secondary)',
+                backgroundColor: 'var(--bg-primary)',
+                padding: '12px 18px',
+                borderRadius: '8px',
+                border: '1px solid var(--border-color)',
+                minWidth: '180px'
+              }}
+            >
+              <span>📊 <strong>{categories.length}</strong> Categories</span>
+              <span>⚡ Updated <strong>Daily</strong></span>
+              <span>🛡️ <strong>100%</strong> Verified Listings</span>
+            </div>
           </div>
+
+          <hr style={{ border: '0', borderTop: '1px solid var(--border-color)', margin: '4px 0' }} />
 
           {/* Directory Navigation Toolbar */}
           <div
