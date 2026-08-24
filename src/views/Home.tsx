@@ -363,19 +363,19 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
       <section className="section" style={{ position: 'relative', zIndex: 1 }}>
         <div className="container" style={{ display: 'flex', flexDirection: 'column', gap: '56px' }}>
           
-          {/* Block 1: AI Chatbots & Models */}
+          {/* Block 1: AI Video & Image Generators */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px', borderBottom: '2px solid var(--border-color)', paddingBottom: '12px' }}>
               <h3 style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '24px' }}>🤖</span> AI Chatbots & Models
+                <span style={{ fontSize: '24px' }}>🎥</span> AI Video & Image Generators
               </h3>
-              <Link to="/categories/chatbots" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }}>
+              <Link to="/ai-tools?c=image-generation" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }}>
                 View All &gt;
               </Link>
             </div>
             <div className="grid grid-cols-4">
               {tools
-                .filter(t => t.categorySlug === 'chatbots' && t.status === 'approved')
+                .filter(t => (t.categorySlug === 'image-generation' || t.categorySlug === 'video') && t.status === 'approved')
                 .slice(0, 4)
                 .map((tool) => (
                   <ToolCard key={tool.id} tool={tool} onToast={onToast} />
