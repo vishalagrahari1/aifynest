@@ -708,8 +708,14 @@ export const Directory: React.FC<DirectoryProps> = ({
 
         .directory-tools-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+          grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 24px;
+        }
+
+        @media (max-width: 600px) {
+          .directory-tools-grid {
+            grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+          }
         }
 
         @media (max-width: 1200px) {
