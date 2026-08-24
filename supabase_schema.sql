@@ -477,51 +477,77 @@ ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 
 -- Profiles Policies
+DROP POLICY IF EXISTS "Public Read Profiles" ON public.profiles;
+DROP POLICY IF EXISTS "Users edit self profile" ON public.profiles;
 CREATE POLICY "Public Read Profiles" ON public.profiles FOR SELECT USING (true);
 CREATE POLICY "Users edit self profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
 
 -- Categories Policies
+DROP POLICY IF EXISTS "Public Read Categories" ON public.categories;
+DROP POLICY IF EXISTS "Admin write categories" ON public.categories;
 CREATE POLICY "Public Read Categories" ON public.categories FOR SELECT USING (true);
 CREATE POLICY "Admin write categories" ON public.categories FOR ALL USING (public.is_admin(auth.uid()));
 
 -- Tools Policies
+DROP POLICY IF EXISTS "Public Read Approved Tools" ON public.tools;
+DROP POLICY IF EXISTS "Admin full tools access" ON public.tools;
+DROP POLICY IF EXISTS "Owner read own tools" ON public.tools;
 CREATE POLICY "Public Read Approved Tools" ON public.tools FOR SELECT USING (status = 'approved');
 CREATE POLICY "Admin full tools access" ON public.tools FOR ALL USING (public.is_admin(auth.uid()));
 CREATE POLICY "Owner read own tools" ON public.tools FOR SELECT USING (owner_id = auth.uid());
 
 -- Submissions Policies
+DROP POLICY IF EXISTS "Submitter manage own" ON public.tool_submissions;
+DROP POLICY IF EXISTS "Admin submissions access" ON public.tool_submissions;
 CREATE POLICY "Submitter manage own" ON public.tool_submissions FOR ALL USING (submitter_id = auth.uid());
 CREATE POLICY "Admin submissions access" ON public.tool_submissions FOR ALL USING (public.is_admin(auth.uid()));
 
 -- Claims Policies
+DROP POLICY IF EXISTS "Claimant manage own" ON public.tool_claims;
+DROP POLICY IF EXISTS "Admin claims access" ON public.tool_claims;
 CREATE POLICY "Claimant manage own" ON public.tool_claims FOR ALL USING (claimant_id = auth.uid());
 CREATE POLICY "Admin claims access" ON public.tool_claims FOR ALL USING (public.is_admin(auth.uid()));
 
 -- Reviews Policies
+DROP POLICY IF EXISTS "Public read approved reviews" ON public.reviews;
+DROP POLICY IF EXISTS "User write own reviews" ON public.reviews;
+DROP POLICY IF EXISTS "User update own reviews" ON public.reviews;
+DROP POLICY IF EXISTS "Admin reviews access" ON public.reviews;
 CREATE POLICY "Public read approved reviews" ON public.reviews FOR SELECT USING (status = 'approved');
 CREATE POLICY "User write own reviews" ON public.reviews FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "User update own reviews" ON public.reviews FOR UPDATE USING (auth.uid() = user_id);
 CREATE POLICY "Admin reviews access" ON public.reviews FOR ALL USING (public.is_admin(auth.uid()));
 
 -- Favorites Policies
+DROP POLICY IF EXISTS "User manage own favorites" ON public.favorites;
 CREATE POLICY "User manage own favorites" ON public.favorites FOR ALL USING (user_id = auth.uid());
 
 -- Analytics Policies
+DROP POLICY IF EXISTS "Public write events" ON public.analytics_events;
+DROP POLICY IF EXISTS "Admin view analytics" ON public.analytics_events;
+DROP POLICY IF EXISTS "Owner view analytics" ON public.analytics_events;
 CREATE POLICY "Public write events" ON public.analytics_events FOR INSERT WITH CHECK (true);
 CREATE POLICY "Admin view analytics" ON public.analytics_events FOR SELECT USING (public.is_admin(auth.uid()));
 CREATE POLICY "Owner view analytics" ON public.analytics_events FOR SELECT USING (EXISTS (SELECT 1 FROM public.tools WHERE id = analytics_events.tool_id AND owner_id = auth.uid()));
 
 -- Campaigns & Payments Policies
+DROP POLICY IF EXISTS "Owner view campaigns" ON public.campaigns;
+DROP POLICY IF EXISTS "Admin manage campaigns" ON public.campaigns;
+DROP POLICY IF EXISTS "Owner view payments" ON public.payments;
+DROP POLICY IF EXISTS "Admin manage payments" ON public.payments;
 CREATE POLICY "Owner view campaigns" ON public.campaigns FOR SELECT USING (EXISTS (SELECT 1 FROM public.tools WHERE id = campaigns.tool_id AND owner_id = auth.uid()));
 CREATE POLICY "Admin manage campaigns" ON public.campaigns FOR ALL USING (public.is_admin(auth.uid()));
 CREATE POLICY "Owner view payments" ON public.payments FOR SELECT USING (EXISTS (SELECT 1 FROM public.campaigns c JOIN public.tools t ON c.tool_id = t.id WHERE c.id = payments.campaign_id AND t.owner_id = auth.uid()));
 CREATE POLICY "Admin manage payments" ON public.payments FOR ALL USING (public.is_admin(auth.uid()));
 
 -- Audit Logs Policies
+DROP POLICY IF EXISTS "Admin view logs" ON public.audit_logs;
+DROP POLICY IF EXISTS "Admin create logs" ON public.audit_logs;
 CREATE POLICY "Admin view logs" ON public.audit_logs FOR SELECT USING (public.is_admin(auth.uid()));
 CREATE POLICY "Admin create logs" ON public.audit_logs FOR INSERT WITH CHECK (public.is_admin(auth.uid()));
 
 -- Notifications Policies
+DROP POLICY IF EXISTS "Users manage own notifications" ON public.notifications;
 CREATE POLICY "Users manage own notifications" ON public.notifications FOR ALL USING (user_id = auth.uid());
 
 -- ----------------------------------------------------
