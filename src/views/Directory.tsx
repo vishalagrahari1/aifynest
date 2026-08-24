@@ -40,7 +40,7 @@ export const Directory: React.FC<DirectoryProps> = ({
   const pageParam = Number(searchParams.get('page') || '1');
 
   // Load items per page setting
-  const itemsPerPage = 6;
+  const itemsPerPage = 9;
 
   // Active search input state (client-side override before submission)
   const [searchInput, setSearchInput] = useState(qParam);
@@ -252,346 +252,428 @@ export const Directory: React.FC<DirectoryProps> = ({
     filters.featuredOnly;
 
   return (
-    <div className="container section">
+    <div style={{ position: 'relative' }}>
       <SEOHead title={pageTitle} description={pageDescription} />
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        {/* Title Page Header */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
-            <Link to="/">Home</Link> &gt; <span>AI Tools</span>
-            {currentCategory && (
-              <> &gt; <Link to={`/categories/${currentCategory.slug}`}>{currentCategory.name}</Link></>
-            )}
-          </div>
-          <h1 style={{ margin: 0, fontSize: 'var(--text-3xl)', fontWeight: 'var(--font-bold)' }}>{pageTitle}</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: 0, maxWidth: '800px' }}>
-            {pageDescription}
-          </p>
+      {/* Hero Glow Backdrop */}
+      <div className="hero-glow" style={{ top: '-120px', left: '15%', width: '450px', height: '450px' }}></div>
+      <div className="hero-glow" style={{ top: '300px', right: '5%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(160, 68, 244, 0.05) 0%, rgba(0,0,0,0) 70%)' }}></div>
+
+      <div className="container" style={{ paddingTop: '32px', paddingBottom: '80px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
           
-          {/* Stats Ribbon inspired by Aixploria */}
+          {/* Breadcrumbs & Modern Hero Card */}
           <div 
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '12px', 
-              fontSize: '11px', 
-              color: 'var(--text-secondary)',
-              backgroundColor: 'rgba(255, 255, 255, 0.02)',
-              padding: '6px 14px',
-              borderRadius: 'var(--radius-full)',
-              width: 'fit-content',
+            className="directory-hero-card"
+            style={{
+              background: 'var(--gradient-hero)',
               border: '1px solid var(--border-color)',
-              marginTop: '4px',
-              flexWrap: 'wrap'
+              borderRadius: '24px',
+              padding: '40px 48px',
+              position: 'relative',
+              overflow: 'hidden',
+              boxShadow: 'var(--shadow-md)',
             }}
           >
-            <span>📊 <strong>{categories.length}</strong> Categories</span>
-            <span style={{ color: 'var(--border-color)' }}>|</span>
-            <span>🔄 Updated <strong>Daily</strong></span>
-            <span style={{ color: 'var(--border-color)' }}>|</span>
-            <span>🛡️ <strong>100%</strong> Manually Verified</span>
+            <div style={{ position: 'relative', zIndex: 2 }}>
+              {/* Breadcrumbs */}
+              <div 
+                style={{ 
+                  fontSize: '11px', 
+                  color: 'var(--text-secondary)', 
+                  fontWeight: '700', 
+                  textTransform: 'uppercase', 
+                  letterSpacing: '0.08em', 
+                  marginBottom: '14px', 
+                  display: 'flex', 
+                  gap: '6px',
+                  alignItems: 'center'
+                }}
+              >
+                <Link to="/" style={{ color: 'var(--color-primary)', textDecoration: 'none', transition: 'color 0.2s' }}>Home</Link>
+                <span style={{ color: 'var(--text-muted)' }}>/</span>
+                <span style={{ color: 'var(--text-muted)' }}>Discover</span>
+                {currentCategory && (
+                  <>
+                    <span style={{ color: 'var(--text-muted)' }}>/</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>{currentCategory.name}</span>
+                  </>
+                )}
+              </div>
+
+              <h1 
+                style={{ 
+                  margin: '0 0 16px 0', 
+                  fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', 
+                  fontWeight: 800, 
+                  letterSpacing: '-0.02em',
+                  lineHeight: '1.2',
+                  color: 'var(--text-primary)'
+                }}
+              >
+                {pageTitle}
+              </h1>
+
+              <p 
+                style={{ 
+                  color: 'var(--text-secondary)', 
+                  fontSize: 'var(--text-sm)', 
+                  margin: '0 0 28px 0', 
+                  maxWidth: '750px', 
+                  lineHeight: '1.6' 
+                }}
+              >
+                {pageDescription}
+              </p>
+
+              {/* Stats Ribbon */}
+              <div 
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '16px', 
+                  fontSize: '11px', 
+                  color: 'var(--text-primary)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                  padding: '8px 18px',
+                  borderRadius: 'var(--radius-full)',
+                  width: 'fit-content',
+                  border: '1px solid var(--border-color)',
+                  flexWrap: 'wrap'
+                }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontSize: '13px' }}>📊</span> <strong>{categories.length}</strong> Categories
+                </span>
+                <span style={{ color: 'var(--border-color)' }}>|</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontSize: '13px' }}>⚡</span> Updated <strong>Daily</strong>
+                </span>
+                <span style={{ color: 'var(--border-color)' }}>|</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontSize: '13px' }}>🛡️</span> <strong>100%</strong> Verified Listings
+                </span>
+              </div>
+            </div>
+            
+            {/* Ambient decorative glow */}
+            <div className="hero-glow" style={{ bottom: '-150px', right: '-150px', width: '300px', height: '300px', opacity: 0.5 }}></div>
           </div>
-        </div>
 
-        {/* Dynamic Toolbar: Search input + Sorting selector */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '16px',
-            backgroundColor: 'var(--bg-card)',
-            border: '1px solid var(--border-color)',
-            padding: '12px 18px',
-            borderRadius: 'var(--radius-md)',
-          }}
-        >
-          <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '6px', width: '100%', maxWidth: '320px', position: 'relative' }}>
-            <input
-              type="text"
-              placeholder="Search category tools..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              style={{
-                padding: '8px 12px 8px 36px',
-                fontSize: 'var(--text-xs)',
-                borderRadius: 'var(--radius-sm)',
-                border: '1px solid var(--border-color)',
-                backgroundColor: 'var(--bg-primary)',
-                color: 'var(--text-primary)',
-                width: '100%',
-                outline: 'none',
-              }}
-            />
-            <Search size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-          </form>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: 'var(--text-xs)' }}>
-            <span style={{ color: 'var(--text-secondary)' }}>{totalItems} tools matching</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ color: 'var(--text-muted)' }}>Sort by:</span>
-              <select
-                value={sortParam}
-                onChange={(e) => handleSortChange(e.target.value)}
+          {/* Directory Navigation Toolbar */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '16px',
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              padding: '14px 20px',
+              borderRadius: 'var(--radius-lg)',
+              boxShadow: 'var(--shadow-sm)',
+            }}
+          >
+            {/* Toolbar Search Box */}
+            <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '6px', width: '100%', maxWidth: '340px', position: 'relative' }}>
+              <input
+                type="text"
+                placeholder="Search matching tools..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
                 style={{
-                  padding: '6px 10px',
-                  borderRadius: 'var(--radius-sm)',
+                  padding: '10px 16px 10px 42px',
+                  fontSize: 'var(--text-xs)',
+                  borderRadius: 'var(--radius-md)',
                   border: '1px solid var(--border-color)',
                   backgroundColor: 'var(--bg-primary)',
                   color: 'var(--text-primary)',
-                  fontSize: 'var(--text-xs)',
+                  width: '100%',
                   outline: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                <option value="trending">Trending (Decay Weight)</option>
-                <option value="most-popular">Most Popular Reviews</option>
-                <option value="highest-rated">Highest Ratings</option>
-                <option value="newest">Newest Launch</option>
-                <option value="free">Free Tiers First</option>
-                <option value="a-z">A-Z Name Alphabet</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* AIXploria-style Quick Filter Chips Bar */}
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', marginRight: '4px', fontWeight: 'bold' }}>Quick Filters:</span>
-          
-          <button
-            onClick={() => handleFilterChange({ ...filters, featuredOnly: !filters.featuredOnly })}
-            className="chip-filter"
-            style={{
-              padding: '6px 12px',
-              borderRadius: '20px',
-              border: '1px solid var(--border-color)',
-              fontSize: '11px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              backgroundColor: filters.featuredOnly ? 'var(--color-gold-light)' : 'var(--bg-card)',
-              color: filters.featuredOnly ? 'var(--color-gold)' : 'var(--text-secondary)',
-              borderColor: filters.featuredOnly ? 'var(--color-gold)' : 'var(--border-color)',
-              transition: 'all 0.2s',
-            }}
-          >
-            <span>★ Gold Vetted</span>
-          </button>
-
-          <button
-            onClick={() => handleFilterChange({ ...filters, verifiedOnly: !filters.verifiedOnly })}
-            className="chip-filter"
-            style={{
-              padding: '6px 12px',
-              borderRadius: '20px',
-              border: '1px solid var(--border-color)',
-              fontSize: '11px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              backgroundColor: filters.verifiedOnly ? 'var(--color-success-light)' : 'var(--bg-card)',
-              color: filters.verifiedOnly ? 'var(--color-success)' : 'var(--text-secondary)',
-              borderColor: filters.verifiedOnly ? 'var(--color-success)' : 'var(--border-color)',
-              transition: 'all 0.2s',
-            }}
-          >
-            <span>✓ Verified</span>
-          </button>
-
-          {(['free', 'freemium', 'free-trial', 'paid'] as const).map((model) => {
-            const isActive = filters.pricing.includes(model);
-            const label = model === 'free' ? '🆓 100% Free' : model === 'freemium' ? '🎁 Freemium' : model === 'free-trial' ? '⏳ Free Trial' : '💰 Paid';
-            
-            const handleToggleModel = () => {
-              let updatedPricing = [...filters.pricing];
-              if (isActive) {
-                updatedPricing = updatedPricing.filter((p) => p !== model);
-              } else {
-                updatedPricing.push(model);
-              }
-              handleFilterChange({ ...filters, pricing: updatedPricing });
-            };
-
-            return (
-              <button
-                key={model}
-                onClick={handleToggleModel}
-                className="chip-filter"
-                style={{
-                  padding: '6px 12px',
-                  borderRadius: '20px',
-                  border: '1px solid var(--border-color)',
-                  fontSize: '11px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  backgroundColor: isActive ? 'var(--color-primary-light)' : 'var(--bg-card)',
-                  color: isActive ? 'var(--color-primary)' : 'var(--text-secondary)',
-                  borderColor: isActive ? 'var(--color-primary)' : 'var(--border-color)',
                   transition: 'all 0.2s',
                 }}
-              >
-                <span>{label}</span>
-              </button>
-            );
-          })}
-        </div>
+                className="search-input-glow"
+              />
+              <Search size={15} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+            </form>
 
-        {/* Filter chips listing */}
-        {hasActiveFilters && (
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', marginTop: '-8px' }}>
-            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Active Filters:</span>
-            {filters.category && (
-              <span className="badge badge-pricing" style={chipStyle}>
-                Category: {categories.find((c) => c.slug === filters.category)?.name}
-                <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveFilterChip('category')} />
+            {/* Toolbar Sort Selectors */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: 'var(--text-sm)', flexWrap: 'wrap' }}>
+              <span style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', fontWeight: '500' }}>
+                Found <strong>{totalItems}</strong> matching tools
               </span>
-            )}
-            {filters.subCategory && (
-              <span className="badge badge-pricing" style={chipStyle}>
-                Subcategory: {filters.subCategory}
-                <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveFilterChip('subCategory')} />
-              </span>
-            )}
-            {filters.pricing.map((p) => (
-              <span key={p} className="badge badge-pricing" style={chipStyle}>
-                Pricing: {p}
-                <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveFilterChip('pricing', p)} />
-              </span>
-            ))}
-            {filters.platforms.map((plat) => (
-              <span key={plat} className="badge badge-pricing" style={chipStyle}>
-                Platform: {plat}
-                <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveFilterChip('platforms', plat)} />
-              </span>
-            ))}
-            {filters.rating > 0 && (
-              <span className="badge badge-pricing" style={chipStyle}>
-                Rating: ★{filters.rating}+
-                <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveFilterChip('rating')} />
-              </span>
-            )}
-            {filters.verifiedOnly && (
-              <span className="badge badge-pricing" style={chipStyle}>
-                Verified Only
-                <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveFilterChip('verifiedOnly')} />
-              </span>
-            )}
-            {filters.openSourceOnly && (
-              <span className="badge badge-pricing" style={chipStyle}>
-                Open Source
-                <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveFilterChip('openSourceOnly')} />
-              </span>
-            )}
-            {filters.featuredOnly && (
-              <span className="badge badge-pricing" style={chipStyle}>
-                Gold Vetted
-                <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveFilterChip('featuredOnly')} />
-              </span>
-            )}
-          </div>
-        )}
-
-        {/* Content Layout Grid (Sidebar + List) */}
-        <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '24px' }} className="directory-layout">
-          {/* Sidebar */}
-          <div className="directory-sidebar">
-            <SidebarFilter categories={categories} filters={filters} onChange={handleFilterChange} />
-          </div>
-
-          {/* Tools Grid */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            {paginatedTools.length > 0 ? (
-              <>
-                <div className="grid grid-cols-3">
-                  {paginatedTools.map((tool) => (
-                    <ToolCard
-                      key={tool.id}
-                      tool={tool}
-                      onToast={onToast}
-                      isCompareChecked={compareList.includes(tool.id)}
-                      onCompareToggle={() => onCompareToggle(tool.id)}
-                    />
-                  ))}
-                </div>
-
-                {/* Pagination links */}
-                {totalPages > 1 && (
-                  <div style={{ display: 'flex', justifySelf: 'center', gap: '8px', marginTop: '20px' }}>
-                    <button
-                      onClick={() => handlePageChange(pageParam - 1)}
-                      disabled={pageParam === 1}
-                      className="btn btn-outline btn-sm"
-                      style={{ padding: '6px 12px' }}
-                    >
-                      &lt; Previous
-                    </button>
-                    {Array.from({ length: totalPages }).map((_, idx) => {
-                      const pageIdx = idx + 1;
-                      return (
-                        <button
-                          key={pageIdx}
-                          onClick={() => handlePageChange(pageIdx)}
-                          className={`btn btn-sm ${pageParam === pageIdx ? 'btn-primary' : 'btn-outline'}`}
-                          style={{ minWidth: '32px', padding: '6px' }}
-                        >
-                          {pageIdx}
-                        </button>
-                      );
-                    })}
-                    <button
-                      onClick={() => handlePageChange(pageParam + 1)}
-                      disabled={pageParam === totalPages}
-                      className="btn btn-outline btn-sm"
-                      style={{ padding: '6px 12px' }}
-                    >
-                      Next &gt;
-                    </button>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div
-                style={{
-                  textAlign: 'center',
-                  padding: '80px 40px',
-                  backgroundColor: 'var(--bg-card)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: 'var(--radius-lg)',
-                }}
-              >
-                <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', marginBottom: '8px' }}>
-                  No tools found
-                </div>
-                <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: '20px', maxWidth: '400px', margin: '0 auto 20px auto' }}>
-                  We couldn't find any approved AI tools matching your specific search query or active filter criteria.
-                </p>
-                <button
-                  onClick={() => handleFilterChange({
-                    category: '',
-                    subCategory: '',
-                    pricing: [],
-                    platforms: [],
-                    rating: 0,
-                    verifiedOnly: false,
-                    openSourceOnly: false,
-                  })}
-                  className="btn btn-primary"
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: 'var(--text-muted)', fontSize: 'var(--text-xs)' }}>Sort by:</span>
+                <select
+                  value={sortParam}
+                  onChange={(e) => handleSortChange(e.target.value)}
+                  style={{
+                    padding: '8px 14px',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'var(--bg-primary)',
+                    color: 'var(--text-primary)',
+                    fontSize: 'var(--text-xs)',
+                    fontWeight: '600',
+                    outline: 'none',
+                    cursor: 'pointer',
+                    transition: 'border-color 0.2s',
+                  }}
+                  className="sort-select-premium"
                 >
-                  Clear All Filters
-                </button>
+                  <option value="trending">🔥 Trending Weight</option>
+                  <option value="most-popular">💬 Most Popular Reviews</option>
+                  <option value="highest-rated">⭐ Highest Ratings</option>
+                  <option value="newest">📅 Newest Launch</option>
+                  <option value="free">🆓 Free Tiers First</option>
+                  <option value="a-z">🔤 Alphabetical (A-Z)</option>
+                </select>
               </div>
-            )}
+            </div>
           </div>
+
+          {/* Quick Filter Chips Bar */}
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', marginRight: '4px', fontWeight: 'bold' }}>Quick Filters:</span>
+            
+            <button
+              onClick={() => handleFilterChange({ ...filters, featuredOnly: !filters.featuredOnly })}
+              className="chip-filter-premium"
+              style={{
+                padding: '6px 14px',
+                borderRadius: 'var(--radius-full)',
+                border: '1px solid var(--border-color)',
+                fontSize: '11px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                backgroundColor: filters.featuredOnly ? 'var(--color-gold-light)' : 'var(--bg-card)',
+                color: filters.featuredOnly ? 'var(--color-gold)' : 'var(--text-secondary)',
+                borderColor: filters.featuredOnly ? 'var(--color-gold)' : 'var(--border-color)',
+                transition: 'all 0.2s',
+              }}
+            >
+              <span>★ Gold Vetted</span>
+            </button>
+
+            <button
+              onClick={() => handleFilterChange({ ...filters, verifiedOnly: !filters.verifiedOnly })}
+              className="chip-filter-premium"
+              style={{
+                padding: '6px 14px',
+                borderRadius: 'var(--radius-full)',
+                border: '1px solid var(--border-color)',
+                fontSize: '11px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                backgroundColor: filters.verifiedOnly ? 'var(--color-success-light)' : 'var(--bg-card)',
+                color: filters.verifiedOnly ? 'var(--color-success)' : 'var(--text-secondary)',
+                borderColor: filters.verifiedOnly ? 'var(--color-success)' : 'var(--border-color)',
+                transition: 'all 0.2s',
+              }}
+            >
+              <span>✓ Verified</span>
+            </button>
+
+            {(['free', 'freemium', 'free-trial', 'paid'] as const).map((model) => {
+              const isActive = filters.pricing.includes(model);
+              const label = model === 'free' ? '🆓 100% Free' : model === 'freemium' ? '🎁 Freemium' : model === 'free-trial' ? '⏳ Free Trial' : '💰 Paid';
+              
+              const handleToggleModel = () => {
+                let updatedPricing = [...filters.pricing];
+                if (isActive) {
+                  updatedPricing = updatedPricing.filter((p) => p !== model);
+                } else {
+                  updatedPricing.push(model);
+                }
+                handleFilterChange({ ...filters, pricing: updatedPricing });
+              };
+
+              return (
+                <button
+                  key={model}
+                  onClick={handleToggleModel}
+                  className="chip-filter-premium"
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: 'var(--radius-full)',
+                    border: '1px solid var(--border-color)',
+                    fontSize: '11px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    backgroundColor: isActive ? 'var(--color-primary-light)' : 'var(--bg-card)',
+                    color: isActive ? 'var(--color-primary)' : 'var(--text-secondary)',
+                    borderColor: isActive ? 'var(--color-primary)' : 'var(--border-color)',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <span>{label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Active filter chips listing */}
+          {hasActiveFilters && (
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', marginTop: '-12px' }}>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Active filters:</span>
+              {filters.category && (
+                <span className="badge badge-pricing" style={chipStyle}>
+                  Category: {categories.find((c) => c.slug === filters.category)?.name}
+                  <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveFilterChip('category')} />
+                </span>
+              )}
+              {filters.subCategory && (
+                <span className="badge badge-pricing" style={chipStyle}>
+                  Subcategory: {filters.subCategory}
+                  <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveFilterChip('subCategory')} />
+                </span>
+              )}
+              {filters.pricing.map((p) => (
+                <span key={p} className="badge badge-pricing" style={chipStyle}>
+                  Pricing: {p}
+                  <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveFilterChip('pricing', p)} />
+                </span>
+              ))}
+              {filters.platforms.map((plat) => (
+                <span key={plat} className="badge badge-pricing" style={chipStyle}>
+                  Platform: {plat}
+                  <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveFilterChip('platforms', plat)} />
+                </span>
+              ))}
+              {filters.rating > 0 && (
+                <span className="badge badge-pricing" style={chipStyle}>
+                  Rating: ★{filters.rating}+
+                  <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveFilterChip('rating')} />
+                </span>
+              )}
+              {filters.verifiedOnly && (
+                <span className="badge badge-pricing" style={chipStyle}>
+                  Verified Only
+                  <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveFilterChip('verifiedOnly')} />
+                </span>
+              )}
+              {filters.openSourceOnly && (
+                <span className="badge badge-pricing" style={chipStyle}>
+                  Open Source
+                  <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveFilterChip('openSourceOnly')} />
+                </span>
+              )}
+              {filters.featuredOnly && (
+                <span className="badge badge-pricing" style={chipStyle}>
+                  Gold Vetted
+                  <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveFilterChip('featuredOnly')} />
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Content Layout Grid (Sidebar + List) */}
+          <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '28px' }} className="directory-layout">
+            {/* Left Filter Sidebar */}
+            <div className="directory-sidebar">
+              <SidebarFilter categories={categories} filters={filters} onChange={handleFilterChange} />
+            </div>
+
+            {/* Right Tools Grid */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+              {paginatedTools.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-3">
+                    {paginatedTools.map((tool) => (
+                      <ToolCard
+                        key={tool.id}
+                        tool={tool}
+                        onToast={onToast}
+                        isCompareChecked={compareList.includes(tool.id)}
+                        onCompareToggle={() => onCompareToggle(tool.id)}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Navigation Pagination */}
+                  {totalPages > 1 && (
+                    <div style={{ display: 'flex', justifySelf: 'center', gap: '8px', marginTop: '24px' }}>
+                      <button
+                        onClick={() => handlePageChange(pageParam - 1)}
+                        disabled={pageParam === 1}
+                        className="btn btn-outline btn-sm"
+                        style={{ padding: '8px 14px', borderRadius: 'var(--radius-md)' }}
+                      >
+                        &lt; Previous
+                      </button>
+                      {Array.from({ length: totalPages }).map((_, idx) => {
+                        const pageIdx = idx + 1;
+                        return (
+                          <button
+                            key={pageIdx}
+                            onClick={() => handlePageChange(pageIdx)}
+                            className={`btn btn-sm ${pageParam === pageIdx ? 'btn-primary' : 'btn-outline'}`}
+                            style={{ minWidth: '36px', padding: '8px', borderRadius: 'var(--radius-md)' }}
+                          >
+                            {pageIdx}
+                          </button>
+                        );
+                      })}
+                      <button
+                        onClick={() => handlePageChange(pageParam + 1)}
+                        disabled={pageParam === totalPages}
+                        className="btn btn-outline btn-sm"
+                        style={{ padding: '8px 14px', borderRadius: 'var(--radius-md)' }}
+                      >
+                        Next &gt;
+                      </button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div
+                  style={{
+                    textAlign: 'center',
+                    padding: '80px 40px',
+                    backgroundColor: 'var(--bg-card)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-lg)',
+                    boxShadow: 'var(--shadow-sm)',
+                  }}
+                >
+                  <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', marginBottom: '8px' }}>
+                    No matching tools found
+                  </div>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: '24px', maxWidth: '400px', margin: '0 auto 24px auto', lineHeight: '1.5' }}>
+                    We couldn't find any approved AI tools matching your specific search query or active filter criteria.
+                  </p>
+                  <button
+                    onClick={() => handleFilterChange({
+                      category: '',
+                      subCategory: '',
+                      pricing: [],
+                      platforms: [],
+                      rating: 0,
+                      verifiedOnly: false,
+                      openSourceOnly: false,
+                      featuredOnly: false,
+                    })}
+                    className="btn btn-primary"
+                  >
+                    Clear All Filters
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -640,15 +722,34 @@ export const Directory: React.FC<DirectoryProps> = ({
         </div>
       )}
 
-      {/* Media Queries for Responsive Sidebar drawer layout */}
+      {/* CSS Styles injection for interactive scaling and glows */}
       <style>{`
         @media (max-width: 900px) {
           .directory-layout {
             grid-template-columns: 1fr !important;
           }
           .directory-sidebar {
-            display: none !important; /* In production, we'd have a drawer toggle button */
+            display: none !important;
           }
+        }
+
+        .search-input-glow:focus {
+          border-color: var(--color-primary) !important;
+          box-shadow: 0 0 15px rgba(37, 99, 235, 0.15) !important;
+        }
+
+        .sort-select-premium:hover {
+          border-color: var(--color-primary) !important;
+        }
+
+        .chip-filter-premium {
+          transition: all 0.2s ease-in-out;
+        }
+
+        .chip-filter-premium:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          border-color: var(--color-primary) !important;
         }
       `}</style>
     </div>
