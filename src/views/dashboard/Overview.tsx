@@ -43,12 +43,18 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'listings' | 'analytics' | 'reviews' | 'promotions' | 'billing' | 'settings' | 'notifications'>('overview');
 
   useEffect(() => {
-    if (location.pathname.endsWith('/tools')) {
+    const params = new URLSearchParams(location.search);
+    const tabParam = params.get('tab');
+    
+    const validTabs = ['overview', 'listings', 'analytics', 'reviews', 'promotions', 'billing', 'settings', 'notifications'];
+    if (tabParam && validTabs.includes(tabParam)) {
+      setActiveTab(tabParam as any);
+    } else if (location.pathname.endsWith('/tools')) {
       setActiveTab('listings');
     } else {
       setActiveTab('overview');
     }
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
 
   // Active Selected Tool ID dropdown tracker (supports "all" or specific tool)
   const [activeToolId, setActiveToolId] = useState<string>('all');
