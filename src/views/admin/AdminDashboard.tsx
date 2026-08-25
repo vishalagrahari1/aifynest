@@ -6,6 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { SEOHead } from '../../components/shared/SEOHead';
 import { Modal } from '../../components/shared/Modal';
 import { StarRating } from '../../components/shared/StarRating';
+import { DataQualityAudit } from './DataQualityAudit';
 import {
   Shield,
   Layout,
@@ -51,7 +52,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
   const { user } = useAuth();
 
   // Navigation state
-  const [activeTab, setActiveTab] = useState<'overview' | 'submissions' | 'tools' | 'import' | 'affiliates' | 'claims' | 'reviews' | 'analytics' | 'notifications' | 'logs' | 'pending_review' | 'changes_requested'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'submissions' | 'tools' | 'import' | 'affiliates' | 'claims' | 'reviews' | 'analytics' | 'notifications' | 'logs' | 'pending_review' | 'changes_requested' | 'data_quality'>('overview');
 
   // Filters for submissions moderation table
   const [subStatusFilter, setSubStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected' | 'needs_changes'>('all');
@@ -910,6 +911,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
             { id: 'changes_requested', name: 'Changes Requested', count: changesRequestedCount },
             { id: 'claims', name: 'Claims', count: pendingClaimsCount },
             { id: 'submissions', name: 'Submissions', count: 0 },
+            { id: 'data_quality', name: 'Data Quality', count: 0 },
             { id: 'affiliates', name: 'Affiliates Linker', count: 0 },
             { id: 'reviews', name: 'Moderation', count: pendingReviews.length },
             { id: 'notifications', name: 'Notifications', count: unreadNotifs.length },
@@ -2677,6 +2679,11 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                 </table>
               </div>
             </div>
+          )}
+
+          {/* TAB 10: DATA QUALITY AUDIT */}
+          {activeTab === 'data_quality' && (
+            <DataQualityAudit onToast={onToast} />
           )}
         </div>
       </div>
