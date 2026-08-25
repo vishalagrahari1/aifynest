@@ -4,7 +4,7 @@ import { useSearchParams, useParams } from 'react-router-dom';
 import { useDatabase } from '../context/DatabaseContext';
 import { ComparisonTable } from '../components/comparison/ComparisonTable';
 import { SEOHead } from '../components/shared/SEOHead';
-import { Plus } from '../components/shared/Icons';
+
 
 interface CompareProps {
   compareList: string[];
@@ -131,35 +131,26 @@ export const Compare: React.FC<CompareProps> = ({
                 placeholder="Search AI tool to add to comparison..."
                 value={searchQuery}
                 onChange={handleSearchChange}
-                style={{
-                  padding: '8px 12px',
-                  fontSize: 'var(--text-xs)',
-                  borderRadius: 'var(--radius-sm)',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: 'var(--bg-secondary)',
-                  color: 'var(--text-primary)',
-                  width: '100%',
-                  outline: 'none',
-                }}
+                className="form-input"
               />
             </div>
 
             {/* Dropdown results */}
             {showDropdown && searchResults.length > 0 && (
               <div
+                className="glass"
                 style={{
                   position: 'absolute',
                   top: '100%',
                   left: 0,
                   right: 0,
-                  marginTop: '4px',
-                  backgroundColor: 'var(--bg-card)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: 'var(--radius-sm)',
+                  marginTop: '8px',
+                  borderRadius: 'var(--radius-md)',
                   boxShadow: 'var(--shadow-lg)',
                   zIndex: 2000,
-                  maxHeight: '200px',
+                  maxHeight: '220px',
                   overflowY: 'auto',
+                  padding: '6px',
                 }}
               >
                 {searchResults.map((tool) => (
@@ -167,20 +158,30 @@ export const Compare: React.FC<CompareProps> = ({
                     key={tool.id}
                     onClick={() => handleAddTool(tool.id)}
                     style={{
-                      padding: '10px 12px',
+                      padding: '10px 14px',
                       fontSize: 'var(--text-xs)',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '8px',
-                      borderBottom: '1px solid var(--border-color)',
+                      justifyContent: 'space-between',
+                      borderRadius: 'var(--radius-sm)',
+                      transition: 'background var(--transition-fast)',
                       color: 'var(--text-primary)',
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-tertiary)')}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                    className="dropdown-link-hover"
                   >
-                    <Plus size={12} />
-                    <span>{tool.name}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <img 
+                        src={tool.logoUrl} 
+                        alt={tool.name} 
+                        style={{ width: '20px', height: '20px', borderRadius: '4px', objectFit: 'cover' }} 
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop';
+                        }}
+                      />
+                      <strong>{tool.name}</strong>
+                    </div>
+                    <span className="badge badge-pricing" style={{ fontSize: '9px' }}>{tool.pricing}</span>
                   </div>
                 ))}
               </div>
@@ -191,6 +192,11 @@ export const Compare: React.FC<CompareProps> = ({
         {/* Comparison grid view table */}
         <ComparisonTable tools={comparedTools} onRemove={onCompareToggle} />
       </div>
+      <style>{`
+        .dropdown-link-hover:hover {
+          background-color: var(--bg-tertiary) !important;
+        }
+      `}</style>
     </div>
   );
 };

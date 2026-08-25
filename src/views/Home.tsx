@@ -13,7 +13,7 @@ interface HomeProps {
 }
 
 export const Home: React.FC<HomeProps> = ({ onToast }) => {
-  const { tools, categories, collections, trackEvent } = useDatabase();
+  const { tools, categories, collections, blogPosts, trackEvent } = useDatabase();
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -322,6 +322,36 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
             {categories.slice(0, 8).map((cat) => (
               <CategoryCard key={cat.slug} category={cat} toolCount={getToolCount(cat.slug)} />
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Popular Tools Section Grid */}
+      <section className="section" style={{ position: 'relative', zIndex: 1 }}>
+        <div className="container">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px' }}>
+            <div>
+              <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', marginBottom: '8px' }}>
+                Popular Tools
+              </h2>
+              <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: 0 }}>
+                Browse the highest rated AI tools vetted by community builders and reviewers.
+              </p>
+            </div>
+            <Link to="/trending" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }}>
+              <span>View All Popular Tools</span>
+              <ArrowRight size={14} />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-4">
+            {tools
+              .filter(t => t.status === 'approved')
+              .sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount)
+              .slice(0, 8)
+              .map((tool) => (
+                <ToolCard key={tool.id} tool={tool} onToast={onToast} />
+              ))}
           </div>
         </div>
       </section>
@@ -649,6 +679,93 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                 Compare Cursor vs Phind
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Blog Section: 1 Row, 4 Articles */}
+      <section className="section" style={{ position: 'relative', zIndex: 1, backgroundColor: 'var(--bg-secondary)', borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)' }}>
+        <div className="container">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px' }}>
+            <div>
+              <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', marginBottom: '8px' }}>
+                Latest AI Insights & Tutorials
+              </h2>
+              <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: 0 }}>
+                Explore developer guides, model tutorials, and comparison breakdowns written by experts.
+              </p>
+            </div>
+            <Link to="/blog" className="btn btn-outline btn-sm" style={{ padding: '8px 16px', fontWeight: 'bold' }}>
+              <span>See All Articles</span>
+              <ArrowRight size={14} />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-4">
+            {blogPosts.slice(0, 4).map((post) => (
+              <div 
+                key={post.slug} 
+                className="card"
+                style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  height: '100%', 
+                  padding: 0,
+                  overflow: 'hidden',
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'var(--bg-card)',
+                  borderRadius: 'var(--radius-lg)'
+                }}
+              >
+                <div style={{ height: '160px', overflow: 'hidden', position: 'relative' }}>
+                  <img 
+                    src={post.image} 
+                    alt={post.title} 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }}
+                  />
+                  <span 
+                    style={{ 
+                      position: 'absolute', 
+                      top: '12px', 
+                      left: '12px', 
+                      backgroundColor: 'var(--color-primary)', 
+                      color: 'white', 
+                      fontSize: '10px', 
+                      fontWeight: 'bold', 
+                      padding: '2px 8px', 
+                      borderRadius: 'var(--radius-sm)',
+                      textTransform: 'uppercase'
+                    }}
+                  >
+                    {post.category}
+                  </span>
+                </div>
+
+                <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between', gap: '12px' }}>
+                  <div>
+                    <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'bold', margin: '0 0 8px 0', lineHeight: '1.4', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      {post.title}
+                    </h3>
+                    <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', lineHeight: '1.5', margin: 0, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      {post.excerpt}
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '10px', color: 'var(--text-muted)', borderTop: '1px solid var(--border-color)', paddingTop: '10px' }}>
+                    <span>{post.date}</span>
+                    <span>{post.readTime} read</span>
+                  </div>
+
+                  <Link 
+                    to={`/blog/${post.slug}`} 
+                    className="btn btn-outline btn-sm" 
+                    style={{ width: '100%', justifyContent: 'center', marginTop: '8px' }}
+                  >
+                    Read Article
+                  </Link>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

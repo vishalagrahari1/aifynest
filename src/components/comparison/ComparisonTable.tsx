@@ -42,38 +42,53 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({ tools, onRemov
       <table className="data-table" style={{ borderCollapse: 'collapse', width: '100%' }}>
         <thead>
           <tr>
-            <th style={{ minWidth: '150px', backgroundColor: 'var(--bg-tertiary)' }}>Feature / Tool</th>
+            <th style={{ minWidth: '150px', backgroundColor: 'var(--bg-secondary)', borderBottom: '2px solid var(--border-color)', padding: '16px' }}>Feature / Tool</th>
             {tools.map((tool) => (
-              <th key={tool.id} style={{ minWidth: '220px', textAlign: 'center', backgroundColor: 'var(--bg-tertiary)' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', position: 'relative' }}>
+              <th key={tool.id} style={{ minWidth: '220px', textAlign: 'center', backgroundColor: 'var(--bg-card)', borderBottom: '2px solid var(--border-color)', padding: '24px 16px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', position: 'relative' }}>
                   {/* Remove tool from compare */}
                   <button
                     onClick={() => onRemove(tool.id)}
-                    className="btn-icon"
                     style={{
                       position: 'absolute',
-                      top: '-6px',
-                      right: '0px',
-                      border: 'none',
-                      background: 'none',
+                      top: '-12px',
+                      right: '-4px',
+                      border: '1px solid var(--border-color)',
+                      backgroundColor: 'var(--bg-secondary)',
                       cursor: 'pointer',
-                      color: 'var(--text-muted)',
+                      color: 'var(--color-danger)',
+                      width: '26px',
+                      height: '26px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: 'var(--shadow-sm)',
+                      transition: 'all var(--transition-fast)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--color-danger-light)';
+                      e.currentTarget.style.transform = 'scale(1.1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
+                      e.currentTarget.style.transform = 'scale(1)';
                     }}
                     title="Remove from comparison"
                   >
-                    <Trash size={14} />
+                    <Trash size={12} />
                   </button>
                   <img
                     src={tool.logoUrl}
                     alt={tool.name}
-                    style={{ width: '48px', height: '48px', borderRadius: 'var(--radius-md)', objectFit: 'cover' }}
+                    style={{ width: '56px', height: '56px', borderRadius: 'var(--radius-md)', objectFit: 'cover', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}
                     onError={(e) => {
                       e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop';
                     }}
                   />
                   <div>
-                    <div style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)' }}>{tool.name}</div>
-                    <span className="badge badge-pricing" style={{ fontSize: '10px', marginTop: '4px' }}>{tool.pricing}</span>
+                    <div style={{ fontWeight: 'var(--font-bold)', color: 'var(--text-primary)', fontSize: 'var(--text-base)' }}>{tool.name}</div>
+                    <span className="badge badge-pricing" style={{ fontSize: '10px', marginTop: '6px' }}>{tool.pricing}</span>
                   </div>
                 </div>
               </th>
