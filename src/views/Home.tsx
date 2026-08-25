@@ -301,7 +301,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
       </section>
 
       {/* Popular Categories Grid */}
-      <section className="section" style={{ position: 'relative', zIndex: 1 }}>
+      <section id="categories" className="section" style={{ position: 'relative', zIndex: 1 }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px' }}>
             <div>
