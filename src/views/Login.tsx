@@ -61,14 +61,22 @@ export const Login: React.FC<LoginProps> = ({ onToast }) => {
         email: email.trim() || unverifiedEmail,
       });
       if (error) {
-        onToast(error.message, 'error');
+        const errMsg = error.message.toLowerCase();
+        if (errMsg.includes('rate') || errMsg.includes('too many') || errMsg.includes('limit')) {
+          onToast('Verification rate limit exceeded. Please wait a few minutes before trying again.', 'error');
+        } else {
+          // General generic message to prevent email enumeration
+          onToast('If this email is registered in our system, a new verification code has been sent. Please check your inbox.', 'success');
+          setCooldown(60);
+        }
       } else {
-        onToast('Verification code resent successfully! Please check your inbox.', 'success');
+        onToast('If this email is registered in our system, a new verification code has been sent. Please check your inbox.', 'success');
         setCooldown(60);
       }
     } catch (err: any) {
       console.error(err);
-      onToast(err.message || 'Failed to resend verification code.', 'error');
+      onToast('If this email is registered in our system, a new verification code has been sent. Please check your inbox.', 'success');
+      setCooldown(60);
     } finally {
       setIsResending(false);
     }

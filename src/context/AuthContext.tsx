@@ -6,6 +6,7 @@ import { supabase } from '../utils/supabase';
 
 interface AuthContextType {
   user: User | null;
+  loading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string; isUnverified?: boolean }>;
   signup: (name: string, email: string, password: string, role: 'user' | 'owner') => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
@@ -22,6 +23,7 @@ const useSupabase = !import.meta.env.VITE_SUPABASE_URL?.includes('placeholder-ur
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // Helper to fetch profile row from database
   const fetchProfileAndSet = async (authUser: any) => {
@@ -62,18 +64,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // 1. Initial session check
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session && session.user) {
-          fetchProfileAndSet(session.user);
+          fetchProfileAndSet(session.user).then(() => setLoading(false));
         } else {
           setUser(null);
+          setLoading(false);
         }
       });
 
       // 2. Auth state subscription listener
       const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
         if (session && session.user) {
-          fetchProfileAndSet(session.user);
+          fetchProfileAndSet(session.user).then(() => setLoading(false));
         } else {
           setUser(null);
+          setLoading(false);
         }
       });
 
@@ -86,6 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (session) {
         setUser(JSON.parse(session) as User);
       }
+      setLoading(false);
     }
   }, []);
 
@@ -264,6 +269,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider
       value={{
         user,
+        loading,
         login,
         signup,
         logout,

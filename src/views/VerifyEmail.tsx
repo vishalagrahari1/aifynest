@@ -69,7 +69,14 @@ export const VerifyEmail: React.FC<VerifyEmailProps> = ({ onToast }) => {
         });
 
         if (fallbackRes.error) {
-          onToast(fallbackRes.error.message || 'Verification failed. Incorrect or expired code.', 'error');
+          const errMsg = fallbackRes.error.message.toLowerCase();
+          if (errMsg.includes('expired') || errMsg.includes('already') || errMsg.includes('reused') || errMsg.includes('consumed') || errMsg.includes('invalid')) {
+            onToast('Invalid or expired verification code. Please check the code and try again.', 'error');
+          } else if (errMsg.includes('rate') || errMsg.includes('too many') || errMsg.includes('limit')) {
+            onToast('Verification rate limit exceeded. Please wait a few minutes before trying again.', 'error');
+          } else {
+            onToast('Verification failed. Invalid or expired code.', 'error');
+          }
           setIsVerifying(false);
           return;
         }
@@ -88,7 +95,7 @@ export const VerifyEmail: React.FC<VerifyEmailProps> = ({ onToast }) => {
       navigate('/dashboard');
     } catch (err: any) {
       console.error(err);
-      onToast(err.message || 'An unexpected error occurred during verification.', 'error');
+      onToast('An error occurred during verification. Please try again.', 'error');
     } finally {
       setIsVerifying(false);
     }
@@ -105,14 +112,22 @@ export const VerifyEmail: React.FC<VerifyEmailProps> = ({ onToast }) => {
       });
 
       if (error) {
-        onToast(error.message, 'error');
+        const errMsg = error.message.toLowerCase();
+        if (errMsg.includes('rate') || errMsg.includes('too many') || errMsg.includes('limit')) {
+          onToast('Verification rate limit exceeded. Please wait a few minutes before trying again.', 'error');
+        } else {
+          // General generic message to prevent email enumeration
+          onToast('If this email is registered in our system, a new verification code has been sent. Please check your inbox.', 'success');
+          setCooldown(60);
+        }
       } else {
-        onToast('Verification code resent successfully! Please check your inbox.', 'success');
-        setCooldown(60); // 60-second cooldown timer
+        onToast('If this email is registered in our system, a new verification code has been sent. Please check your inbox.', 'success');
+        setCooldown(60);
       }
     } catch (err: any) {
       console.error(err);
-      onToast(err.message || 'Failed to resend verification code.', 'error');
+      onToast('If this email is registered in our system, a new verification code has been sent. Please check your inbox.', 'success');
+      setCooldown(60);
     } finally {
       setIsResending(false);
     }

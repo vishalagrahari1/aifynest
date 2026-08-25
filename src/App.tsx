@@ -40,11 +40,13 @@ const AppContent: React.FC<{
   handleCompareToggle: (toolId: string) => void;
   handleCompareClear: () => void;
 }> = ({ showToast, compareList, handleCompareToggle, handleCompareClear }) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
+    if (loading) return; // Wait until initial session fetch completes to avoid premature redirects
+
     // Redirect unverified logged-in users to /verify-email, preserving exceptions for signup/login pathways
     if (user && !user.emailConfirmedAt) {
       const allowedPaths = ['/verify-email', '/login', '/signup'];
@@ -52,7 +54,7 @@ const AppContent: React.FC<{
         navigate(`/verify-email?email=${encodeURIComponent(user.email)}`);
       }
     }
-  }, [user, location.pathname, navigate]);
+  }, [user, loading, location.pathname, navigate]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
