@@ -144,9 +144,9 @@ export const Header: React.FC = () => {
           }}
           className="desktop-nav"
         >
-          <Link to="/ai-tools" style={navLinkStyle}>Full List</Link>
-          <a href="/#categories" style={navLinkStyle}>AI Categories</a>
-          <Link to="/blog" style={navLinkStyle}>AI Tutorials</Link>
+          <Link to="/ai-tools" style={navLinkStyle}>All Tools</Link>
+          <a href="/#categories" style={navLinkStyle}>Popular Tools</a>
+          <Link to="/blog" style={navLinkStyle}>Blog</Link>
           
           <div 
             style={{ position: 'relative' }}
@@ -373,6 +373,10 @@ export const Header: React.FC = () => {
               </Link>
             </div>
           )}
+          
+          <Link to="/submit-tool" className="btn btn-primary btn-sm" style={{ padding: '8px 16px', borderRadius: 'var(--radius-md)', fontWeight: 'var(--font-bold)' }}>
+            Submit a Tool
+          </Link>
         </div>
 
           {/* Tablet/Mobile Hamburger Trigger */}
@@ -406,8 +410,8 @@ export const Header: React.FC = () => {
           }}
         >
           {/* Navigation Links */}
-          <Link to="/ai-tools" style={mobileNavLinkStyle}>Discover</Link>
-          <Link to="/ai-tools" style={mobileNavLinkStyle}>Categories</Link>
+          <Link to="/ai-tools" style={mobileNavLinkStyle}>All Tools</Link>
+          <a href="/#categories" style={mobileNavLinkStyle}>Popular Tools</a>
           <Link to="/trending" style={mobileNavLinkStyle}>Trending</Link>
           <Link to="/new" style={mobileNavLinkStyle}>New Tools</Link>
           <Link to="/collections" style={mobileNavLinkStyle}>Collections</Link>
