@@ -1,7 +1,7 @@
-/* src/views/Login.tsx */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { supabase } from '../utils/supabase';
 import { SEOHead } from '../components/shared/SEOHead';
 
 interface LoginProps {
@@ -13,31 +13,76 @@ export const Login: React.FC<LoginProps> = ({ onToast }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Unverified email states
+  const [isUnverified, setIsUnverified] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
+  const [cooldown, setCooldown] = useState(0);
+  const [isResending, setIsResending] = useState(false);
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const interval = setInterval(() => {
+      setCooldown((prev) => prev - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [cooldown]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setIsUnverified(false);
     
-    const success = await login(email, password);
+    const res = await login(email, password);
     setIsLoading(false);
 
-    if (success) {
+    if (res.success) {
       onToast('Logged in successfully! Welcome back to AIFynest.', 'success');
       navigate('/dashboard');
     } else {
-      onToast('Invalid email address or password credentials.', 'error');
+      if (res.isUnverified) {
+        setIsUnverified(true);
+        setUnverifiedEmail(email);
+        onToast('Email not verified. Please verify your email.', 'error');
+      } else {
+        onToast(res.error || 'Invalid email address or password credentials.', 'error');
+      }
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (cooldown > 0 || isResending) return;
+    setIsResending(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email.trim() || unverifiedEmail,
+      });
+      if (error) {
+        onToast(error.message, 'error');
+      } else {
+        onToast('Verification code resent successfully! Please check your inbox.', 'success');
+        setCooldown(60);
+      }
+    } catch (err: any) {
+      console.error(err);
+      onToast(err.message || 'Failed to resend verification code.', 'error');
+    } finally {
+      setIsResending(false);
     }
   };
 
   const handleGoogleLogin = () => {
     onToast('Redirecting to Google Login services (mocked)...', 'info');
     setTimeout(async () => {
-      // Login with standard John Doe or create new user
-      const success = await login('john@gmail.com', 'password123');
-      if (success) {
+      const res = await login('john@gmail.com', 'password123');
+      if (res.success) {
         onToast('Logged in successfully with Google account!', 'success');
         navigate('/dashboard');
+      } else {
+        onToast(res.error || 'Failed to login with Google.', 'error');
       }
     }, 1200);
   };
@@ -53,12 +98,20 @@ export const Login: React.FC<LoginProps> = ({ onToast }) => {
     else if (role === 'owner') testEmail = 'owner@synthesia.io';
 
     setIsLoading(true);
-    const success = await login(testEmail, 'password123');
+    const res = await login(testEmail, 'password123');
     setIsLoading(false);
 
-    if (success) {
+    if (res.success) {
       onToast(`Logged in successfully as ${role.toUpperCase()}!`, 'success');
       navigate('/dashboard');
+    } else {
+      if (res.isUnverified) {
+        setIsUnverified(true);
+        setUnverifiedEmail(testEmail);
+        onToast('Email not verified. Please verify your email.', 'error');
+      } else {
+        onToast(res.error || 'Invalid email address or password credentials.', 'error');
+      }
     }
   };
 
@@ -81,6 +134,44 @@ export const Login: React.FC<LoginProps> = ({ onToast }) => {
             Sign in to manage your tools, saved lists, reviews, and analytics.
           </p>
         </div>
+
+        {isUnverified && (
+          <div
+            style={{
+              backgroundColor: 'rgba(239, 68, 68, 0.08)',
+              border: '1px solid var(--color-danger)',
+              borderRadius: 'var(--radius-md)',
+              padding: '16px',
+              marginBottom: '20px',
+              textAlign: 'left',
+            }}
+          >
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-danger)', fontWeight: 'bold', marginBottom: '8px' }}>
+              ⚠️ Email Not Verified
+            </div>
+            <p style={{ fontSize: '11px', color: 'var(--text-secondary)', lineHeight: '1.4', marginBottom: '12px' }}>
+              Your email address is not verified yet. Please enter the verification code sent to your email to activate your account.
+            </p>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <Link
+                to={`/verify-email?email=${encodeURIComponent(unverifiedEmail)}`}
+                className="btn btn-primary btn-sm"
+                style={{ padding: '6px 12px', fontSize: '11px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
+              >
+                Verify Email
+              </Link>
+              <button
+                type="button"
+                onClick={handleResendCode}
+                disabled={cooldown > 0 || isResending}
+                className="btn btn-outline btn-sm"
+                style={{ padding: '6px 12px', fontSize: '11px' }}
+              >
+                {cooldown > 0 ? `Resend (${cooldown}s)` : 'Resend Code'}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Social Login */}
         <button onClick={handleGoogleLogin} className="btn btn-outline w-full" style={socialBtnStyle}>

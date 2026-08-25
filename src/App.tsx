@@ -1,8 +1,7 @@
-/* src/App.tsx */
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { DatabaseProvider } from './context/DatabaseContext';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
 import { Toast } from './components/shared/Toast';
@@ -25,6 +24,7 @@ import { Pricing } from './views/Pricing';
 import { Advertise } from './views/Advertise';
 import { Login } from './views/Login';
 import { Signup } from './views/Signup';
+import { VerifyEmail } from './views/VerifyEmail';
 import { OwnerDashboard } from './views/dashboard/Overview';
 import { AdminDashboard } from './views/admin/AdminDashboard';
 import { AffiliateRedirect } from './views/AffiliateRedirect';
@@ -33,6 +33,157 @@ import { Alternatives } from './views/Alternatives';
 
 // Import CSS Design system
 import './styles/main.css';
+
+const AppContent: React.FC<{
+  showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
+  compareList: string[];
+  handleCompareToggle: (toolId: string) => void;
+  handleCompareClear: () => void;
+}> = ({ showToast, compareList, handleCompareToggle, handleCompareClear }) => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Redirect unverified logged-in users to /verify-email, preserving exceptions for signup/login pathways
+    if (user && !user.emailConfirmedAt) {
+      const allowedPaths = ['/verify-email', '/login', '/signup'];
+      if (!allowedPaths.includes(location.pathname)) {
+        navigate(`/verify-email?email=${encodeURIComponent(user.email)}`);
+      }
+    }
+  }, [user, location.pathname, navigate]);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <Header />
+      
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <Routes>
+          {/* Core Public routes */}
+          <Route path="/" element={<Home onToast={showToast} />} />
+          <Route
+            path="/ai-tools"
+            element={
+              <Directory
+                onToast={showToast}
+                compareList={compareList}
+                onCompareToggle={handleCompareToggle}
+                onCompareClear={handleCompareClear}
+              />
+            }
+          />
+          
+          {/* Redirect categories index to home (homepage lists all categories anyway) */}
+          <Route path="/categories" element={<Navigate to="/" replace />} />
+          <Route
+            path="/categories/:slug"
+            element={
+              <CategoryDetail
+                onToast={showToast}
+                compareList={compareList}
+                onCompareToggle={handleCompareToggle}
+              />
+            }
+          />
+          
+          <Route
+            path="/tools/:slug"
+            element={
+              <ToolDetail
+                onToast={showToast}
+                compareList={compareList}
+                onCompareToggle={handleCompareToggle}
+              />
+            }
+          />
+          <Route path="/go/:slug" element={<AffiliateRedirect onToast={showToast} />} />
+
+          <Route
+            path="/compare"
+            element={
+              <Compare
+                compareList={compareList}
+                onCompareToggle={handleCompareToggle}
+                onCompareClear={handleCompareClear}
+              />
+            }
+          />
+          <Route
+            path="/compare/:slugs"
+            element={
+              <Compare
+                compareList={compareList}
+                onCompareToggle={handleCompareToggle}
+                onCompareClear={handleCompareClear}
+              />
+            }
+          />
+          <Route
+            path="/alternatives/:toolSlug"
+            element={
+              <Alternatives />
+            }
+          />
+
+          <Route path="/collections" element={<Collections />} />
+          <Route
+            path="/collections/:id"
+            element={
+              <CollectionDetail
+                onToast={showToast}
+                compareList={compareList}
+                onCompareToggle={handleCompareToggle}
+              />
+            }
+          />
+
+          <Route
+            path="/trending"
+            element={
+              <Trending
+                onToast={showToast}
+                compareList={compareList}
+                onCompareToggle={handleCompareToggle}
+              />
+            }
+          />
+
+          <Route
+            path="/new"
+            element={
+              <NewTools
+                onToast={showToast}
+                compareList={compareList}
+                onCompareToggle={handleCompareToggle}
+              />
+            }
+          />
+
+          <Route path="/submit-tool" element={<SubmitTool onToast={showToast} />} />
+          <Route path="/claim" element={<ClaimListing onToast={showToast} />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/advertise" element={<Advertise />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogDetail />} />
+
+          {/* Authentication routes */}
+          <Route path="/login" element={<Login onToast={showToast} />} />
+          <Route path="/signup" element={<Signup onToast={showToast} />} />
+          <Route path="/verify-email" element={<VerifyEmail onToast={showToast} />} />
+
+          {/* Dashboard & Admin channels */}
+          <Route path="/dashboard" element={<OwnerDashboard onToast={showToast} />} />
+          <Route path="/dashboard/tools" element={<OwnerDashboard onToast={showToast} />} />
+          <Route path="/dashboard/tools/:id/edit" element={<ManageTool />} />
+          <Route path="/admin" element={<AdminDashboard onToast={showToast} />} />
+        </Routes>
+      </main>
+
+      <Footer />
+    </div>
+  );
+};
 
 export const App: React.FC = () => {
   // Global Toast Alert system state
@@ -69,133 +220,12 @@ export const App: React.FC = () => {
     <Router>
       <DatabaseProvider>
         <AuthProvider>
-          <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            <Header />
-            
-            <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-              <Routes>
-                {/* Core Public routes */}
-                <Route path="/" element={<Home onToast={showToast} />} />
-                <Route
-                  path="/ai-tools"
-                  element={
-                    <Directory
-                      onToast={showToast}
-                      compareList={compareList}
-                      onCompareToggle={handleCompareToggle}
-                      onCompareClear={handleCompareClear}
-                    />
-                  }
-                />
-                
-                {/* Redirect categories index to home (homepage lists all categories anyway) */}
-                <Route path="/categories" element={<Navigate to="/" replace />} />
-                <Route
-                  path="/categories/:slug"
-                  element={
-                    <CategoryDetail
-                      onToast={showToast}
-                      compareList={compareList}
-                      onCompareToggle={handleCompareToggle}
-                    />
-                  }
-                />
-                
-                <Route
-                  path="/tools/:slug"
-                  element={
-                    <ToolDetail
-                      onToast={showToast}
-                      compareList={compareList}
-                      onCompareToggle={handleCompareToggle}
-                    />
-                  }
-                />
-                <Route path="/go/:slug" element={<AffiliateRedirect onToast={showToast} />} />
-
-                <Route
-                  path="/compare"
-                  element={
-                    <Compare
-                      compareList={compareList}
-                      onCompareToggle={handleCompareToggle}
-                      onCompareClear={handleCompareClear}
-                    />
-                  }
-                />
-                <Route
-                  path="/compare/:slugs"
-                  element={
-                    <Compare
-                      compareList={compareList}
-                      onCompareToggle={handleCompareToggle}
-                      onCompareClear={handleCompareClear}
-                    />
-                  }
-                />
-                <Route
-                  path="/alternatives/:toolSlug"
-                  element={
-                    <Alternatives />
-                  }
-                />
-
-                <Route path="/collections" element={<Collections />} />
-                <Route
-                  path="/collections/:id"
-                  element={
-                    <CollectionDetail
-                      onToast={showToast}
-                      compareList={compareList}
-                      onCompareToggle={handleCompareToggle}
-                    />
-                  }
-                />
-
-                <Route
-                  path="/trending"
-                  element={
-                    <Trending
-                      onToast={showToast}
-                      compareList={compareList}
-                      onCompareToggle={handleCompareToggle}
-                    />
-                  }
-                />
-
-                <Route
-                  path="/new"
-                  element={
-                    <NewTools
-                      onToast={showToast}
-                      compareList={compareList}
-                      onCompareToggle={handleCompareToggle}
-                    />
-                  }
-                />
-
-                <Route path="/submit-tool" element={<SubmitTool onToast={showToast} />} />
-                <Route path="/claim" element={<ClaimListing onToast={showToast} />} />
-                <Route path="/pricing" element={<Pricing />} />
-                <Route path="/advertise" element={<Advertise />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/blog/:slug" element={<BlogDetail />} />
-
-                {/* Authentication routes */}
-                <Route path="/login" element={<Login onToast={showToast} />} />
-                <Route path="/signup" element={<Signup onToast={showToast} />} />
-
-                {/* Dashboard & Admin channels */}
-                <Route path="/dashboard" element={<OwnerDashboard onToast={showToast} />} />
-                <Route path="/dashboard/tools" element={<OwnerDashboard onToast={showToast} />} />
-                <Route path="/dashboard/tools/:id/edit" element={<ManageTool />} />
-                <Route path="/admin" element={<AdminDashboard onToast={showToast} />} />
-              </Routes>
-            </main>
-
-            <Footer />
-          </div>
-
+          <AppContent
+            showToast={showToast}
+            compareList={compareList}
+            handleCompareToggle={handleCompareToggle}
+            handleCompareClear={handleCompareClear}
+          />
           {/* Render Toast Alert notifications */}
           {toast && (
             <Toast

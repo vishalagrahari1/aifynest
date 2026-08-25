@@ -1,17 +1,17 @@
-/* src/views/Signup.tsx */
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { SEOHead } from '../components/shared/SEOHead';
 
 export const Signup: React.FC<{ onToast: (msg: string, type?: 'success' | 'error' | 'info') => void }> = ({ onToast }) => {
   const { signup, updateUserInterests, user } = useAuth();
   const navigate = useNavigate();
-  const [step, setStep] = useState<'form' | 'verify' | 'onboarding'>('form');
+  const [searchParams] = useSearchParams();
+  const [step, setStep] = useState<'form' | 'onboarding'>('form');
   
   // Registration Form States
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(searchParams.get('email') || '');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -21,6 +21,13 @@ export const Signup: React.FC<{ onToast: (msg: string, type?: 'success' | 'error
   
   // Onboarding Selection States
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+
+  useEffect(() => {
+    const qEmail = searchParams.get('email');
+    if (qEmail) {
+      setEmail(qEmail);
+    }
+  }, [searchParams]);
 
   const interestsList = [
     'Writing', 'Marketing', 'Coding', 'Design', 'Video', 'Image Generation',
@@ -57,20 +64,15 @@ export const Signup: React.FC<{ onToast: (msg: string, type?: 'success' | 'error
     }
 
     setIsLoading(true);
-    const success = await signup(name, email, password, role);
+    const res = await signup(name, email, password, role);
     setIsLoading(false);
 
-    if (success) {
+    if (res.success) {
       onToast('Account initialized! Please verify your email.', 'success');
-      setStep('verify');
+      navigate(`/verify-email?email=${encodeURIComponent(email)}`);
     } else {
-      onToast('An account with this email address already exists.', 'error');
+      onToast(res.error || 'An account with this email address already exists.', 'error');
     }
-  };
-
-  const handleVerifyEmail = () => {
-    onToast('Email verified successfully! Welcome aboard.', 'success');
-    setStep('onboarding');
   };
 
   const handleToggleInterest = (interest: string) => {
@@ -100,10 +102,12 @@ export const Signup: React.FC<{ onToast: (msg: string, type?: 'success' | 'error
     setTimeout(async () => {
       const mockName = 'Google Explorer';
       const mockEmail = 'explorer_' + Math.floor(Math.random()*1000) + '@gmail.com';
-      const success = await signup(mockName, mockEmail, 'google_sso_pass_123', 'user');
-      if (success) {
+      const res = await signup(mockName, mockEmail, 'google_sso_pass_123', 'user');
+      if (res.success) {
         onToast('Successfully signed up with Google Account!', 'success');
         setStep('onboarding');
+      } else {
+        onToast(res.error || 'Failed to sign up with Google.', 'error');
       }
     }, 1200);
   };
@@ -258,33 +262,6 @@ export const Signup: React.FC<{ onToast: (msg: string, type?: 'success' | 'error
               Log in
             </Link>
           </div>
-        </div>
-      )}
-
-      {/* Simulated Email Verification Screen */}
-      {step === 'verify' && (
-        <div style={cardStyle}>
-          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-            <div style={{ fontSize: '32px', marginBottom: '12px' }}>✉️</div>
-            <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', margin: '0 0 8px 0' }}>Verify Your Email</h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', lineHeight: '1.6' }}>
-              We have sent a 6-digit confirmation code to your registered email address. Please click below to simulate verification.
-            </p>
-          </div>
-
-          <div className="form-group" style={{ marginBottom: '16px' }}>
-            <input
-              type="text"
-              placeholder="Enter 6-digit code"
-              defaultValue="123456"
-              className="form-input"
-              style={{ textAlign: 'center', fontSize: 'var(--text-base)', letterSpacing: '4px', fontWeight: 'bold' }}
-            />
-          </div>
-
-          <button onClick={handleVerifyEmail} className="btn btn-primary w-full" style={{ padding: '12px' }}>
-            Confirm & Verify
-          </button>
         </div>
       )}
 

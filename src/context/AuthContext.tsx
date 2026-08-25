@@ -6,8 +6,8 @@ import { supabase } from '../utils/supabase';
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  signup: (name: string, email: string, password: string, role: 'user' | 'owner') => Promise<boolean>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; isUnverified?: boolean }>;
+  signup: (name: string, email: string, password: string, role: 'user' | 'owner') => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   isAdmin: () => boolean;
   isOwner: () => boolean;
@@ -39,6 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: profile.email,
           role: profile.role,
           interests: profile.interests || [],
+          emailConfirmedAt: authUser.email_confirmed_at || null,
         });
       } else {
         // Fallback default meta mapping if profile insert trigger is delayed
@@ -48,6 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: authUser.email || '',
           role: authUser.user_metadata?.role || 'user',
           interests: [],
+          emailConfirmedAt: authUser.email_confirmed_at || null,
         });
       }
     } catch (err) {
@@ -100,7 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return seedUsers;
   };
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string; isUnverified?: boolean }> => {
     if (useSupabase) {
       try {
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -109,32 +111,55 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
         if (error) {
           console.error('Supabase Login Error:', error.message);
-          return false;
+          const isUnverified = error.message.toLowerCase().includes('confirm') || 
+                              error.message.toLowerCase().includes('verified') || 
+                              error.message.toLowerCase().includes('verification') ||
+                              error.message.toLowerCase().includes('verify');
+          return { success: false, error: error.message, isUnverified };
         }
         if (data.user) {
+          // If unconfirmed logins is allowed in Supabase, check user email_confirmed_at status
+          if (!data.user.email_confirmed_at) {
+            setUser({
+              id: data.user.id,
+              name: data.user.user_metadata?.name || 'User',
+              email: data.user.email || '',
+              role: data.user.user_metadata?.role || 'user',
+              interests: [],
+              emailConfirmedAt: null,
+            });
+            return { success: false, error: 'Email not verified.', isUnverified: true };
+          }
           await fetchProfileAndSet(data.user);
-          return true;
+          return { success: true };
         }
-        return false;
-      } catch (err) {
+        return { success: false, error: 'Failed to sign in. Please try again.' };
+      } catch (err: any) {
         console.error(err);
-        return false;
+        return { success: false, error: err.message || 'An unexpected error occurred.' };
       }
     } else {
       const users = getUsersFromStorage();
       const matched = users.find((u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
       
       if (matched) {
-        const sessionUser: User = { id: matched.id, name: matched.name, email: matched.email, role: matched.role, interests: matched.interests || [] };
+        const sessionUser: User = { 
+          id: matched.id, 
+          name: matched.name, 
+          email: matched.email, 
+          role: matched.role, 
+          interests: matched.interests || [],
+          emailConfirmedAt: matched.emailConfirmedAt || new Date().toISOString()
+        };
         setUser(sessionUser);
         localStorage.setItem('ai_user_session', JSON.stringify(sessionUser));
-        return true;
+        return { success: true };
       }
-      return false;
+      return { success: false, error: 'Invalid email address or password credentials.' };
     }
   };
 
-  const signup = async (name: string, email: string, password: string, role: 'user' | 'owner'): Promise<boolean> => {
+  const signup = async (name: string, email: string, password: string, role: 'user' | 'owner'): Promise<{ success: boolean; error?: string }> => {
     if (useSupabase) {
       try {
         const { data, error } = await supabase.auth.signUp({
@@ -149,23 +174,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
         if (error) {
           console.error('Supabase Signup Error:', error.message);
-          return false;
+          return { success: false, error: error.message };
         }
         if (data.user) {
-          await fetchProfileAndSet(data.user);
-          return true;
+          if (data.user.email_confirmed_at) {
+            await fetchProfileAndSet(data.user);
+          } else {
+            setUser(null);
+          }
+          return { success: true };
         }
-        return false;
-      } catch (err) {
+        return { success: false, error: 'User registration failed. Please try again.' };
+      } catch (err: any) {
         console.error(err);
-        return false;
+        return { success: false, error: err.message || 'An unexpected error occurred.' };
       }
     } else {
       const users = getUsersFromStorage();
       const exists = users.some((u) => u.email.toLowerCase() === email.toLowerCase());
       
       if (exists) {
-        return false;
+        return { success: false, error: 'An account with this email address already exists.' };
       }
 
       const newUser: User = {
@@ -175,15 +204,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role,
         password,
         interests: [],
+        emailConfirmedAt: new Date().toISOString(),
       };
 
       const updated = [...users, newUser];
       localStorage.setItem('ai_users', JSON.stringify(updated));
 
-      const sessionUser: User = { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role, interests: [] };
+      const sessionUser: User = { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role, interests: [], emailConfirmedAt: newUser.emailConfirmedAt };
       setUser(sessionUser);
       localStorage.setItem('ai_user_session', JSON.stringify(sessionUser));
-      return true;
+      return { success: true };
     }
   };
 

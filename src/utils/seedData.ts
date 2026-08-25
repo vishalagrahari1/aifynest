@@ -8,6 +8,7 @@ export interface User {
   password?: string;
   interests?: string[];
   notificationsCount?: number;
+  emailConfirmedAt?: string | null;
 }
 
 export interface PricingPlan {
