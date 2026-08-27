@@ -27,6 +27,7 @@ import { Signup } from './views/Signup';
 import { VerifyEmail } from './views/VerifyEmail';
 import { AffiliateRedirect } from './views/AffiliateRedirect';
 import { Alternatives } from './views/Alternatives';
+import { Info } from './views/Info';
 import { ErrorBoundary } from './components/shared/ErrorBoundary';
 
 const OwnerDashboard = React.lazy(() => import('./views/dashboard/Overview').then(m => ({ default: m.OwnerDashboard })));
@@ -186,6 +187,13 @@ const AppContent: React.FC<{
           <Route path="/advertise" element={<Advertise />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogDetail />} />
+
+          {/* Policy & Info routes */}
+          <Route path="/editorial" element={<Info initialTab="editorial" />} />
+          <Route path="/reviews" element={<Info initialTab="reviews" />} />
+          <Route path="/disclosure" element={<Info initialTab="disclosure" />} />
+          <Route path="/privacy" element={<Info initialTab="privacy" />} />
+          <Route path="/terms" element={<Info initialTab="terms" />} />
 
           {/* Authentication routes */}
           <Route path="/login" element={<Login onToast={showToast} />} />
