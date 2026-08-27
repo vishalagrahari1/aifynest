@@ -25,33 +25,7 @@ const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://izjpavrrcbglrdvrq
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const SITE_URL = process.env.VITE_SITE_URL || 'https://aifynest.com';
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
-
-async function generate() {
-  console.log('Generating sitemap for site domain:', SITE_URL);
-  
-  // 1. Fetch approved tools
-  const { data: tools, error: tErr } = await supabase
-    .from('tools')
-    .select('slug, status')
-    .eq('status', 'approved');
-  
-  if (tErr) {
-    console.error('Error fetching tools for sitemap:', tErr);
-    process.exit(1);
-  }
-
-  // 2. Fetch categories
-  const { data: categories, error: cErr } = await supabase
-    .from('categories')
-    .select('slug');
-  
-  if (cErr) {
-    console.error('Error fetching categories for sitemap:', cErr);
-    process.exit(1);
-  }
-
-  // Define static urls
+function writeSitemap(categories, tools) {
   const staticUrls = [
     '',
     '/ai-tools',
@@ -73,7 +47,7 @@ async function generate() {
   });
 
   // Write category routes
-  if (categories) {
+  if (categories && categories.length > 0) {
     categories.forEach((cat) => {
       xml += `  <url>\n`;
       xml += `    <loc>${SITE_URL}/ai-tools/${cat.slug}</loc>\n`;
@@ -84,7 +58,7 @@ async function generate() {
   }
 
   // Write approved tool detail routes
-  if (tools) {
+  if (tools && tools.length > 0) {
     tools.forEach((tool) => {
       xml += `  <url>\n`;
       xml += `    <loc>${SITE_URL}/tools/${tool.slug}</loc>\n`;
@@ -98,7 +72,42 @@ async function generate() {
 
   const outputPath = path.join(__dirname, 'public', 'sitemap.xml');
   fs.writeFileSync(outputPath, xml, 'utf8');
-  console.log(`Sitemap successfully written to ${outputPath} (${tools.length} approved tools indexed).`);
+  console.log(`Sitemap successfully written to ${outputPath} (${tools ? tools.length : 0} approved tools indexed).`);
+}
+
+async function generate() {
+  console.log('Generating sitemap for site domain:', SITE_URL);
+  
+  if (!SUPABASE_SERVICE_KEY) {
+    console.warn('⚠️ WARNING: SUPABASE_SERVICE_ROLE_KEY is missing from environment. Static sitemap generated without database listings.');
+    writeSitemap([], []);
+    return;
+  }
+
+  try {
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+    
+    // 1. Fetch approved tools
+    const { data: tools, error: tErr } = await supabase
+      .from('tools')
+      .select('slug, status')
+      .eq('status', 'approved');
+    
+    if (tErr) throw tErr;
+
+    // 2. Fetch categories
+    const { data: categories, error: cErr } = await supabase
+      .from('categories')
+      .select('slug');
+    
+    if (cErr) throw cErr;
+
+    writeSitemap(categories, tools);
+  } catch (err) {
+    console.error('Error fetching data from Supabase for sitemap:', err.message);
+    console.warn('Falling back to static-only sitemap generation.');
+    writeSitemap([], []);
+  }
 }
 
 generate();
