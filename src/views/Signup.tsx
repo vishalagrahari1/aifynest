@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { supabase } from '../utils/supabase';
 import { SEOHead } from '../components/shared/SEOHead';
 
 export const Signup: React.FC<{ onToast: (msg: string, type?: 'success' | 'error' | 'info') => void }> = ({ onToast }) => {
@@ -97,19 +98,36 @@ export const Signup: React.FC<{ onToast: (msg: string, type?: 'success' | 'error
     navigate('/dashboard');
   };
 
-  const handleGoogleSignup = () => {
-    onToast('Redirecting to Google Account services (mocked)...', 'info');
-    setTimeout(async () => {
-      const mockName = 'Google Explorer';
-      const mockEmail = 'explorer_' + Math.floor(Math.random()*1000) + '@gmail.com';
-      const res = await signup(mockName, mockEmail, 'google_sso_pass_123', 'user');
-      if (res.success) {
-        onToast('Successfully signed up with Google Account!', 'success');
-        setStep('onboarding');
-      } else {
-        onToast(res.error || 'Failed to sign up with Google.', 'error');
+  const handleGoogleSignup = async () => {
+    const useSupabase = !import.meta.env.VITE_SUPABASE_URL?.includes('placeholder-url');
+    if (useSupabase) {
+      onToast('Redirecting to Google Sign up...', 'info');
+      try {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: `${window.location.origin}/dashboard`
+          }
+        });
+        if (error) throw error;
+      } catch (err: any) {
+        console.error('Google Signup Error:', err);
+        onToast(err.message || 'Failed to initialize Google signup.', 'error');
       }
-    }, 1200);
+    } else {
+      onToast('Redirecting to Google Account services (mocked)...', 'info');
+      setTimeout(async () => {
+        const mockName = 'Google Explorer';
+        const mockEmail = 'explorer_' + Math.floor(Math.random()*1000) + '@gmail.com';
+        const res = await signup(mockName, mockEmail, 'google_sso_pass_123', 'user');
+        if (res.success) {
+          onToast('Successfully signed up with Google Account!', 'success');
+          setStep('onboarding');
+        } else {
+          onToast(res.error || 'Failed to sign up with Google.', 'error');
+        }
+      }, 1200);
+    }
   };
 
   return (

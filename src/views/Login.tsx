@@ -82,17 +82,34 @@ export const Login: React.FC<LoginProps> = ({ onToast }) => {
     }
   };
 
-  const handleGoogleLogin = () => {
-    onToast('Redirecting to Google Login services (mocked)...', 'info');
-    setTimeout(async () => {
-      const res = await login('john@gmail.com', 'password123');
-      if (res.success) {
-        onToast('Logged in successfully with Google account!', 'success');
-        navigate('/dashboard');
-      } else {
-        onToast(res.error || 'Failed to login with Google.', 'error');
+  const handleGoogleLogin = async () => {
+    const useSupabase = !import.meta.env.VITE_SUPABASE_URL?.includes('placeholder-url');
+    if (useSupabase) {
+      onToast('Redirecting to Google Login...', 'info');
+      try {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: `${window.location.origin}/dashboard`
+          }
+        });
+        if (error) throw error;
+      } catch (err: any) {
+        console.error('Google Auth Error:', err);
+        onToast(err.message || 'Failed to initialize Google login.', 'error');
       }
-    }, 1200);
+    } else {
+      onToast('Redirecting to Google Login services (mocked)...', 'info');
+      setTimeout(async () => {
+        const res = await login('john@gmail.com', 'password123');
+        if (res.success) {
+          onToast('Logged in successfully with Google account!', 'success');
+          navigate('/dashboard');
+        } else {
+          onToast(res.error || 'Failed to login with Google.', 'error');
+        }
+      }, 1200);
+    }
   };
 
   const handleForgotPassword = (e: React.MouseEvent) => {
