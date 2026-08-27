@@ -95,6 +95,24 @@ interface DatabaseContextType {
   getOwnedTool: (toolId: string, userId: string) => Tool | null;
   canManageTool: (toolId: string, userId: string) => boolean;
   dbError: string | null;
+
+  // Step 11 Monetization
+  ownerWallet: { availableBalance: number; currency: string } | null;
+  ledger: any[];
+  fundCampaign: (campaignId: string, amount: number) => Promise<void>;
+  simulateTopup: (amount: number) => Promise<void>;
+  verifyPayment: (paymentId: string) => Promise<void>;
+  approveCampaign: (campaignId: string) => Promise<void>;
+  adjustWalletBalance: (ownerId: string, amount: number, reason: string) => Promise<void>;
+
+  // Step 12 UX & Trust Workflows
+  verificationRequests: any[];
+  reports: any[];
+  submitReport: (toolId: string, reason: string, details: string) => Promise<void>;
+  resolveReport: (reportId: string, status: 'resolved' | 'dismissed') => Promise<void>;
+  requestToolVerification: (toolId: string, notes: string) => Promise<void>;
+  approveToolVerification: (requestId: string) => Promise<void>;
+  revokeToolVerification: (toolId: string, reason: string) => Promise<void>;
 }
 
 const DatabaseContext = createContext<DatabaseContextType | undefined>(undefined);
@@ -115,6 +133,10 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [affiliateLinks, setAffiliateLinks] = useState<AffiliateLink[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [dbError, setDbError] = useState<string | null>(null);
+  const [ownerWallet, setOwnerWallet] = useState<{ availableBalance: number; currency: string } | null>(null);
+  const [ledger, setLedger] = useState<any[]>([]);
+  const [verificationRequests, setVerificationRequests] = useState<any[]>([]);
+  const [reports, setReports] = useState<any[]>([]);
 
   // DB Row to frontend UI model mapper helpers
   const mapToolRow = (t: any): Tool => ({
@@ -147,6 +169,7 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     claimStatus: t.claim_status,
     lastUpdated: t.last_updated,
     tags: t.tags || [],
+    verification_status: t.verification_status || 'unverified',
   });
 
   const fetchDatabaseState = async () => {
@@ -315,13 +338,13 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setPayments(payData.map(p => ({
           id: p.id,
           campaignId: p.campaign_id,
-          userId: 'admin-id',
+          userId: p.owner_id || 'admin-id',
           amount: Number(p.amount),
-          date: p.date,
-          status: 'success' as any,
-          invoiceNumber: p.invoice_number,
-          type: 'sponsorship' as any,
-          description: p.description
+          date: p.created_at ? new Date(p.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+          status: p.status as any,
+          invoiceNumber: p.provider_payment_id || p.id,
+          type: (p.payment_type || 'sponsorship') as any,
+          description: `Provider: ${p.provider || 'manual'}`
         })));
       }
 
@@ -367,6 +390,54 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           browser: e.browser || '',
           path: e.path || '',
         })));
+      }
+
+      // 9. Wallet & Ledger Topup logs
+      try {
+        const { data: walletData } = await supabase.from('owner_wallets').select('*');
+        if (walletData && walletData.length > 0) {
+          setOwnerWallet({
+            availableBalance: Number(walletData[0].available_balance),
+            currency: walletData[0].currency
+          });
+        } else {
+          setOwnerWallet(null);
+        }
+      } catch (wErr) {
+        console.warn('Wallet not initialized yet:', wErr);
+      }
+
+      try {
+        const { data: ledgerData } = await supabase.from('financial_ledger').select('*').order('created_at', { ascending: false });
+        if (ledgerData) {
+          setLedger(ledgerData);
+        } else {
+          setLedger([]);
+        }
+      } catch (lErr) {
+        console.warn('Ledger not initialized yet:', lErr);
+      }
+
+      try {
+        const { data: verifData } = await supabase.from('tool_verification_requests').select('*');
+        if (verifData) {
+          setVerificationRequests(verifData);
+        } else {
+          setVerificationRequests([]);
+        }
+      } catch (vErr) {
+        console.warn('Verification requests read failed:', vErr);
+      }
+
+      try {
+        const { data: reportsData } = await supabase.from('reports').select('*').order('created_at', { ascending: false });
+        if (reportsData) {
+          setReports(reportsData);
+        } else {
+          setReports([]);
+        }
+      } catch (rErr) {
+        console.warn('Reports read failed:', rErr);
       }
 
     } catch (err: any) {
@@ -1093,46 +1164,45 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const newCamp: Campaign = {
       ...campData,
       id: Math.random().toString(36).substr(2, 9),
-      remainingBudget: campData.budget,
+      remainingBudget: 0,
       spent: 0,
       impressions: 0,
       clicks: 0,
       startDate: new Date().toISOString(),
       endDate: new Date().toISOString(),
-      cpc: 0.5,
+      cpc: 0.20,
       cpm: 5.0,
-      status: 'active',
+      status: 'draft',
     };
     if (useSupabase) {
-      supabase.from('campaigns').insert({
-        tool_id: newCamp.toolId,
-        campaign_name: newCamp.campaignName,
-        placement: newCamp.placement,
-        budget: newCamp.budget,
-        spent: 0,
-        remaining_budget: newCamp.budget,
-        status: 'active',
-      }).then(() => fetchDatabaseState());
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (!user) return;
+        supabase.from('campaigns').insert({
+          tool_id: campData.toolId,
+          campaign_name: campData.campaignName,
+          placement: campData.placement,
+          cpc_bid: 0.20,
+          daily_budget: 10.00,
+          total_budget: 0.00,
+          spent: 0.00,
+          remaining_budget: 0.00,
+          status: 'draft',
+          owner_id: user.id,
+          start_at: new Date().toISOString(),
+          end_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        }).then(() => fetchDatabaseState());
+      });
     } else {
       const updated = [newCamp, ...campaigns];
       setCampaigns(updated);
       saveToStorage('ai_campaigns', updated);
     }
-
-    // Toggle sponsored flag in tool
-    updateTool(newCamp.toolId, {
-      isSponsored: newCamp.placement === 'featured' || newCamp.placement === 'sponsored-search' || newCamp.placement === 'homepage-featured',
-      isFeatured: newCamp.placement === 'featured' || newCamp.placement === 'homepage-featured',
-    });
-
     return newCamp;
   };
 
   const updateCampaign = (id: string, updatedFields: Partial<Campaign>) => {
     if (useSupabase) {
       supabase.from('campaigns').update({
-        spent: updatedFields.spent,
-        remaining_budget: updatedFields.remainingBudget,
         status: updatedFields.status,
       }).eq('id', id).then(() => fetchDatabaseState());
       return;
@@ -1152,6 +1222,131 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     });
     setCampaigns(updated);
     saveToStorage('ai_campaigns', updated);
+  };
+
+  const fundCampaign = async (campaignId: string, amount: number) => {
+    if (useSupabase) {
+      const { error } = await supabase.rpc('fund_campaign', {
+        p_campaign_id: campaignId,
+        p_amount: amount
+      });
+      if (error) throw error;
+      await fetchDatabaseState();
+    }
+  };
+
+  const simulateTopup = async (amount: number) => {
+    if (useSupabase) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+      const tempTxId = 'mock_tx_' + Math.random().toString(36).substr(2, 9);
+      const { error } = await supabase.rpc('simulate_wallet_deposit', {
+        p_owner_id: user.id,
+        p_amount: amount,
+        p_provider: 'manual_simulator',
+        p_provider_payment_id: tempTxId
+      });
+      if (error) throw error;
+      await fetchDatabaseState();
+    }
+  };
+
+  const verifyPayment = async (paymentId: string) => {
+    if (useSupabase) {
+      const { error } = await supabase.rpc('verify_payment', {
+        p_payment_id: paymentId
+      });
+      if (error) throw error;
+      await fetchDatabaseState();
+    }
+  };
+
+  const approveCampaign = async (campaignId: string) => {
+    if (useSupabase) {
+      const { error } = await supabase.rpc('approve_campaign', {
+        p_campaign_id: campaignId
+      });
+      if (error) throw error;
+      await fetchDatabaseState();
+    }
+  };
+
+  const adjustWalletBalance = async (ownerId: string, amount: number, reason: string) => {
+    if (useSupabase) {
+      const { error } = await supabase.rpc('adjust_wallet_balance', {
+        p_owner_id: ownerId,
+        p_amount: amount,
+        p_reason: reason
+      });
+      if (error) throw error;
+      await fetchDatabaseState();
+    }
+  };
+
+  const submitReport = async (toolId: string, reason: string, details: string) => {
+    if (useSupabase) {
+      let sessId = localStorage.getItem('aifynest_report_sess');
+      if (!sessId) {
+        sessId = 'sess_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('aifynest_report_sess', sessId);
+      }
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error } = await supabase.from('reports').insert({
+        tool_id: toolId,
+        reporter_user_id: user?.id || null,
+        session_id: sessId,
+        reason,
+        details,
+        status: 'pending'
+      });
+      if (error) throw error;
+      await fetchDatabaseState();
+    }
+  };
+
+  const resolveReport = async (reportId: string, status: 'resolved' | 'dismissed') => {
+    if (useSupabase) {
+      const { error } = await supabase.from('reports').update({ status }).eq('id', reportId);
+      if (error) throw error;
+      await fetchDatabaseState();
+    }
+  };
+
+  const requestToolVerification = async (toolId: string, notes: string) => {
+    if (useSupabase) {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error } = await supabase.from('tool_verification_requests').insert({
+        tool_id: toolId,
+        owner_id: user?.id,
+        status: 'pending',
+        notes
+      });
+      if (error) throw error;
+      
+      setTools(prev => prev.map(t => t.id === toolId ? { ...t, verification_status: 'pending' as any } : t));
+      await fetchDatabaseState();
+    }
+  };
+
+  const approveToolVerification = async (requestId: string) => {
+    if (useSupabase) {
+      const { error } = await supabase.rpc('approve_tool_verification', {
+        p_request_id: requestId
+      });
+      if (error) throw error;
+      await fetchDatabaseState();
+    }
+  };
+
+  const revokeToolVerification = async (toolId: string, reason: string) => {
+    if (useSupabase) {
+      const { error } = await supabase.rpc('revoke_tool_verification', {
+        p_tool_id: toolId,
+        p_reason: reason
+      });
+      if (error) throw error;
+      await fetchDatabaseState();
+    }
   };
 
   const recordPayment = (payData: Omit<Payment, 'id' | 'date' | 'invoiceNumber'>) => {
@@ -1667,6 +1862,20 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         getOwnedTools,
         getOwnedTool,
         canManageTool,
+        ownerWallet,
+        ledger,
+        fundCampaign,
+        simulateTopup,
+        verifyPayment,
+        approveCampaign,
+        adjustWalletBalance,
+        verificationRequests,
+        reports,
+        submitReport,
+        resolveReport,
+        requestToolVerification,
+        approveToolVerification,
+        revokeToolVerification,
       }}
     >
       {children}

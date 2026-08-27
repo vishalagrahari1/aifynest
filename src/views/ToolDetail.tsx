@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { StarRating } from '../components/shared/StarRating';
 import { SEOHead } from '../components/shared/SEOHead';
 import { Heart, Share2, Plus, Check, Award } from '../components/shared/Icons';
+import { Modal } from '../components/shared/Modal';
 
 interface ToolDetailProps {
   onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
@@ -19,12 +20,17 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
   onCompareToggle,
 }) => {
   const { slug } = useParams<{ slug: string }>();
-  const { tools, reviews, addReview, collections, toggleFavoriteTool, trackEvent } = useDatabase();
+  const { tools, reviews, addReview, collections, toggleFavoriteTool, trackEvent, submitReport } = useDatabase();
   const { user } = useAuth();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<'overview' | 'reviews' | 'pricing'>('overview');
   const [selectedScreenshot, setSelectedScreenshot] = useState<string | null>(null);
+
+  // Report modal states
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportReason, setReportReason] = useState('spam');
+  const [reportDetails, setReportDetails] = useState('');
 
   // Review submission state
   const [reviewRating, setReviewRating] = useState(5);
@@ -64,6 +70,11 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
   if (!tool || !canAccess) {
     return (
       <div className="container section text-center" style={{ maxWidth: '540px' }}>
+        <SEOHead 
+          title="Listing Under Moderation" 
+          description="This AI tool listing is currently pending review, needs revisions, or is not published yet." 
+          robots="noindex, nofollow" 
+        />
         <h2>Listing Under Moderation</h2>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: '1.6' }}>
           This AI tool listing is currently pending review, needs revisions, or is not published yet.
@@ -106,6 +117,20 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
     window.open(`/go/${tool.slug}`, '_blank', 'noopener,noreferrer');
   };
 
+  const handleReportSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!tool) return;
+    try {
+      await submitReport(tool.id, reportReason, reportDetails);
+      setIsReportModalOpen(false);
+      setReportDetails('');
+      onToast('Thank you! Listing report filed successfully and sent to moderators.', 'success');
+    } catch (err: any) {
+      console.error(err);
+      onToast(err.message || 'Failed to submit report. Please try again.', 'error');
+    }
+  };
+
   const handleReviewSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
@@ -136,34 +161,133 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
     setReviewCons('');
   };
 
-  // Find related tools (same category, approved, excluding current)
-  const relatedTools = tools
+  // Find related tools using deterministic similarity scoring
+  const similarTools = tools
+    .filter((t) => t.id !== tool.id && t.status === 'approved')
+    .map((t) => {
+      let score = 0;
+      
+      // 1. Category (30%)
+      if (t.categorySlug === tool.categorySlug) {
+        score += 30;
+      }
+      
+      // 2. Tags (20%)
+      const commonTags = tool.tags.filter((tag) => t.tags.includes(tag));
+      if (tool.tags.length > 0) {
+        score += (commonTags.length / tool.tags.length) * 20;
+      }
+      
+      // 3. Features (20%)
+      const commonFeatures = tool.features.filter((f1) => 
+        t.features.some((f2) => f2.toLowerCase().includes(f1.toLowerCase()) || f1.toLowerCase().includes(f2.toLowerCase()))
+      );
+      if (tool.features.length > 0) {
+        score += (commonFeatures.length / tool.features.length) * 20;
+      }
+      
+      // 4. Use Cases (15%)
+      const commonUseCases = tool.useCases.filter((uc1) => 
+        t.useCases.some((uc2) => uc2.toLowerCase().includes(uc1.toLowerCase()) || uc1.toLowerCase().includes(uc2.toLowerCase()))
+      );
+      if (tool.useCases.length > 0) {
+        score += (commonUseCases.length / tool.useCases.length) * 15;
+      }
+      
+      // 5. Pricing (10%)
+      if (t.pricing === tool.pricing) {
+        score += 10;
+      }
+      
+      // 6. Platform (5%)
+      const commonPlatforms = tool.platforms.filter((p) => t.platforms.includes(p));
+      if (tool.platforms.length > 0) {
+        score += (commonPlatforms.length / tool.platforms.length) * 5;
+      }
+      
+      return { tool: t, score };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map((item) => item.tool);
+
+  // Find alternatives (budget-friendly options in same category)
+  const alternatives = tools
     .filter((t) => t.categorySlug === tool.categorySlug && t.id !== tool.id && t.status === 'approved')
+    .map((t) => {
+      const pricingWeight = { 'free': 4, 'freemium': 3, 'free-trial': 2, 'paid': 1 };
+      const currentWeight = pricingWeight[tool.pricing as keyof typeof pricingWeight] || 1;
+      const tWeight = pricingWeight[t.pricing as keyof typeof pricingWeight] || 1;
+      
+      const score = (tWeight > currentWeight ? 50 : 0) + t.rating * 5;
+      return { tool: t, score };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map((item) => item.tool);
+
+  // Find more popular tools in this category
+  const moreInCategory = tools
+    .filter((t) => t.categorySlug === tool.categorySlug && t.id !== tool.id && t.status === 'approved')
+    .sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount)
     .slice(0, 3);
 
   // Dynamic SEO schema markup details
-  const schemaMarkup = {
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    'name': tool.name,
-    'description': tool.description,
-    'applicationCategory': tool.categorySlug,
-    'operatingSystem': tool.platforms.join(', '),
-    'offers': {
-      '@type': 'Offer',
-      'price': tool.pricingPlans.length > 0 && tool.pricingPlans[0].price !== 'Custom' ? tool.pricingPlans[0].price.replace('$', '') : '0',
-      'priceCurrency': 'USD',
+  const siteUrl = import.meta.env.VITE_SITE_URL || 'https://aifynest.com';
+  const schemaMarkup = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      'name': tool.name,
+      'description': tool.description,
+      'applicationCategory': tool.categorySlug,
+      'operatingSystem': tool.platforms.join(', '),
+      'offers': {
+        '@type': 'Offer',
+        'price': tool.pricingPlans.length > 0 && tool.pricingPlans[0].price !== 'Custom' ? tool.pricingPlans[0].price.replace('$', '') : '0',
+        'priceCurrency': 'USD',
+      },
+      ...(tool.rating > 0 && tool.reviewCount > 0
+        ? {
+            'aggregateRating': {
+              '@type': 'AggregateRating',
+              'ratingValue': tool.rating,
+              'reviewCount': tool.reviewCount,
+            },
+          }
+        : {}),
     },
-    ...(tool.rating > 0
-      ? {
-          'aggregateRating': {
-            '@type': 'AggregateRating',
-            'ratingValue': tool.rating,
-            'reviewCount': tool.reviewCount,
-          },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      'itemListElement': [
+        {
+          '@type': 'ListItem',
+          'position': 1,
+          'name': 'Home',
+          'item': siteUrl,
+        },
+        {
+          '@type': 'ListItem',
+          'position': 2,
+          'name': 'AI Tools',
+          'item': `${siteUrl}/ai-tools`,
+        },
+        {
+          '@type': 'ListItem',
+          'position': 3,
+          'name': tool.categorySlug.toUpperCase(),
+          'item': `${siteUrl}/ai-tools/${tool.categorySlug}`,
+        },
+        {
+          '@type': 'ListItem',
+          'position': 4,
+          'name': tool.name,
+          'item': `${siteUrl}/tools/${tool.slug}`,
         }
-      : {}),
-  };
+      ]
+    }
+  ];
 
   return (
     <div className="container section">
@@ -171,6 +295,7 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
         title={`${tool.name} – Features, Pricing, Reviews & Alternatives`}
         description={`Read verified reviews, compare pricing tiers, find platform integrations, and explore alternatives for ${tool.name}. ${tool.tagline}.`}
         schemaMarkup={schemaMarkup}
+        robots={tool.status === 'approved' ? 'index, follow' : 'noindex, nofollow'}
       />
 
       {/* Breadcrumbs */}
@@ -250,6 +375,13 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
               <Share2 size={16} />
             </button>
           </div>
+          <button 
+            onClick={() => setIsReportModalOpen(true)} 
+            className="btn btn-outline btn-xs w-full"
+            style={{ marginTop: '8px', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
+          >
+            <span>🚩 Report / Flag Listing</span>
+          </button>
         </div>
       </div>
 
@@ -633,44 +765,127 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
             </div>
           )}
 
-          {/* Alternatives/Related tools */}
-          {relatedTools.length > 0 && (
-            <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '24px' }}>
-              <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', marginBottom: '16px' }}>
-                Similar AI Alternatives
-              </h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
-                {relatedTools.map((relTool) => (
-                  <div
-                    key={relTool.id}
-                    style={{
-                      backgroundColor: 'var(--bg-secondary)',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: 'var(--radius-md)',
-                      padding: '16px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '8px',
-                    }}
-                  >
-                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                      <img src={relTool.logoUrl} alt={relTool.name} style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', objectFit: 'cover' }} />
-                      <div style={{ fontWeight: 'bold', fontSize: 'var(--text-sm)' }}>{relTool.name}</div>
+          {/* Similar Tools, Alternatives & Category Suggestions Grid blocks */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', borderTop: '1px solid var(--border-color)', paddingTop: '28px', marginTop: '24px' }}>
+            
+            {/* Similar Tools */}
+            {similarTools.length > 0 && (
+              <div>
+                <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', marginBottom: '16px' }}>
+                  Similar AI Tools
+                </h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+                  {similarTools.map((relTool) => (
+                    <div
+                      key={relTool.id}
+                      style={{
+                        backgroundColor: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '16px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '8px',
+                      }}
+                    >
+                      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <img src={relTool.logoUrl} alt={relTool.name} style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', objectFit: 'cover' }} />
+                        <div style={{ fontWeight: 'bold', fontSize: 'var(--text-sm)' }}>{relTool.name}</div>
+                      </div>
+                      <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: 0 }}>
+                        {relTool.tagline}
+                      </p>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+                        <span className="badge badge-pricing" style={{ fontSize: '10px' }}>{relTool.pricing}</span>
+                        <Link to={`/tools/${relTool.slug}`} style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold' }}>
+                          View Details
+                        </Link>
+                      </div>
                     </div>
-                    <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: 0 }}>
-                      {relTool.tagline}
-                    </p>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
-                      <span className="badge badge-pricing" style={{ fontSize: '10px' }}>{relTool.pricing}</span>
-                      <Link to={`/tools/${relTool.slug}`} style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold' }}>
-                        View Details
-                      </Link>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+
+            {/* Alternatives */}
+            {alternatives.length > 0 && (
+              <div>
+                <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', marginBottom: '16px' }}>
+                  Alternatives
+                </h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+                  {alternatives.map((relTool) => (
+                    <div
+                      key={relTool.id}
+                      style={{
+                        backgroundColor: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '16px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '8px',
+                      }}
+                    >
+                      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <img src={relTool.logoUrl} alt={relTool.name} style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', objectFit: 'cover' }} />
+                        <div style={{ fontWeight: 'bold', fontSize: 'var(--text-sm)' }}>{relTool.name}</div>
+                      </div>
+                      <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: 0 }}>
+                        {relTool.tagline}
+                      </p>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+                        <span className="badge badge-pricing" style={{ fontSize: '10px' }}>{relTool.pricing}</span>
+                        <Link to={`/tools/${relTool.slug}`} style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold' }}>
+                          View Details
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* More tools in category */}
+            {moreInCategory.length > 0 && (
+              <div>
+                <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', marginBottom: '16px' }}>
+                  More tools in this category
+                </h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+                  {moreInCategory.map((relTool) => (
+                    <div
+                      key={relTool.id}
+                      style={{
+                        backgroundColor: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '16px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '8px',
+                      }}
+                    >
+                      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <img src={relTool.logoUrl} alt={relTool.name} style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', objectFit: 'cover' }} />
+                        <div style={{ fontWeight: 'bold', fontSize: 'var(--text-sm)' }}>{relTool.name}</div>
+                      </div>
+                      <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: 0 }}>
+                        {relTool.tagline}
+                      </p>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+                        <span className="badge badge-pricing" style={{ fontSize: '10px' }}>{relTool.pricing}</span>
+                        <Link to={`/tools/${relTool.slug}`} style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold' }}>
+                          View Details
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+          </div>
         </div>
 
         {/* Right Column Specs Sidebar */}
@@ -768,10 +983,10 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
                 👥 View {tool.name} Alternatives
               </Link>
               
-              {relatedTools.length > 0 && (
+              {similarTools.length > 0 && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
                   <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 'bold' }}>Side-by-Side Comparisons:</span>
-                  {relatedTools.map((rel) => (
+                  {similarTools.map((rel) => (
                     <Link
                       key={rel.id}
                       to={`/compare/${tool.slug}-vs-${rel.slug}`}
@@ -831,6 +1046,45 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
           />
         </div>
       )}
+
+      {/* REPORT MODAL */}
+      <Modal isOpen={isReportModalOpen} title={`Report Listing – ${tool.name}`} onClose={() => setIsReportModalOpen(false)}>
+        <form onSubmit={handleReportSubmit} style={{ padding: '12px', minWidth: '400px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', margin: 0 }}>
+            Is there something wrong with this tool page? Let us know so our moderation team can review it.
+          </p>
+          
+          <div className="form-group">
+            <label className="form-label">Reason for Flagging</label>
+            <select className="form-input" value={reportReason} onChange={(e) => setReportReason(e.target.value)}>
+              <option value="spam">Spam / Copycat Listing</option>
+              <option value="broken-link">Broken / Malicious Links</option>
+              <option value="wrong-category">Incorrect Category or Tags</option>
+              <option value="out-of-business">Defunct / Out of Business</option>
+              <option value="other">Other Violation (Describe below)</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Explanation Details</label>
+            <textarea 
+              className="form-input" 
+              rows={4} 
+              placeholder="Provide context for why you are flagging this listing..." 
+              value={reportDetails} 
+              onChange={(e) => setReportDetails(e.target.value)} 
+              required 
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '10px' }}>
+            <button type="button" onClick={() => setIsReportModalOpen(false)} className="btn btn-outline">Cancel</button>
+            <button type="submit" className="btn btn-primary">
+              Submit Report
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Style overrides for details and summaries */}
       <style>{`

@@ -9,6 +9,7 @@ interface SEOHeadProps {
   ogType?: 'website' | 'article' | 'product';
   ogImage?: string;
   schemaMarkup?: Record<string, any>;
+  robots?: string;
 }
 
 export const SEOHead: React.FC<SEOHeadProps> = (props) => {

@@ -48,11 +48,22 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
     bulkUpdateToolsStatus,
     bulkDeleteTools,
     seedTenToolsPerCategory,
+    campaigns,
+    payments,
+    ledger,
+    verifyPayment,
+    approveCampaign,
+    adjustWalletBalance,
+    reports,
+    verificationRequests,
+    resolveReport,
+    approveToolVerification,
+    revokeToolVerification,
   } = useDatabase();
   const { user } = useAuth();
 
   // Navigation state
-  const [activeTab, setActiveTab] = useState<'overview' | 'submissions' | 'tools' | 'import' | 'affiliates' | 'claims' | 'reviews' | 'analytics' | 'notifications' | 'logs' | 'pending_review' | 'changes_requested' | 'data_quality'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'submissions' | 'tools' | 'import' | 'affiliates' | 'claims' | 'reviews' | 'analytics' | 'notifications' | 'logs' | 'pending_review' | 'changes_requested' | 'data_quality' | 'monetization' | 'financial_ledger' | 'reports' | 'verification_requests'>('overview');
 
   // Filters for submissions moderation table
   const [subStatusFilter, setSubStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected' | 'needs_changes'>('all');
@@ -914,7 +925,11 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
             { id: 'data_quality', name: 'Data Quality', count: 0 },
             { id: 'affiliates', name: 'Affiliates Linker', count: 0 },
             { id: 'reviews', name: 'Moderation', count: pendingReviews.length },
+            { id: 'reports', name: 'Reported Listings', count: reports ? reports.filter(r => r.status === 'pending').length : 0 },
+            { id: 'verification_requests', name: 'Verification Queue', count: verificationRequests ? verificationRequests.filter(v => v.status === 'pending').length : 0 },
             { id: 'notifications', name: 'Notifications', count: unreadNotifs.length },
+            { id: 'monetization', name: 'Monetization Queue', count: campaigns ? campaigns.filter(c => c.status === 'pending').length : 0 },
+            { id: 'financial_ledger', name: 'Financial Ledger', count: 0 },
             { id: 'logs', name: 'Audit Logs', count: 0 },
           ].map((tab) => (
             <button
@@ -2649,6 +2664,334 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                   No administrative alerts.
                 </div>
               )}
+            </div>
+          )}
+
+          {/* TAB: MONETIZATION MANAGEMENT */}
+          {activeTab === 'monetization' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
+              <div>
+                <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', margin: 0 }}>Monetization Moderation Queue</h3>
+                <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Review bidding campaigns activation requests and verify simulated deposits.</span>
+              </div>
+
+              {/* 1. Pending Campaigns */}
+              <div style={{ padding: '20px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-card)' }}>
+                <h4 style={{ margin: '0 0 16px 0', fontSize: 'var(--text-sm)', fontWeight: 'bold' }}>Pending Campaigns ({campaigns ? campaigns.filter(c => c.status === 'pending').length : 0})</h4>
+                {campaigns && campaigns.filter(c => c.status === 'pending').length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {campaigns.filter(c => c.status === 'pending').map((camp) => {
+                      const toolObj = tools.find((t) => t.id === camp.toolId);
+                      return (
+                        <div key={camp.id} style={{ padding: '12px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div>
+                            <span style={{ fontWeight: 'bold', display: 'block' }}>{camp.campaignName}</span>
+                            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                              Tool: {toolObj?.name} | Placement: {camp.placement} | Budget: ${Number(camp.remainingBudget || camp.budget).toFixed(2)} | Bid: ${Number(camp.cpc || 0.20).toFixed(2)}
+                            </span>
+                          </div>
+                          <button
+                            onClick={async () => {
+                              try {
+                                await approveCampaign(camp.id);
+                                onToast('Campaign approved and marked ACTIVE successfully!', 'success');
+                              } catch (err: any) {
+                                onToast(err.message || 'Approval failed', 'error');
+                              }
+                            }}
+                            className="btn btn-success btn-xs"
+                          >
+                            Approve & Activate
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div style={{ color: 'var(--text-muted)', fontSize: 'var(--text-xs)' }}>
+                    No campaigns awaiting approval.
+                  </div>
+                )}
+              </div>
+
+              {/* 2. Pending Payments Verification */}
+              <div style={{ padding: '20px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-card)' }}>
+                <h4 style={{ margin: '0 0 16px 0', fontSize: 'var(--text-sm)', fontWeight: 'bold' }}>Pending Deposits Verification ({payments ? payments.filter(p => p.status === 'pending').length : 0})</h4>
+                {payments && payments.filter(p => p.status === 'pending').length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {payments.filter(p => p.status === 'pending').map((pay) => (
+                       <div key={pay.id} style={{ padding: '12px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                          <span style={{ fontWeight: 'bold', display: 'block' }}>Simulated Deposit of ${Number(pay.amount).toFixed(2)} USD</span>
+                          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                            Owner ID: {pay.userId} | TX Ref: {pay.invoiceNumber}
+                          </span>
+                        </div>
+                        <button
+                          onClick={async () => {
+                            try {
+                              await verifyPayment(pay.id);
+                              onToast('Deposit verified and credited to owner wallet successfully!', 'success');
+                            } catch (err: any) {
+                              onToast(err.message || 'Verification failed', 'error');
+                            }
+                          }}
+                          className="btn btn-primary btn-xs"
+                        >
+                          Verify & Credit Balance
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{ color: 'var(--text-muted)', fontSize: 'var(--text-xs)' }}>
+                    No pending deposits.
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* TAB: REPORTED LISTINGS */}
+          {activeTab === 'reports' && (
+            <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '24px' }}>
+              <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                🚩 Reported Listings Flagged by Users
+              </h2>
+              {reports && reports.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {reports.map((rep) => {
+                    const reportedTool = tools.find(t => t.id === rep.tool_id);
+                    return (
+                      <div key={rep.id} style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', backgroundColor: rep.status === 'pending' ? '#ef444405' : 'transparent' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <div>
+                            <span style={{ fontWeight: 'bold', fontSize: 'var(--text-sm)' }}>
+                              {reportedTool ? reportedTool.name : 'Unknown Tool'} ({rep.reason})
+                            </span>
+                            <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginTop: '2px' }}>
+                              Reported At: {new Date(rep.created_at).toLocaleString()} | Reporter User ID: {rep.reporter_user_id || 'Anonymous Guest'}
+                            </span>
+                            <p style={{ margin: '8px 0 0 0', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
+                              <strong>Details provided:</strong> {rep.details || 'No additional explanation details.'}
+                            </p>
+                            <span className={`badge`} style={{ display: 'inline-block', marginTop: '8px', fontSize: '10px', backgroundColor: rep.status === 'pending' ? 'var(--color-warning-light)' : 'var(--color-success-light)', color: rep.status === 'pending' ? 'var(--color-warning)' : 'var(--color-success)' }}>
+                              Status: {rep.status.toUpperCase()}
+                            </span>
+                          </div>
+                          {rep.status === 'pending' && (
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    await resolveReport(rep.id, 'resolved');
+                                    onToast('Report status updated to RESOLVED.', 'success');
+                                  } catch (err: any) {
+                                    onToast(err.message || 'Action failed', 'error');
+                                  }
+                                }}
+                                className="btn btn-primary btn-xs"
+                              >
+                                Resolve
+                              </button>
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    await resolveReport(rep.id, 'dismissed');
+                                    onToast('Report DISMISSED.', 'success');
+                                  } catch (err: any) {
+                                    onToast(err.message || 'Action failed', 'error');
+                                  }
+                                }}
+                                className="btn btn-outline btn-xs"
+                              >
+                                Dismiss
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div style={{ color: 'var(--text-muted)', fontSize: 'var(--text-xs)' }}>
+                  No reports logged yet.
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB: VERIFICATION QUEUE */}
+          {activeTab === 'verification_requests' && (
+            <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '24px' }}>
+              <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                🛡️ Tool Verification Submission Queue
+              </h2>
+              {verificationRequests && verificationRequests.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {verificationRequests.map((req) => {
+                    const targetTool = tools.find(t => t.id === req.tool_id);
+                    return (
+                      <div key={req.id} style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <div>
+                            <span style={{ fontWeight: 'bold', fontSize: 'var(--text-sm)' }}>
+                              {targetTool ? targetTool.name : 'Unknown Tool'}
+                            </span>
+                            <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginTop: '2px' }}>
+                              Owner ID: {req.owner_id} | Created: {new Date(req.created_at).toLocaleString()}
+                            </span>
+                            <p style={{ margin: '8px 0 0 0', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
+                              <strong>Owner notes:</strong> {req.notes || 'No supporting proof logs provided.'}
+                            </p>
+                            <span className={`badge`} style={{ display: 'inline-block', marginTop: '8px', fontSize: '10px', backgroundColor: req.status === 'pending' ? 'var(--color-warning-light)' : req.status === 'approved' ? 'var(--color-success-light)' : 'var(--color-danger-light)', color: req.status === 'pending' ? 'var(--color-warning)' : req.status === 'approved' ? 'var(--color-success)' : 'var(--color-danger)' }}>
+                              Status: {req.status.toUpperCase()}
+                            </span>
+                          </div>
+                          {req.status === 'pending' && (
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    await approveToolVerification(req.id);
+                                    onToast('Verification request APPROVED! Listing badge updated.', 'success');
+                                  } catch (err: any) {
+                                    onToast(err.message || 'Approval failed', 'error');
+                                  }
+                                }}
+                                className="btn btn-primary btn-xs"
+                              >
+                                Approve & Verify
+                              </button>
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    await revokeToolVerification(req.tool_id, 'Admin rejected verification request.');
+                                    onToast('Verification request REJECTED.', 'success');
+                                  } catch (err: any) {
+                                    onToast(err.message || 'Rejection failed', 'error');
+                                  }
+                                }}
+                                className="btn btn-outline btn-xs"
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          )}
+                          {req.status === 'approved' && (
+                            <button
+                              onClick={async () => {
+                                try {
+                                  await revokeToolVerification(req.tool_id, 'Revoked by administrator manually.');
+                                  onToast('Verification status REVOKED.', 'success');
+                                } catch (err: any) {
+                                  onToast(err.message || 'Revocation failed', 'error');
+                                }
+                              }}
+                              className="btn btn-outline btn-xs"
+                              style={{ borderColor: 'var(--color-danger)', color: 'var(--color-danger)' }}
+                            >
+                              Revoke Verification
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div style={{ color: 'var(--text-muted)', fontSize: 'var(--text-xs)' }}>
+                  No verification requests logged.
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB: GLOBAL FINANCIAL LEDGER */}
+          {activeTab === 'financial_ledger' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                <div>
+                  <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', margin: 0 }}>Global Financial Ledger</h3>
+                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Platform append-only transactional accounting log.</span>
+                </div>
+              </div>
+
+              {/* Administrative Adjustment Form */}
+              <div style={{ padding: '20px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-card)' }}>
+                <h4 style={{ margin: '0 0 16px 0', fontSize: 'var(--text-sm)', fontWeight: 'bold' }}>Create Compensating Balance Adjustment</h4>
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    const fd = new FormData(e.currentTarget);
+                    const ownerId = fd.get('owner_id') as string;
+                    const amount = Number(fd.get('adj_amount'));
+                    const reason = fd.get('adj_reason') as string;
+                    try {
+                      await adjustWalletBalance(ownerId, amount, reason);
+                      onToast('Administrative adjustment applied and ledgered successfully!', 'success');
+                      e.currentTarget.reset();
+                    } catch (err: any) {
+                      onToast(err.message || 'Adjustment failed', 'error');
+                    }
+                  }}
+                  style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'flex-end' }}
+                >
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-secondary)' }}>Target Owner Profile ID</span>
+                    <input name="owner_id" type="text" className="form-input btn-sm" placeholder="UUID" required style={{ width: '220px' }} />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-secondary)' }}>Amount (Positive/Negative)</span>
+                    <input name="adj_amount" type="number" step="0.01" className="form-input btn-sm" placeholder="e.g. -50.00" required style={{ width: '120px' }} />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-secondary)' }}>Audit adjustment Notes</span>
+                    <input name="adj_reason" type="text" className="form-input btn-sm" placeholder="Reason details..." required style={{ width: '280px' }} />
+                  </div>
+                  <button type="submit" className="btn btn-primary btn-sm">
+                    Apply Adjustment
+                  </button>
+                </form>
+              </div>
+
+              {/* Global Ledger Entries list */}
+              <div>
+                <h4 style={{ margin: '0 0 12px 0', fontSize: 'var(--text-sm)', fontWeight: 'bold' }}>All Ledger Transactions</h4>
+                {ledger && ledger.length > 0 ? (
+                  <div style={{ overflowX: 'auto', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-card)' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-xs)', textAlign: 'left' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-tertiary)' }}>
+                          <th style={{ padding: '10px 14px' }}>Date</th>
+                          <th style={{ padding: '10px 14px' }}>Owner ID</th>
+                          <th style={{ padding: '10px 14px' }}>Transaction Type</th>
+                          <th style={{ padding: '10px 14px' }}>Reference</th>
+                          <th style={{ padding: '10px 14px', textAlign: 'right' }}>Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {ledger.map((item: any) => (
+                          <tr key={item.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                            <td style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>{new Date(item.created_at).toLocaleString()}</td>
+                            <td style={{ padding: '10px 14px', fontFamily: 'monospace' }}>{item.owner_id}</td>
+                            <td style={{ padding: '10px 14px', fontWeight: 'bold', textTransform: 'uppercase' }}>{item.transaction_type}</td>
+                            <td style={{ padding: '10px 14px', color: 'var(--text-muted)' }}>{item.reference_id || item.id}</td>
+                            <td style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 'bold', color: Number(item.amount) > 0 ? 'var(--color-success)' : 'var(--color-danger)' }}>
+                              {Number(item.amount) > 0 ? '+' : ''}${Number(item.amount).toFixed(2)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)', backgroundColor: 'var(--bg-card)', border: '1px dashed var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
+                    No ledger transactions found in the global platform logs.
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

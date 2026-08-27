@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDatabase } from '../context/DatabaseContext';
+import { supabase } from '../utils/supabase';
 
 import { ToolCard } from '../components/shared/ToolCard';
 import { CategoryCard } from '../components/shared/CategoryCard';
@@ -47,18 +48,6 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
   ];
 
 
-  // Suggested keywords to match
-  const keywordSuggestions = [
-    'ChatGPT',
-    'Claude',
-    'AI video generators',
-    'AI writing tools',
-    'AI coding assistants',
-    'AI image generators',
-    'Voice cloning',
-    'Data science'
-  ];
-
   // Track home view on mount
   useEffect(() => {
     trackEvent('category_view', undefined, 'homepage');
@@ -75,27 +64,75 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, []);
 
-  // Update autocomplete recommendations
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    
-    if (query.trim().length > 0) {
-      // Find matching keywords or tool names
-      const matchedKeywords = keywordSuggestions.filter((kw) =>
-        kw.toLowerCase().includes(query.toLowerCase())
-      );
-      const matchedTools = tools
-        .filter((t) => t.status === 'approved' && t.name.toLowerCase().includes(query.toLowerCase()))
-        .map((t) => t.name);
-
-      const combined = Array.from(new Set([...matchedTools, ...matchedKeywords])).slice(0, 5);
-      setSuggestions(combined);
-      setShowSuggestions(true);
-    } else {
+  // Debounced search query suggestion loading from Supabase
+  useEffect(() => {
+    if (!searchQuery.trim()) {
       setSuggestions([]);
       setShowSuggestions(false);
+      return;
     }
+
+    const timer = setTimeout(async () => {
+      try {
+        const query = searchQuery.trim();
+        
+        // Fetch categories matching the query
+        const matchedCategories = categories
+          .filter(c => c.name.toLowerCase().includes(query.toLowerCase()))
+          .map(c => c.name);
+
+        // Fetch matching tool records (capped at 10 items for performance)
+        const { data: matchedToolsData } = await supabase
+          .from('tools')
+          .select('name, sub_category, tags, use_cases')
+          .eq('status', 'approved')
+          .or(`name.ilike.%${query}%,tagline.ilike.%${query}%,sub_category.ilike.%${query}%`)
+          .limit(10);
+
+        const toolNames = matchedToolsData?.map(t => t.name) || [];
+        const subCategories = matchedToolsData?.map(t => t.sub_category).filter(Boolean) || [];
+        
+        // Extract matching tags and use cases
+        const matchingTags: string[] = [];
+        const matchingUseCases: string[] = [];
+        matchedToolsData?.forEach(t => {
+          if (Array.isArray(t.tags)) {
+            t.tags.forEach((tag: string) => {
+              if (tag.toLowerCase().includes(query.toLowerCase()) && !matchingTags.includes(tag)) {
+                matchingTags.push(tag);
+              }
+            });
+          }
+          if (Array.isArray(t.use_cases)) {
+            t.use_cases.forEach((uc: string) => {
+              if (uc.toLowerCase().includes(query.toLowerCase()) && !matchingUseCases.includes(uc)) {
+                matchingUseCases.push(uc);
+              }
+            });
+          }
+        });
+
+        // Combine suggestions and remove duplicates
+        const combined = Array.from(new Set([
+          ...toolNames,
+          ...matchedCategories,
+          ...subCategories,
+          ...matchingTags.map(t => `#${t}`),
+          ...matchingUseCases
+        ])).slice(0, 8);
+
+        setSuggestions(combined);
+        setShowSuggestions(combined.length > 0);
+      } catch (err) {
+        console.error('Error fetching search suggestions:', err);
+      }
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, categories]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -327,7 +364,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
       </section>
 
       {/* Popular Tools Section Grid */}
-      <section className="section" style={{ position: 'relative', zIndex: 1 }}>
+      <section id="popular-tools" className="section" style={{ position: 'relative', zIndex: 1 }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px' }}>
             <div>
@@ -399,7 +436,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
               <h3 style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span style={{ fontSize: '24px' }}>🎥</span> AI Video & Image Generators
               </h3>
-              <Link to="/ai-tools?c=image-generation" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }}>
+              <Link to="/categories/image-generation" style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }}>
                 View All &gt;
               </Link>
             </div>

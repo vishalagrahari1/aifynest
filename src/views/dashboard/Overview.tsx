@@ -24,16 +24,20 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
     tools,
     reviews,
     campaigns,
-    payments,
     notifications,
     addCampaign,
-    recordPayment,
     updateTool,
     collections,
     analyticsEvents,
     markNotificationRead,
     getOwnedTools,
     getOwnerAnalytics,
+    ownerWallet,
+    ledger,
+    fundCampaign,
+    simulateTopup,
+    updateCampaign,
+    requestToolVerification,
   } = useDatabase();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -80,6 +84,11 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
   const [promoPlacement, setPromoPlacement] = useState<'featured' | 'sponsored-search' | 'homepage-featured' | 'category' | 'newsletter'>('homepage-featured');
   const [promoBudget, setPromoBudget] = useState(100);
   const [promoCoupon, setPromoCoupon] = useState('');
+
+  // Verification request modal states
+  const [isVerifModalOpen, setIsVerifModalOpen] = useState(false);
+  const [verifToolId, setVerifToolId] = useState('');
+  const [verifNotes, setVerifNotes] = useState('');
 
   // Authentication check
   if (!user) {
@@ -341,9 +350,6 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
   const ownerReviews = reviews.filter((r) => ownerToolIds.includes(r.toolId));
   // Filter campaigns for owner tools
   const ownerCampaigns = campaigns.filter((c) => ownerToolIds.includes(c.toolId));
-  // Filter payments
-  const ownerPayments = payments.filter((p) => p.userId === user.id);
-
   // Edit Listing Action
   const handleEditClick = (toolId: string) => {
     const t = tools.find((tool) => tool.id === toolId);
@@ -379,34 +385,38 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
       return;
     }
 
-    let cpcVal = 0;
-    let cpmVal = 0;
-    if (promoPlacement === 'sponsored-search') cpcVal = 1.5;
-    else if (promoPlacement === 'category') cpcVal = 1.0;
-    else if (promoPlacement === 'homepage-featured') cpmVal = 12.0;
-
-    const camp = addCampaign({
+    addCampaign({
       toolId: promoToolId,
       campaignName: promoCampaignName || `${tools.find((t) => t.id === promoToolId)?.name} Promotion`,
       placement: promoPlacement,
       startDate: new Date().toISOString().split('T')[0],
       endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       budget: promoBudget,
-      cpc: cpcVal,
-      cpm: cpmVal,
-    });
-
-    recordPayment({
-      campaignId: camp.id,
-      userId: user.id,
-      amount: promoBudget,
-      type: 'sponsorship',
-      description: `Sponsored campaign "${camp.campaignName}" placement fee.`,
-      status: 'success',
+      cpc: 0.20,
+      cpm: 5.0,
     });
 
     setIsPromoModalOpen(false);
-    onToast('Sponsorship purchased successfully! Campaign is active.', 'success');
+    setActiveTab('promotions');
+    onToast('Campaign created in DRAFT status! Fund it in the promotions tab to request activation.', 'success');
+  };
+
+  const handleRequestVerificationClick = (toolId: string) => {
+    setVerifToolId(toolId);
+    setVerifNotes('');
+    setIsVerifModalOpen(true);
+  };
+
+  const handleRequestVerificationSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await requestToolVerification(verifToolId, verifNotes);
+      setIsVerifModalOpen(false);
+      onToast('Verification request submitted successfully! An admin will review it shortly.', 'success');
+    } catch (err: any) {
+      console.error(err);
+      onToast(err.message || 'Failed to submit verification request.', 'error');
+    }
   };
 
   // Submit response reply to review
@@ -804,9 +814,29 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
                               </span>
                             </div>
 
-                            <div style={{ display: 'flex', gap: '8px' }}>
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                               <Link to={`/tools/${tool.slug}`} className="btn btn-outline btn-xs">View</Link>
                               <button onClick={() => handleEditClick(tool.id)} className="btn btn-outline btn-xs">Edit</button>
+                              
+                              {tool.status === 'approved' && (
+                                <>
+                                  {tool.verification_status === 'verified' && (
+                                    <span className="badge" style={{ backgroundColor: '#10b98120', color: '#10b981', fontSize: '9px', fontWeight: 'bold' }}>✓ Verified</span>
+                                  )}
+                                  {tool.verification_status === 'pending' && (
+                                    <span className="badge" style={{ backgroundColor: '#f59e0b20', color: '#f59e0b', fontSize: '9px' }}>Pending Verification</span>
+                                  )}
+                                  {(!tool.verification_status || tool.verification_status === 'unverified') && (
+                                    <button 
+                                      onClick={() => handleRequestVerificationClick(tool.id)} 
+                                      className="btn btn-outline btn-xs"
+                                      style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}
+                                    >
+                                      Verify
+                                    </button>
+                                  )}
+                                </>
+                              )}
                             </div>
                           </div>
                         );
@@ -1173,75 +1203,215 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
             {/* TAB 5: SPONSORSHIPS PROMOTION */}
             {activeTab === 'promotions' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'bold', margin: 0 }}>CPC Sponsored Promotions</h3>
+                {/* Wallet available card */}
+                <div style={{ padding: '20px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 'bold' }}>OWNER WALLET BALANCE</span>
+                    <h3 style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold', margin: '4px 0 0 0', color: 'var(--color-success)' }}>
+                      ${ownerWallet?.availableBalance?.toFixed(2) || '0.00'} <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>USD</span>
+                    </h3>
+                  </div>
                   <button onClick={() => { setPromoToolId(ownerTools[0]?.id || ''); setIsPromoModalOpen(true); }} className="btn btn-gold btn-sm">
-                    + Launch Ad Placement
+                    + Launch New Campaign
                   </button>
                 </div>
 
-                <div className="table-container">
-                  <table className="data-table">
-                    <thead>
-                      <tr>
-                        <th>Campaign Name</th>
-                        <th>Placement Scope</th>
-                        <th>Budget Spent</th>
-                        <th>Impressions</th>
-                        <th>Clicks Charged</th>
-                        <th>Remaining Balance</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {ownerCampaigns.map((camp) => (
-                        <tr key={camp.id}>
-                          <td style={{ fontWeight: 'bold' }}>{camp.campaignName}</td>
-                          <td>{camp.placement.toUpperCase()}</td>
-                          <td style={{ color: 'var(--color-danger)' }}>${Math.round(camp.spent)}</td>
-                          <td>{camp.impressions}</td>
-                          <td>{camp.clicks}</td>
-                          <td style={{ color: 'var(--color-success)', fontWeight: 'bold' }}>${Math.round(camp.remainingBudget)}</td>
-                          <td>
-                            <span className={`badge ${camp.status === 'active' ? 'badge-approved' : 'badge-pending'}`}>
-                              {camp.status.toUpperCase()}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'bold', margin: 0 }}>My Bidding Campaigns</h3>
                 </div>
+
+                {ownerCampaigns.length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {ownerCampaigns.map((camp) => {
+                      const toolObj = tools.find((t) => t.id === camp.toolId);
+                      return (
+                        <div key={camp.id} style={{ padding: '20px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+                            <div>
+                              <h4 style={{ margin: '0 0 4px 0', fontSize: 'var(--text-sm)', fontWeight: 'bold' }}>{camp.campaignName}</h4>
+                              <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>
+                                Tool: <strong>{toolObj?.name}</strong> | Placement: <strong>{camp.placement}</strong>
+                              </span>
+                            </div>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <span className={`badge ${camp.status === 'active' ? 'badge-approved' : 'badge-pending'}`}>
+                                {camp.status.toUpperCase()}
+                              </span>
+                              {camp.status === 'active' && (
+                                <button
+                                  onClick={() => updateCampaign(camp.id, { status: 'paused' })}
+                                  className="btn btn-outline btn-xs"
+                                >
+                                  Pause
+                                </button>
+                              )}
+                              {camp.status === 'paused' && (
+                                <button
+                                  onClick={() => updateCampaign(camp.id, { status: 'active' })}
+                                  className="btn btn-outline btn-xs"
+                                >
+                                  Resume
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '12px' }}>
+                            <div style={{ padding: '8px', border: '1px solid var(--border-color)', borderRadius: '4px', textAlign: 'center' }}>
+                              <span style={{ fontSize: '9px', color: 'var(--text-muted)', display: 'block' }}>CPC Bid</span>
+                              <strong style={{ fontSize: 'var(--text-xs)' }}>${camp.cpc?.toFixed(2) || '0.20'}</strong>
+                            </div>
+                            <div style={{ padding: '8px', border: '1px solid var(--border-color)', borderRadius: '4px', textAlign: 'center' }}>
+                              <span style={{ fontSize: '9px', color: 'var(--text-muted)', display: 'block' }}>Total Budget</span>
+                              <strong style={{ fontSize: 'var(--text-xs)' }}>${camp.budget?.toFixed(2) || '0.00'}</strong>
+                            </div>
+                            <div style={{ padding: '8px', border: '1px solid var(--border-color)', borderRadius: '4px', textAlign: 'center' }}>
+                              <span style={{ fontSize: '9px', color: 'var(--text-muted)', display: 'block' }}>Spent</span>
+                              <strong style={{ fontSize: 'var(--text-xs)', color: 'var(--color-danger)' }}>${camp.spent?.toFixed(2) || '0.00'}</strong>
+                            </div>
+                            <div style={{ padding: '8px', border: '1px solid var(--border-color)', borderRadius: '4px', textAlign: 'center' }}>
+                              <span style={{ fontSize: '9px', color: 'var(--text-muted)', display: 'block' }}>Remaining</span>
+                              <strong style={{ fontSize: 'var(--text-xs)', color: 'var(--color-success)' }}>${camp.remainingBudget?.toFixed(2) || '0.00'}</strong>
+                            </div>
+                            <div style={{ padding: '8px', border: '1px solid var(--border-color)', borderRadius: '4px', textAlign: 'center' }}>
+                              <span style={{ fontSize: '9px', color: 'var(--text-muted)', display: 'block' }}>Clicks</span>
+                              <strong style={{ fontSize: 'var(--text-xs)' }}>{camp.clicks || 0}</strong>
+                            </div>
+                          </div>
+
+                          {/* Budget Transfer Simulator Panel */}
+                          <div style={{ padding: '12px', backgroundColor: 'var(--bg-primary)', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                            <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
+                              Transfer funds from your available wallet balance to this campaign:
+                            </span>
+                            <form
+                              onSubmit={async (e) => {
+                                e.preventDefault();
+                                const fd = new FormData(e.currentTarget);
+                                const amount = Number(fd.get('fund_amount'));
+                                try {
+                                  await fundCampaign(camp.id, amount);
+                                  onToast('Campaign funded successfully! Pending admin approval.', 'success');
+                                  e.currentTarget.reset();
+                                } catch (err: any) {
+                                  onToast(err.message || 'Funding failed', 'error');
+                                }
+                              }}
+                              style={{ display: 'flex', gap: '8px' }}
+                            >
+                              <input
+                                name="fund_amount"
+                                type="number"
+                                step="1"
+                                min="10"
+                                max="1000"
+                                className="form-input btn-xs"
+                                style={{ width: '80px', padding: '4px 8px' }}
+                                placeholder="$10"
+                                required
+                              />
+                              <button type="submit" className="btn btn-primary btn-xs">
+                                Fund Campaign
+                              </button>
+                            </form>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                    No campaigns configured. Click "+ Launch New Campaign" to get started.
+                  </div>
+                )}
               </div>
             )}
 
             {/* TAB 6: BILLING INVOICES */}
             {activeTab === 'billing' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'bold', margin: 0 }}>Billing Ledger</h3>
-                <div className="table-container">
-                  <table className="data-table">
-                    <thead>
-                      <tr>
-                        <th>Invoice Date</th>
-                        <th>Invoice Number</th>
-                        <th>Description Parameter</th>
-                        <th>Paid Charge</th>
-                        <th>Receipt Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {ownerPayments.map((pay) => (
-                        <tr key={pay.id}>
-                          <td>{pay.date}</td>
-                          <td style={{ fontWeight: 'bold' }}>{pay.invoiceNumber}</td>
-                          <td>{pay.description}</td>
-                          <td style={{ color: 'var(--color-success)', fontWeight: 'bold' }}>${pay.amount}</td>
-                          <td><span className="badge badge-verified">PAID (SUCCESS)</span></td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <div style={{ padding: '20px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+                  <div>
+                    <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 'bold' }}>OWNER WALLET BALANCE</span>
+                    <h3 style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold', margin: '4px 0 0 0', color: 'var(--color-success)' }}>
+                      ${ownerWallet?.availableBalance?.toFixed(2) || '0.00'} <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>USD</span>
+                    </h3>
+                  </div>
+
+                  {/* Topup simulator form */}
+                  <div style={{ padding: '12px', borderLeft: '1px solid var(--border-color)' }}>
+                    <span style={{ fontSize: '10px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>TEST MODE WALLET DEPOSIT</span>
+                    <form
+                      onSubmit={async (e) => {
+                        e.preventDefault();
+                        const fd = new FormData(e.currentTarget);
+                        const topupAmt = Number(fd.get('topup_amount'));
+                        try {
+                          await simulateTopup(topupAmt);
+                          onToast('Pending deposit requested! Awaiting admin verification in admin view.', 'success');
+                          e.currentTarget.reset();
+                        } catch (err: any) {
+                          onToast(err.message || 'Deposit failed', 'error');
+                        }
+                      }}
+                      style={{ display: 'flex', gap: '8px' }}
+                    >
+                      <input
+                        name="topup_amount"
+                        type="number"
+                        step="10"
+                        min="10"
+                        max="5000"
+                        className="form-input btn-xs"
+                        style={{ width: '80px', padding: '4px 8px' }}
+                        placeholder="$100"
+                        required
+                      />
+                      <button type="submit" className="btn btn-success btn-xs">
+                        Simulate Deposit
+                      </button>
+                    </form>
+                  </div>
+                </div>
+
+                <div style={{ padding: '12px', backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', fontSize: '11px', color: 'var(--text-muted)' }}>
+                  💡 <strong>Test Wallet Note:</strong> Payments are processed as mock pending transactions. Balance credits are applied only after an Administrator verifies them inside the Admin dashboard.
+                </div>
+
+                <div>
+                  <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'bold', borderBottom: '1px solid var(--border-color)', paddingBottom: '10px', marginBottom: '16px' }}>
+                    Immutable Financial History (Ledger Logs)
+                  </h3>
+                  {ledger && ledger.length > 0 ? (
+                    <div style={{ overflowX: 'auto', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-xs)', textAlign: 'left' }}>
+                        <thead>
+                          <tr style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-tertiary)' }}>
+                            <th style={{ padding: '8px 12px' }}>Date</th>
+                            <th style={{ padding: '8px 12px' }}>Transaction Type</th>
+                            <th style={{ padding: '8px 12px' }}>Reference ID</th>
+                            <th style={{ padding: '8px 12px', textAlign: 'right' }}>Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {ledger.map((item: any) => (
+                            <tr key={item.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                              <td style={{ padding: '8px 12px', color: 'var(--text-muted)' }}>{new Date(item.created_at).toLocaleDateString()}</td>
+                              <td style={{ padding: '8px 12px', textTransform: 'uppercase', fontWeight: 'bold' }}>{item.transaction_type}</td>
+                              <td style={{ padding: '8px 12px', fontFamily: 'monospace', fontSize: '10px' }}>{item.reference_id || item.id}</td>
+                              <td style={{ padding: '8px 12px', textAlign: 'right', fontWeight: 'bold', color: item.amount > 0 ? 'var(--color-success)' : 'var(--color-danger)' }}>
+                                {item.amount > 0 ? '+' : ''}${Number(item.amount).toFixed(2)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div style={{ padding: '20px', color: 'var(--text-muted)', textAlign: 'center' }}>
+                      No ledger transactions found.
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -1375,6 +1545,34 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
               </button>
             </div>
           </form>
+        </Modal>
+
+      {/* REQUEST VERIFICATION MODAL */}
+      <Modal isOpen={isVerifModalOpen} title="Request Listing Verification" onClose={() => setIsVerifModalOpen(false)}>
+        <form onSubmit={handleRequestVerificationSubmit} style={{ padding: '12px', minWidth: '400px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', margin: 0 }}>
+            Request verified credentials badge for your tool to build trust. Please provide links to your documentation or other proof of ownership.
+          </p>
+          
+          <div className="form-group">
+            <label className="form-label">Supporting Notes / Proof</label>
+            <textarea 
+              className="form-input" 
+              rows={4} 
+              placeholder="e.g. Domain ownership logs, team profile, or verification file path details." 
+              value={verifNotes} 
+              onChange={(e) => setVerifNotes(e.target.value)} 
+              required 
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '10px' }}>
+            <button type="button" onClick={() => setIsVerifModalOpen(false)} className="btn btn-outline">Cancel</button>
+            <button type="submit" className="btn btn-primary">
+              Submit Request
+            </button>
+          </div>
+        </form>
       </Modal>
     </div>
   );

@@ -25,16 +25,229 @@ const ChevronDown: React.FC<{ size?: number }> = ({ size = 14 }) => (
   </svg>
 );
 
+const LANGUAGES = [
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷' },
+  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+  { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+  { code: 'ja', name: '日本語', flag: '🇯🇵' },
+  { code: 'zh', name: '中文', flag: '🇨🇳' }
+];
+
+const TRANSLATIONS: Record<string, Record<string, string>> = {
+  en: {
+    allTools: 'All Tools',
+    popularTools: 'Popular Tools',
+    blog: 'Blog',
+    more: '+ More',
+    trending: 'Trending AI Tools',
+    newest: 'Newest Listings',
+    collections: 'Curated Collections',
+    compare: 'Compare Tools',
+    sponsorship: 'Sponsorship Placements',
+    submitTool: 'Submit Tool',
+    login: 'Log in',
+    signup: 'Sign up',
+    getStarted: 'Get Started',
+    claimTool: 'Claim Tool',
+    savedTitle: 'Saved Favorites',
+    noSaved: 'No saved tools yet.',
+    signInPrompt: 'Sign in to save and access your favorite AI tools.',
+    logout: 'Log Out',
+    adminConsole: 'Admin Console',
+    dashboard: 'Dashboard',
+    myTools: 'My Tools',
+    analytics: 'Analytics',
+    myReviews: 'My Reviews',
+    language: 'Language',
+  },
+  es: {
+    allTools: 'Herramientas',
+    popularTools: 'Populares',
+    blog: 'Blog',
+    more: '+ Más',
+    trending: 'Herramientas Populares',
+    newest: 'Últimas Listadas',
+    collections: 'Colecciones Curadas',
+    compare: 'Comparar Herramientas',
+    sponsorship: 'Anuncios Patrocinados',
+    submitTool: 'Publicar IA',
+    login: 'Iniciar Sesión',
+    signup: 'Registrarse',
+    getStarted: 'Empezar',
+    claimTool: 'Reclamar IA',
+    savedTitle: 'Favoritos Guardados',
+    noSaved: 'Aún no hay herramientas guardadas.',
+    signInPrompt: 'Inicia sesión para guardar tus herramientas favoritas.',
+    logout: 'Cerrar Sesión',
+    adminConsole: 'Panel de Admin',
+    dashboard: 'Panel de Control',
+    myTools: 'Mis Herramientas',
+    analytics: 'Estadísticas',
+    myReviews: 'Mis Reseñas',
+    language: 'Idioma',
+  },
+  fr: {
+    allTools: 'Toutes les IA',
+    popularTools: 'Populaires',
+    blog: 'Blog',
+    more: '+ Plus',
+    trending: 'Outils Populaires',
+    newest: 'Dernières Nouveautés',
+    collections: 'Collections Thématiques',
+    compare: 'Comparer les IA',
+    sponsorship: 'Placements Premium',
+    submitTool: 'Soumettre IA',
+    login: 'Connexion',
+    signup: 'S\'inscrire',
+    getStarted: 'Démarrer',
+    claimTool: 'Réclamer IA',
+    savedTitle: 'Favoris Enregistrés',
+    noSaved: 'Aucun outil enregistré pour le moment.',
+    signInPrompt: 'Connectez-vous pour enregistrer vos favoris.',
+    logout: 'Déconnexion',
+    adminConsole: 'Console Admin',
+    dashboard: 'Tableau de bord',
+    myTools: 'Mes Outils',
+    analytics: 'Statistiques',
+    myReviews: 'Mes Avis',
+    language: 'Langue',
+  },
+  de: {
+    allTools: 'Alle Tools',
+    popularTools: 'Beliebte Tools',
+    blog: 'Blog',
+    more: '+ Mehr',
+    trending: 'Beliebte KI-Tools',
+    newest: 'Neueste Einträge',
+    collections: 'Kuratierte Kollektionen',
+    compare: 'Tools vergleichen',
+    sponsorship: 'Sponsoring-Plätze',
+    submitTool: 'Tool einreichen',
+    login: 'Anmelden',
+    signup: 'Registrieren',
+    getStarted: 'Starten',
+    claimTool: 'Tool beanspruchen',
+    savedTitle: 'Gespeicherte Favoriten',
+    noSaved: 'Noch keine Tools gespeichert.',
+    signInPrompt: 'Melden Sie sich an, um Favoriten zu speichern.',
+    logout: 'Abmelden',
+    adminConsole: 'Admin-Konsole',
+    dashboard: 'Dashboard',
+    myTools: 'Meine Tools',
+    analytics: 'Analysen',
+    myReviews: 'Meine Bewertungen',
+    language: 'Sprache',
+  },
+  hi: {
+    allTools: 'सभी उपकरण',
+    popularTools: 'लोकप्रिय उपकरण',
+    blog: 'ब्लॉग',
+    more: '+ अधिक',
+    trending: 'रुझान वाले उपकरण',
+    newest: 'नवीनतम लिस्टिंग',
+    collections: 'विशेष संग्रह',
+    compare: 'तुलना करें',
+    sponsorship: 'प्रायोजित प्लेसमेंट',
+    submitTool: 'उपकरण जोड़ें',
+    login: 'लॉग इन',
+    signup: 'साइन अप',
+    getStarted: 'शुरू करें',
+    claimTool: 'दावा करें',
+    savedTitle: 'पसंदीदा सहेजे गए',
+    noSaved: 'कोई सहेजा गया उपकरण नहीं है।',
+    signInPrompt: 'पसंदीदा उपकरणों को सहेजने के लिए लॉग इन करें।',
+    logout: 'लॉग आउट',
+    adminConsole: 'एडमिन कंसोल',
+    dashboard: 'डैशबोर्ड',
+    myTools: 'मेरे उपकरण',
+    analytics: 'विश्लेषण',
+    myReviews: 'मेरी समीक्षाएं',
+    language: 'भाषा',
+  },
+  ja: {
+    allTools: 'すべてのツール',
+    popularTools: '人気のツール',
+    blog: 'ブログ',
+    more: '+ もっと見る',
+    trending: 'トレンドのツール',
+    newest: '新着掲載',
+    collections: '厳選コレクション',
+    compare: 'ツール比較',
+    sponsorship: 'スポンサー掲載',
+    submitTool: 'ツールを送信',
+    login: 'ログイン',
+    signup: '会員登録',
+    getStarted: '始める',
+    claimTool: '申請する',
+    savedTitle: '保存したお気に入り',
+    noSaved: '保存されたツールはまだありません。',
+    signInPrompt: 'お気に入りのツールを保存してアクセスするにはログインしてください。',
+    logout: 'ログアウト',
+    adminConsole: '管理コンソール',
+    dashboard: 'ダッシュボード',
+    myTools: '登録したツール',
+    analytics: 'アナリティクス',
+    myReviews: 'レビュー履歴',
+    language: '言語',
+  },
+  zh: {
+    allTools: '所有工具',
+    popularTools: '热门工具',
+    blog: '博客',
+    more: '+ 更多',
+    trending: '趋势AI工具',
+    newest: '最新发布',
+    collections: '精选收藏集',
+    compare: '比较工具',
+    sponsorship: '广告赞助合作',
+    submitTool: '提交工具',
+    login: '登录',
+    signup: '注册',
+    getStarted: '开始使用',
+    claimTool: '认领工具',
+    savedTitle: '已保存的收藏',
+    noSaved: '暂无已保存的工具。',
+    signInPrompt: '登录以保存并查看您喜爱的AI工具。',
+    logout: '退出登录',
+    adminConsole: '管理控制台',
+    dashboard: '仪表板',
+    myTools: '我的工具',
+    analytics: '分析统计',
+    myReviews: '我的评论',
+    language: '语言',
+  }
+};
+
 export const Header: React.FC = () => {
   const { user, logout, isOwner, isAdmin } = useAuth();
-  const { dbError } = useDatabase();
+  const { dbError, tools, collections, toggleFavoriteTool } = useDatabase();
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
+  
+  const [isSavedDropdownOpen, setIsSavedDropdownOpen] = useState(false);
+  const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
+  const [activeLanguage, setActiveLanguage] = useState(() => {
+    return localStorage.getItem('app_lang') || 'en';
+  });
+
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const savedDropdownRef = useRef<HTMLDivElement>(null);
+  const langDropdownRef = useRef<HTMLDivElement>(null);
+
   const navigate = useNavigate();
   const location = useLocation();
+
+  const t = (key: string) => {
+    return TRANSLATIONS[activeLanguage]?.[key] || TRANSLATIONS['en']?.[key] || key;
+  };
+
+  const userFavorites = collections ? collections.find((c) => c.userId === user?.id && c.name === 'My Favorites') : null;
+  const savedToolIds = userFavorites ? userFavorites.tools : [];
+  const savedToolsList = (tools && savedToolIds.length > 0) ? tools.filter(tool => savedToolIds.includes(tool.id)) : [];
 
   // Apply theme class to document
   useEffect(() => {
@@ -49,6 +262,12 @@ export const Header: React.FC = () => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setUserDropdownOpen(false);
+      }
+      if (savedDropdownRef.current && !savedDropdownRef.current.contains(e.target as Node)) {
+        setIsSavedDropdownOpen(false);
+      }
+      if (langDropdownRef.current && !langDropdownRef.current.contains(e.target as Node)) {
+        setIsLanguageDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -144,9 +363,9 @@ export const Header: React.FC = () => {
           }}
           className="desktop-nav"
         >
-          <Link to="/ai-tools" style={navLinkStyle}>All Tools</Link>
-          <a href="/#categories" style={navLinkStyle}>Popular Tools</a>
-          <Link to="/blog" style={navLinkStyle}>Blog</Link>
+          <Link to="/ai-tools" style={navLinkStyle}>{t('allTools')}</Link>
+          <a href="/#popular-tools" style={navLinkStyle}>{t('popularTools')}</a>
+          <Link to="/blog" style={navLinkStyle}>{t('blog')}</Link>
           
           <div 
             style={{ position: 'relative' }}
@@ -165,7 +384,7 @@ export const Header: React.FC = () => {
                 cursor: 'pointer',
               }}
             >
-              <span>+ More</span>
+              <span>{t('more')}</span>
               <ChevronDown size={14} />
             </button>
             
@@ -189,19 +408,19 @@ export const Header: React.FC = () => {
                 }}
               >
                 <Link to="/trending" className="dropdown-link" style={{ padding: '8px 12px', fontSize: '13px' }}>
-                  Trending AI Tools
+                  {t('trending')}
                 </Link>
                 <Link to="/new" className="dropdown-link" style={{ padding: '8px 12px', fontSize: '13px' }}>
-                  Newest Listings
+                  {t('newest')}
                 </Link>
                 <Link to="/collections" className="dropdown-link" style={{ padding: '8px 12px', fontSize: '13px' }}>
-                  Curated Collections
+                  {t('collections')}
                 </Link>
                 <Link to="/compare" className="dropdown-link" style={{ padding: '8px 12px', fontSize: '13px' }}>
-                  Compare Tools
+                  {t('compare')}
                 </Link>
                 <Link to="/advertise" className="dropdown-link" style={{ padding: '8px 12px', fontSize: '13px' }}>
-                  Sponsorship Placements
+                  {t('sponsorship')}
                 </Link>
               </div>
             )}
@@ -210,25 +429,215 @@ export const Header: React.FC = () => {
 
         {/* Right Action stack: Outlined Login, Prominent Get Started, Visually distinct Submit Tool */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }} className="desktop-actions">
-          {/* Bookmark Icon */}
-          <Link 
-            to={user ? "/dashboard?tab=saved" : "/login"} 
-            className="header-icon-btn" 
-            title="Saved Favorites"
-            style={iconBtnStyle}
-          >
-            <Bookmark size={18} />
-          </Link>
+          {/* Bookmark Icon Container */}
+          <div style={{ position: 'relative' }} ref={savedDropdownRef}>
+            <button 
+              onClick={() => {
+                setIsSavedDropdownOpen(!isSavedDropdownOpen);
+                setIsLanguageDropdownOpen(false);
+                setUserDropdownOpen(false);
+              }}
+              className="header-icon-btn" 
+              title={t('savedTitle')}
+              style={{ ...iconBtnStyle, border: 'none', background: 'none', cursor: 'pointer' }}
+            >
+              <Bookmark size={18} />
+            </button>
 
-          {/* Globe Icon (Claim listing) */}
-          <Link 
-            to="/claim-listing" 
-            className="header-icon-btn" 
-            title="Claim your tool"
-            style={iconBtnStyle}
-          >
-            <GlobeIcon size={18} />
-          </Link>
+            {/* Saved Tools Dropdown */}
+            {isSavedDropdownOpen && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  marginTop: '8px',
+                  width: '320px',
+                  backgroundColor: 'var(--bg-card)',
+                  backdropFilter: 'blur(16px)',
+                  WebkitBackdropFilter: 'blur(16px)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-md)',
+                  boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  padding: '12px',
+                  zIndex: 1000,
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', paddingBottom: '8px', borderBottom: '1px solid var(--border-color)' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 'bold', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span>🔖</span> {t('savedTitle')}
+                  </span>
+                  {user && savedToolsList.length > 0 && (
+                    <span className="badge badge-pricing" style={{ fontSize: '10px', padding: '2px 6px' }}>
+                      {savedToolsList.length}
+                    </span>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '260px', overflowY: 'auto' }} className="saved-tools-list">
+                  {!user ? (
+                    <div style={{ padding: '12px 6px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+                        {t('signInPrompt')}
+                      </p>
+                      <Link 
+                        to="/login" 
+                        className="btn btn-primary btn-xs" 
+                        style={{ width: '100%', display: 'block', textDecoration: 'none', textAlign: 'center' }}
+                        onClick={() => setIsSavedDropdownOpen(false)}
+                      >
+                        {t('login')}
+                      </Link>
+                    </div>
+                  ) : savedToolsList.length === 0 ? (
+                    <div style={{ padding: '20px 10px', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '12px' }}>
+                      {t('noSaved')}
+                    </div>
+                  ) : (
+                    savedToolsList.map((tool) => (
+                      <div 
+                        key={tool.id} 
+                        style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'space-between', 
+                          padding: '6px', 
+                          borderRadius: 'var(--radius-sm)', 
+                          transition: 'background 150ms ease',
+                          cursor: 'pointer',
+                          backgroundColor: 'rgba(255,255,255,0.02)'
+                        }}
+                        className="saved-tool-dropdown-item"
+                        onClick={() => {
+                          setIsSavedDropdownOpen(false);
+                          navigate(`/tools/${tool.slug}`);
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
+                          <img 
+                            src={tool.logoUrl} 
+                            alt={tool.name} 
+                            style={{ width: '28px', height: '28px', borderRadius: 'var(--radius-sm)', objectFit: 'cover' }} 
+                            onError={(e) => {
+                              e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=50&h=50&fit=crop';
+                            }}
+                          />
+                          <div style={{ overflow: 'hidden', textAlign: 'left' }}>
+                            <div style={{ fontSize: '12px', fontWeight: 'var(--font-semibold)', color: 'var(--text-primary)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                              {tool.name}
+                            </div>
+                            <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                              {tool.subCategory}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleFavoriteTool(user.id, tool.id);
+                          }}
+                          style={{ 
+                            background: 'none', 
+                            border: 'none', 
+                            color: 'var(--text-muted)', 
+                            cursor: 'pointer', 
+                            fontSize: '14px', 
+                            padding: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                          className="saved-tool-remove-btn"
+                          title="Remove"
+                        >
+                          &times;
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Globe Icon Container (Language Selection) */}
+          <div style={{ position: 'relative' }} ref={langDropdownRef}>
+            <button 
+              onClick={() => {
+                setIsLanguageDropdownOpen(!isLanguageDropdownOpen);
+                setIsSavedDropdownOpen(false);
+                setUserDropdownOpen(false);
+              }}
+              className="header-icon-btn" 
+              title={t('language')}
+              style={{ ...iconBtnStyle, border: 'none', background: 'none', cursor: 'pointer' }}
+            >
+              <GlobeIcon size={18} />
+            </button>
+
+            {/* Language Selector Dropdown */}
+            {isLanguageDropdownOpen && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  marginTop: '8px',
+                  width: '180px',
+                  backgroundColor: 'var(--bg-card)',
+                  backdropFilter: 'blur(16px)',
+                  WebkitBackdropFilter: 'blur(16px)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-md)',
+                  boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  padding: '6px',
+                  zIndex: 1000,
+                }}
+              >
+                <div style={{ padding: '6px 10px', fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  {t('language')}
+                </div>
+                {LANGUAGES.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => {
+                      setActiveLanguage(lang.code);
+                      localStorage.setItem('app_lang', lang.code);
+                      setIsLanguageDropdownOpen(false);
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      width: '100%',
+                      padding: '8px 10px',
+                      border: 'none',
+                      background: 'none',
+                      cursor: 'pointer',
+                      borderRadius: 'var(--radius-sm)',
+                      fontSize: '13px',
+                      color: activeLanguage === lang.code ? 'var(--color-primary)' : 'var(--text-secondary)',
+                      backgroundColor: activeLanguage === lang.code ? 'rgba(var(--color-primary-rgb), 0.08)' : 'transparent',
+                      transition: 'all 150ms ease',
+                      textAlign: 'left'
+                    }}
+                    className="lang-dropdown-btn"
+                  >
+                    <span>{lang.flag}</span>
+                    <span style={{ fontWeight: activeLanguage === lang.code ? '600' : 'normal' }}>{lang.name}</span>
+                    {activeLanguage === lang.code && (
+                      <span style={{ marginLeft: 'auto', fontSize: '10px' }}>✓</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Theme Selector */}
           <button
@@ -267,21 +676,21 @@ export const Header: React.FC = () => {
                     className={`builder-tab ${location.pathname === '/dashboard' && !location.search.includes('tab=') ? 'builder-tab-active' : ''}`}
                     style={{ textDecoration: 'none' }}
                   >
-                    Dashboard
+                    {t('dashboard')}
                   </Link>
                   <Link 
                     to="/dashboard?tab=listings" 
                     className={`builder-tab ${location.search.includes('tab=listings') ? 'builder-tab-active' : ''}`}
                     style={{ textDecoration: 'none' }}
                   >
-                    My Tools
+                    {t('myTools')}
                   </Link>
                   <Link 
                     to="/dashboard?tab=analytics" 
                     className={`builder-tab ${location.search.includes('tab=analytics') ? 'builder-tab-active' : ''}`}
                     style={{ textDecoration: 'none' }}
                   >
-                    Analytics
+                    {t('analytics')}
                   </Link>
                 </div>
               )}
@@ -320,25 +729,25 @@ export const Header: React.FC = () => {
                     {isAdmin() && (
                       <Link to="/admin" className="dropdown-link" style={{ color: 'var(--color-gold)', fontWeight: 'bold' }} onClick={() => setUserDropdownOpen(false)}>
                         <Layout size={14} style={{ flexShrink: 0, color: 'var(--color-gold)' }} />
-                        <span>System Admin Panel</span>
+                        <span>{t('adminConsole')}</span>
                       </Link>
                     )}
                     <Link to="/dashboard" className={`dropdown-link ${location.pathname === '/dashboard' && !location.search.includes('tab=') ? 'dropdown-link-active' : ''}`} onClick={() => setUserDropdownOpen(false)}>
                       <Layout size={14} style={{ flexShrink: 0 }} />
-                      <span>Dashboard</span>
+                      <span>{t('dashboard')}</span>
                     </Link>
                     <Link to="/dashboard?tab=saved" className={`dropdown-link ${location.search.includes('tab=saved') ? 'dropdown-link-active' : ''}`} onClick={() => setUserDropdownOpen(false)}>
                       <User size={14} style={{ flexShrink: 0 }} />
-                      <span>Saved Tools</span>
+                      <span>{t('savedTitle')}</span>
                     </Link>
                     <Link to="/dashboard?tab=reviews" className={`dropdown-link ${location.search.includes('tab=reviews') ? 'dropdown-link-active' : ''}`} onClick={() => setUserDropdownOpen(false)}>
                       <User size={14} style={{ flexShrink: 0 }} />
-                      <span>My Reviews</span>
+                      <span>{t('myReviews')}</span>
                     </Link>
                     {isOwner() && (
                       <Link to="/dashboard?tab=listings" className={`dropdown-link ${location.search.includes('tab=listings') ? 'dropdown-link-active' : ''}`} onClick={() => setUserDropdownOpen(false)}>
                         <Layout size={14} style={{ flexShrink: 0 }} />
-                        <span>My Tools</span>
+                        <span>{t('myTools')}</span>
                       </Link>
                     )}
                     <div style={{ height: '1px', backgroundColor: 'var(--border-color)', margin: '4px 6px' }} />
@@ -356,7 +765,7 @@ export const Header: React.FC = () => {
                       }}
                     >
                       <LogOut size={14} style={{ flexShrink: 0 }} />
-                      <span>Log Out</span>
+                      <span>{t('logout')}</span>
                     </button>
                   </div>
                 )}
@@ -366,16 +775,16 @@ export const Header: React.FC = () => {
             /* Logged Out State */
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
               <Link to="/login" style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-secondary)', textDecoration: 'none' }} className="login-text-link">
-                Log in
+                {t('login')}
               </Link>
               <Link to="/signup" style={cleanSignupBtnStyle} className="clean-signup-btn">
-                Sign up
+                {t('signup')}
               </Link>
             </div>
           )}
           
           <Link to="/submit-tool" className="btn btn-primary btn-sm" style={{ padding: '8px 16px', borderRadius: 'var(--radius-md)', fontWeight: 'var(--font-bold)' }}>
-            Submit a Tool
+            {t('submitTool')}
           </Link>
         </div>
 
@@ -410,13 +819,13 @@ export const Header: React.FC = () => {
           }}
         >
           {/* Navigation Links */}
-          <Link to="/ai-tools" style={mobileNavLinkStyle}>All Tools</Link>
-          <a href="/#categories" style={mobileNavLinkStyle}>Popular Tools</a>
-          <Link to="/trending" style={mobileNavLinkStyle}>Trending</Link>
-          <Link to="/new" style={mobileNavLinkStyle}>New Tools</Link>
-          <Link to="/collections" style={mobileNavLinkStyle}>Collections</Link>
-          <Link to="/compare" style={mobileNavLinkStyle}>Compare</Link>
-          <Link to="/blog" style={mobileNavLinkStyle}>Blog</Link>
+          <Link to="/ai-tools" style={mobileNavLinkStyle}>{t('allTools')}</Link>
+          <a href="/#popular-tools" style={mobileNavLinkStyle}>{t('popularTools')}</a>
+          <Link to="/trending" style={mobileNavLinkStyle}>{t('trending')}</Link>
+          <Link to="/new" style={mobileNavLinkStyle}>{t('newest')}</Link>
+          <Link to="/collections" style={mobileNavLinkStyle}>{t('collections')}</Link>
+          <Link to="/compare" style={mobileNavLinkStyle}>{t('compare')}</Link>
+          <Link to="/blog" style={mobileNavLinkStyle}>{t('blog')}</Link>
 
           <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '8px 0' }} />
 
@@ -425,23 +834,23 @@ export const Header: React.FC = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <Link to="/login" className="btn btn-outline w-full" style={{ padding: '12px', justifyContent: 'center' }}>
                 <User size={16} />
-                <span>Log in</span>
+                <span>{t('login')}</span>
               </Link>
               <Link to="/signup" className="btn btn-primary w-full" style={{ padding: '12px', justifyContent: 'center' }}>
-                <span>Get Started</span>
+                <span>{t('getStarted')}</span>
               </Link>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <Link to="/dashboard" style={mobileNavLinkStyle}>Dashboard</Link>
-              {isOwner() && <Link to="/dashboard?tab=listings" style={mobileNavLinkStyle}>My Tools</Link>}
+              <Link to="/dashboard" style={mobileNavLinkStyle}>{t('dashboard')}</Link>
+              {isOwner() && <Link to="/dashboard?tab=listings" style={mobileNavLinkStyle}>{t('myTools')}</Link>}
               <button
                 onClick={handleLogout}
                 className="btn btn-outline w-full"
                 style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)', padding: '10px', justifyContent: 'center' }}
               >
                 <LogOut size={16} />
-                <span>Log Out</span>
+                <span>{t('logout')}</span>
               </button>
             </div>
           )}
@@ -463,7 +872,7 @@ export const Header: React.FC = () => {
               textAlign: 'center',
             }}
           >
-            <span>+ Submit Your AI Tool</span>
+            <span>{t('submitTool')}</span>
           </Link>
         </div>
       )}
@@ -583,6 +992,19 @@ export const Header: React.FC = () => {
 
         .clean-signup-btn:hover {
           background-color: #1d4ed8 !important; /* Muted hover state */
+        }
+
+        .saved-tool-dropdown-item:hover {
+          background-color: var(--bg-tertiary) !important;
+        }
+
+        .saved-tool-remove-btn:hover {
+          color: var(--color-danger) !important;
+        }
+
+        .lang-dropdown-btn:hover {
+          background-color: var(--bg-tertiary) !important;
+          color: var(--color-primary) !important;
         }
       `}</style>
     </header>

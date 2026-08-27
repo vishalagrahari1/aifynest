@@ -8,6 +8,7 @@ interface SEOMetadata {
   ogType?: 'website' | 'article' | 'product';
   ogImage?: string;
   schemaMarkup?: Record<string, any>;
+  robots?: string;
 }
 
 export function useSEO({
@@ -17,6 +18,7 @@ export function useSEO({
   ogType = 'website',
   ogImage = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&h=630&fit=crop', // default social image
   schemaMarkup,
+  robots = 'index, follow',
 }: SEOMetadata) {
   useEffect(() => {
     // 1. Title
@@ -34,6 +36,9 @@ export function useSEO({
       element.setAttribute('content', contentValue);
     };
 
+    const siteUrl = import.meta.env.VITE_SITE_URL || 'https://aifynest.com';
+    const computedCanonical = canonicalUrl || `${siteUrl}${window.location.pathname}`;
+
     // 2. Description
     setMetaTag('name', 'description', description);
 
@@ -42,8 +47,8 @@ export function useSEO({
     setMetaTag('property', 'og:description', description);
     setMetaTag('property', 'og:type', ogType);
     setMetaTag('property', 'og:image', ogImage);
-    setMetaTag('property', 'og:url', canonicalUrl || window.location.href);
-    setMetaTag('property', 'og:site_name', 'AI Hub Directory');
+    setMetaTag('property', 'og:url', computedCanonical);
+    setMetaTag('property', 'og:site_name', 'AIFynest Directory');
 
     // 4. Twitter / X Cards
     setMetaTag('name', 'twitter:card', 'summary_large_image');
@@ -58,7 +63,7 @@ export function useSEO({
       canonical.setAttribute('rel', 'canonical');
       document.head.appendChild(canonical);
     }
-    canonical.setAttribute('href', canonicalUrl || window.location.href);
+    canonical.setAttribute('href', computedCanonical);
 
     // 6. Structured Schema Markup (JSON-LD)
     let schemaScript = document.getElementById('seo-json-ld') as HTMLScriptElement | null;
@@ -73,6 +78,9 @@ export function useSEO({
       schemaScript.innerHTML = JSON.stringify(schemaMarkup);
       document.head.appendChild(schemaScript);
     }
+
+    // 7. Robots Metadata
+    setMetaTag('name', 'robots', robots);
 
     // Cleanup Schema on unmount
     return () => {

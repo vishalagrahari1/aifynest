@@ -96,6 +96,7 @@ export interface Tool {
     rejectionReason?: string;
     submittedAt?: string;
   };
+  verification_status?: 'unverified' | 'pending' | 'verified';
 }
 
 export interface AffiliateLink {
@@ -179,7 +180,7 @@ export interface Campaign {
   cpm: number; // Cost Per Mille (impressions)
   impressions: number;
   clicks: number;
-  status: 'active' | 'paused' | 'completed' | 'pending-payment';
+  status: 'active' | 'paused' | 'completed' | 'pending-payment' | 'draft' | 'pending' | 'exhausted' | 'rejected' | 'cancelled';
 }
 
 export interface Payment {
@@ -188,7 +189,7 @@ export interface Payment {
   userId: string;
   amount: number;
   date: string;
-  status: 'success' | 'failed';
+  status: 'success' | 'failed' | 'pending' | 'verified' | 'refunded';
   invoiceNumber: string;
   couponCode?: string;
   type: 'sponsorship' | 'premium-profile' | 'api-access' | 'other';

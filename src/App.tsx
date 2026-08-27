@@ -25,11 +25,13 @@ import { Advertise } from './views/Advertise';
 import { Login } from './views/Login';
 import { Signup } from './views/Signup';
 import { VerifyEmail } from './views/VerifyEmail';
-import { OwnerDashboard } from './views/dashboard/Overview';
-import { AdminDashboard } from './views/admin/AdminDashboard';
 import { AffiliateRedirect } from './views/AffiliateRedirect';
-import { ManageTool } from './views/dashboard/ManageTool';
 import { Alternatives } from './views/Alternatives';
+import { ErrorBoundary } from './components/shared/ErrorBoundary';
+
+const OwnerDashboard = React.lazy(() => import('./views/dashboard/Overview').then(m => ({ default: m.OwnerDashboard })));
+const AdminDashboard = React.lazy(() => import('./views/admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
+const ManageTool = React.lazy(() => import('./views/dashboard/ManageTool').then(m => ({ default: m.ManageTool })));
 
 // Import CSS Design system
 import './styles/main.css';
@@ -61,11 +63,27 @@ const AppContent: React.FC<{
       <Header />
       
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <Routes>
-          {/* Core Public routes */}
-          <Route path="/" element={<Home onToast={showToast} />} />
+        <React.Suspense fallback={
+          <div style={{ display: 'flex', minHeight: '60vh', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ border: '3px solid rgba(0,0,0,0.1)', borderTop: '3px solid var(--color-primary)', borderRadius: '50%', width: '32px', height: '32px', animation: 'spin 1s linear infinite' }}></div>
+          </div>
+        }>
+          <Routes>
+            {/* Core Public routes */}
+            <Route path="/" element={<Home onToast={showToast} />} />
           <Route
             path="/ai-tools"
+            element={
+              <Directory
+                onToast={showToast}
+                compareList={compareList}
+                onCompareToggle={handleCompareToggle}
+                onCompareClear={handleCompareClear}
+              />
+            }
+          />
+          <Route
+            path="/ai-tools/:seoSlug"
             element={
               <Directory
                 onToast={showToast}
@@ -180,7 +198,8 @@ const AppContent: React.FC<{
           <Route path="/dashboard/tools/:id/edit" element={<ManageTool />} />
           <Route path="/admin" element={<AdminDashboard onToast={showToast} />} />
         </Routes>
-      </main>
+      </React.Suspense>
+    </main>
 
       <Footer />
     </div>
@@ -222,12 +241,14 @@ export const App: React.FC = () => {
     <Router>
       <DatabaseProvider>
         <AuthProvider>
-          <AppContent
-            showToast={showToast}
-            compareList={compareList}
-            handleCompareToggle={handleCompareToggle}
-            handleCompareClear={handleCompareClear}
-          />
+          <ErrorBoundary>
+            <AppContent
+              showToast={showToast}
+              compareList={compareList}
+              handleCompareToggle={handleCompareToggle}
+              handleCompareClear={handleCompareClear}
+            />
+          </ErrorBoundary>
           {/* Render Toast Alert notifications */}
           {toast && (
             <Toast
