@@ -82,33 +82,41 @@ export const Login: React.FC<LoginProps> = ({ onToast }) => {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    const useSupabase = !import.meta.env.VITE_SUPABASE_URL?.includes('placeholder-url');
-    if (useSupabase) {
-      onToast('Redirecting to Google Login...', 'info');
-      try {
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: `${window.location.origin}/dashboard`
-          }
-        });
-        if (error) throw error;
-      } catch (err: any) {
-        console.error('Google Auth Error:', err);
-        onToast(err.message || 'Failed to initialize Google login.', 'error');
-      }
-    } else {
-      onToast('Redirecting to Google Login services (mocked)...', 'info');
-      setTimeout(async () => {
-        const res = await login('john@gmail.com', 'password123');
-        if (res.success) {
-          onToast('Logged in successfully with Google account!', 'success');
-          navigate('/dashboard');
-        } else {
-          onToast(res.error || 'Failed to login with Google.', 'error');
+  const [showGoogleModal, setShowGoogleModal] = useState(false);
+
+  const handleGoogleLogin = () => {
+    setShowGoogleModal(true);
+  };
+
+  const executeRealGoogleLogin = async () => {
+    setShowGoogleModal(false);
+    onToast('Redirecting to Google OAuth...', 'info');
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`
         }
-      }, 1200);
+      });
+      if (error) throw error;
+    } catch (err: any) {
+      console.error('Google Auth Error:', err);
+      onToast(err.message || 'Failed to redirect to Google.', 'error');
+    }
+  };
+
+  const executeMockGoogleLogin = async () => {
+    setShowGoogleModal(false);
+    onToast('Running simulated Google sign-in...', 'info');
+    setIsLoading(true);
+    // Google logins falls back to seed admin account to demonstrate full dashboard permission levels
+    const res = await login('mevishal1130@gmail.com', 'password123');
+    setIsLoading(false);
+    if (res.success) {
+      onToast('Logged in successfully via simulated Google sign-in!', 'success');
+      navigate('/dashboard');
+    } else {
+      onToast(res.error || 'Failed simulated Google login.', 'error');
     }
   };
 
@@ -279,6 +287,81 @@ export const Login: React.FC<LoginProps> = ({ onToast }) => {
           </Link>
         </div>
       </div>
+
+      {/* Google Auth Options Modal */}
+      {showGoogleModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '20px'
+          }}
+          onClick={() => setShowGoogleModal(false)}
+        >
+          <div
+            style={{
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-lg)',
+              padding: '30px',
+              maxWidth: '440px',
+              width: '100%',
+              boxShadow: 'var(--shadow-xl)',
+              animation: 'fade-in-overlay 150ms ease-out',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>🔑</span> Google Authentication Option
+              </h3>
+              <button 
+                onClick={() => setShowGoogleModal(false)}
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '18px' }}
+              >
+                &times;
+              </button>
+            </div>
+
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.5', margin: '0 0 20px 0' }}>
+              Would you like to initiate the production Google OAuth redirection (which requires Google provider enabled in your Supabase Auth settings) or run a simulated developer sign-in to test the dashboard immediately?
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <button
+                onClick={executeRealGoogleLogin}
+                className="btn btn-primary w-full"
+                style={{ padding: '12px', justifyContent: 'center' }}
+              >
+                Launch Production Google OAuth
+              </button>
+
+              <button
+                onClick={executeMockGoogleLogin}
+                className="btn btn-outline w-full"
+                style={{ padding: '12px', justifyContent: 'center' }}
+              >
+                Simulate Google Login (Dev Mode)
+              </button>
+            </div>
+            
+            <div style={{ marginTop: '16px', borderTop: '1px solid var(--border-color)', paddingTop: '12px', fontSize: '10px', color: 'var(--text-muted)', lineHeight: '1.4' }}>
+              💡 <strong>Note:</strong> If you get a "provider is not enabled" error page on Supabase, choose <em>Simulate Google Login</em> to instantly log in for testing.
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

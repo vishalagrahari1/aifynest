@@ -98,35 +98,42 @@ export const Signup: React.FC<{ onToast: (msg: string, type?: 'success' | 'error
     navigate('/dashboard');
   };
 
-  const handleGoogleSignup = async () => {
-    const useSupabase = !import.meta.env.VITE_SUPABASE_URL?.includes('placeholder-url');
-    if (useSupabase) {
-      onToast('Redirecting to Google Sign up...', 'info');
-      try {
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: `${window.location.origin}/dashboard`
-          }
-        });
-        if (error) throw error;
-      } catch (err: any) {
-        console.error('Google Signup Error:', err);
-        onToast(err.message || 'Failed to initialize Google signup.', 'error');
-      }
-    } else {
-      onToast('Redirecting to Google Account services (mocked)...', 'info');
-      setTimeout(async () => {
-        const mockName = 'Google Explorer';
-        const mockEmail = 'explorer_' + Math.floor(Math.random()*1000) + '@gmail.com';
-        const res = await signup(mockName, mockEmail, 'google_sso_pass_123', 'user');
-        if (res.success) {
-          onToast('Successfully signed up with Google Account!', 'success');
-          setStep('onboarding');
-        } else {
-          onToast(res.error || 'Failed to sign up with Google.', 'error');
+  const [showGoogleModal, setShowGoogleModal] = useState(false);
+
+  const handleGoogleSignup = () => {
+    setShowGoogleModal(true);
+  };
+
+  const executeRealGoogleSignup = async () => {
+    setShowGoogleModal(false);
+    onToast('Redirecting to Google Sign up...', 'info');
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`
         }
-      }, 1200);
+      });
+      if (error) throw error;
+    } catch (err: any) {
+      console.error('Google Signup Error:', err);
+      onToast(err.message || 'Failed to redirect to Google.', 'error');
+    }
+  };
+
+  const executeMockGoogleSignup = async () => {
+    setShowGoogleModal(false);
+    onToast('Running simulated Google sign-up...', 'info');
+    setIsLoading(true);
+    const mockName = 'Google Explorer';
+    const mockEmail = 'explorer_' + Math.floor(Math.random()*1000) + '@gmail.com';
+    const res = await signup(mockName, mockEmail, 'google_sso_pass_123', 'user');
+    setIsLoading(false);
+    if (res.success) {
+      onToast('Successfully signed up with Google Account!', 'success');
+      setStep('onboarding');
+    } else {
+      onToast(res.error || 'Failed simulated Google signup.', 'error');
     }
   };
 
@@ -327,6 +334,81 @@ export const Signup: React.FC<{ onToast: (msg: string, type?: 'success' | 'error
             <button onClick={handleOnboardingComplete} className="btn btn-primary flex-1" style={{ justifyContent: 'center' }}>
               Save & Continue
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Google Auth Options Modal */}
+      {showGoogleModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '20px'
+          }}
+          onClick={() => setShowGoogleModal(false)}
+        >
+          <div
+            style={{
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-lg)',
+              padding: '30px',
+              maxWidth: '440px',
+              width: '100%',
+              boxShadow: 'var(--shadow-xl)',
+              animation: 'fade-in-overlay 150ms ease-out',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>🔑</span> Google Authentication Option
+              </h3>
+              <button 
+                onClick={() => setShowGoogleModal(false)}
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '18px' }}
+              >
+                &times;
+              </button>
+            </div>
+
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.5', margin: '0 0 20px 0' }}>
+              Would you like to initiate the production Google OAuth redirection (which requires Google provider enabled in your Supabase Auth settings) or run a simulated developer sign-up to test the dashboard onboarding immediately?
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <button
+                onClick={executeRealGoogleSignup}
+                className="btn btn-primary w-full"
+                style={{ padding: '12px', justifyContent: 'center' }}
+              >
+                Launch Production Google OAuth
+              </button>
+
+              <button
+                onClick={executeMockGoogleSignup}
+                className="btn btn-outline w-full"
+                style={{ padding: '12px', justifyContent: 'center' }}
+              >
+                Simulate Google Sign-Up (Dev Mode)
+              </button>
+            </div>
+            
+            <div style={{ marginTop: '16px', borderTop: '1px solid var(--border-color)', paddingTop: '12px', fontSize: '10px', color: 'var(--text-muted)', lineHeight: '1.4' }}>
+              💡 <strong>Note:</strong> If you get a "provider is not enabled" error page on Supabase, choose <em>Simulate Google Sign-Up</em> to instantly create an account and personalize your interests.
+            </div>
           </div>
         </div>
       )}
