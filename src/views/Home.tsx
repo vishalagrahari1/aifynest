@@ -418,7 +418,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
             {tools
               .filter(t => t.isSponsored && t.status === 'approved')
               .concat(tools.filter(t => !t.isSponsored && t.status === 'approved'))
-              .slice(0, 4)
+              .slice(0, 8)
               .map((tool) => (
                 <ToolCard key={tool.id} tool={{ ...tool, isSponsored: true }} onToast={onToast} />
               ))}
