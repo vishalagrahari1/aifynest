@@ -24,6 +24,34 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
   // FAQ Accordion toggles
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
+  const sponsoredContainerRef = useRef<HTMLDivElement>(null);
+  const isHoveredRef = useRef(false);
+
+  // Auto-slide effect for sponsored carousel
+  useEffect(() => {
+    const el = sponsoredContainerRef.current;
+    if (!el) return;
+
+    const interval = setInterval(() => {
+      if (isHoveredRef.current) return;
+      
+      const maxScroll = el.scrollWidth - el.clientWidth;
+      if (maxScroll <= 0) return;
+      
+      let nextScroll = el.scrollLeft + 310; // card width + gap
+      if (nextScroll >= maxScroll + 10) {
+        nextScroll = 0;
+      }
+      
+      el.scrollTo({
+        left: nextScroll,
+        behavior: 'smooth'
+      });
+    }, 4000); // Slide every 4 seconds
+
+    return () => clearInterval(interval);
+  }, [tools]);
+
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
   };
@@ -337,6 +365,55 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
         </div>
       </section>
 
+      {/* Featured Sponsored Tools Carousel */}
+      <section className="section" style={{ backgroundColor: 'var(--bg-secondary)', borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)', position: 'relative', zIndex: 1, padding: '40px 0' }}>
+        <div className="container">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <span className="badge badge-sponsored" style={{ margin: 0, textTransform: 'uppercase', fontSize: '9px', letterSpacing: '0.05em' }}>Ad Campaign</span>
+                <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', margin: 0 }}>
+                  Sponsored Featured Tools
+                </h2>
+              </div>
+              <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: 0 }}>
+                Handpicked innovations running sponsored campaigns.
+              </p>
+            </div>
+            <Link to="/advertise" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }}>
+              <span>Advertise Here</span>
+              <ArrowRight size={14} />
+            </Link>
+          </div>
+
+          {/* Sliding Carousel wrapper */}
+          <div 
+            ref={sponsoredContainerRef}
+            onMouseEnter={() => { isHoveredRef.current = true; }}
+            onMouseLeave={() => { isHoveredRef.current = false; }}
+            style={{ 
+              display: 'flex', 
+              gap: '24px', 
+              overflowX: 'auto', 
+              scrollBehavior: 'smooth', 
+              padding: '8px 4px',
+              WebkitOverflowScrolling: 'touch',
+            }}
+            className="sponsored-scroll-container"
+          >
+            {tools
+              .filter(t => t.isSponsored && t.status === 'approved')
+              .concat(tools.filter(t => !t.isSponsored && t.status === 'approved'))
+              .slice(0, 8)
+              .map((tool) => (
+                <div key={tool.id} style={{ flex: '0 0 calc(25% - 18px)', minWidth: '280px' }} className="sponsored-carousel-card">
+                  <ToolCard tool={{ ...tool, isSponsored: true }} onToast={onToast} />
+                </div>
+              ))}
+          </div>
+        </div>
+      </section>
+
       {/* Popular Categories Grid */}
       <section id="categories" className="section" style={{ position: 'relative', zIndex: 1 }}>
         <div className="container">
@@ -388,39 +465,6 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
               .slice(0, 8)
               .map((tool) => (
                 <ToolCard key={tool.id} tool={tool} onToast={onToast} />
-              ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Sponsored Tools */}
-      <section className="section" style={{ backgroundColor: 'var(--bg-secondary)', borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)', position: 'relative', zIndex: 1 }}>
-        <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px' }}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                <span className="badge badge-sponsored" style={{ margin: 0, textTransform: 'uppercase', fontSize: '9px', letterSpacing: '0.05em' }}>Ad Campaign</span>
-                <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', margin: 0 }}>
-                  Sponsored Featured Tools
-                </h2>
-              </div>
-              <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: 0 }}>
-                Handpicked innovations running sponsored campaigns.
-              </p>
-            </div>
-            <Link to="/advertise" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }}>
-              <span>Advertise Here</span>
-              <ArrowRight size={14} />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-4">
-            {tools
-              .filter(t => t.isSponsored && t.status === 'approved')
-              .concat(tools.filter(t => !t.isSponsored && t.status === 'approved'))
-              .slice(0, 8)
-              .map((tool) => (
-                <ToolCard key={tool.id} tool={{ ...tool, isSponsored: true }} onToast={onToast} />
               ))}
           </div>
         </div>
@@ -892,6 +936,13 @@ const styleInjection = (
     .search-input-glow:focus {
       border-color: var(--color-primary) !important;
       box-shadow: 0 0 20px rgba(124, 58, 237, 0.2) !important;
+    }
+    .sponsored-scroll-container::-webkit-scrollbar {
+      display: none;
+    }
+    .sponsored-scroll-container {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
   `}</style>
 );
