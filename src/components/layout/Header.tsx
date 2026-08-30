@@ -991,7 +991,8 @@ export const Header: React.FC = () => {
         }
 
         .clean-signup-btn:hover {
-          background-color: #1d4ed8 !important; /* Muted hover state */
+          background-color: var(--bg-tertiary) !important;
+          border-color: var(--text-secondary) !important;
         }
 
         .saved-tool-dropdown-item:hover {
@@ -1030,18 +1031,18 @@ const mobileNavLinkStyle: React.CSSProperties = {
 };
 
 const cleanSignupBtnStyle: React.CSSProperties = {
-  backgroundColor: '#2563eb', // Royal Blue matching screenshot
-  color: '#ffffff',
-  padding: '8px 20px',
-  borderRadius: '8px',
-  fontWeight: '700',
-  fontSize: '14px',
+  border: '1px solid var(--border-color)',
+  backgroundColor: 'transparent',
+  color: 'var(--text-primary)',
+  padding: '8px 16px',
+  borderRadius: 'var(--radius-md)',
+  fontWeight: '600',
+  fontSize: 'var(--text-sm)',
   textDecoration: 'none',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  transition: 'background-color 0.2s',
-  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+  transition: 'all 0.2s',
 };
 
 const iconBtnStyle: React.CSSProperties = {
