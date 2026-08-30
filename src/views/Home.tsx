@@ -14,7 +14,7 @@ interface HomeProps {
 }
 
 export const Home: React.FC<HomeProps> = ({ onToast }) => {
-  const { tools, categories, collections, blogPosts, trackEvent } = useDatabase();
+  const { tools, categories, collections, blogPosts, trackEvent, getTrendingTools } = useDatabase();
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -386,26 +386,43 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
             )}
           </div>
 
-          {/* Quick links tag helpers */}
+          {/* Dynamic Trending weekly chips */}
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center', marginTop: '24px' }}>
-            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', alignSelf: 'center' }}>Popular:</span>
-            {['chatgpt', 'cursor', 'elevenlabs', 'midjourney'].map((tag) => (
-              <Link
-                key={tag}
-                to={`/tools/${tag}`}
-                style={{
-                  fontSize: 'var(--text-xs)',
-                  color: 'var(--text-secondary)',
-                  backgroundColor: 'var(--bg-tertiary)',
-                  padding: '5px 12px',
-                  borderRadius: 'var(--radius-full)',
-                  fontWeight: '500',
-                  border: '1px solid var(--border-color)',
-                }}
-              >
-                {tag.toUpperCase()}
-              </Link>
-            ))}
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', alignSelf: 'center', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span>🔥</span> Trending this week:
+            </span>
+            {(() => {
+              const trending = getTrendingTools ? getTrendingTools(5) : [];
+              const chips = (trending && trending.length > 0) ? trending.map(t => ({
+                label: t.name,
+                slug: t.slug
+              })) : [
+                { label: 'ChatGPT', slug: 'chatgpt' },
+                { label: 'Cursor', slug: 'cursor' },
+                { label: 'ElevenLabs', slug: 'elevenlabs' },
+                { label: 'Midjourney', slug: 'midjourney' }
+              ];
+              return chips.map((chip) => (
+                <Link
+                  key={chip.slug}
+                  to={`/tools/${chip.slug}`}
+                  style={{
+                    fontSize: 'var(--text-xs)',
+                    color: 'var(--text-secondary)',
+                    backgroundColor: 'var(--bg-tertiary)',
+                    padding: '5px 12px',
+                    borderRadius: 'var(--radius-full)',
+                    fontWeight: '500',
+                    border: '1px solid var(--border-color)',
+                    textDecoration: 'none',
+                    transition: 'all 150ms ease'
+                  }}
+                  className="trending-chip"
+                >
+                  {chip.label}
+                </Link>
+              ));
+            })()}
           </div>
         </div>
       </section>
