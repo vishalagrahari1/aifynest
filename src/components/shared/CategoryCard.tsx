@@ -3,6 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import type { Category } from '../../utils/seedData';
 import { CategoryIcon, ArrowRight } from './Icons';
+import { useDatabase } from '../../context/DatabaseContext';
 
 interface CategoryCardProps {
   category: Category;
@@ -10,6 +11,21 @@ interface CategoryCardProps {
 }
 
 export const CategoryCard: React.FC<CategoryCardProps> = ({ category, toolCount = 0 }) => {
+  const { tools } = useDatabase();
+
+  // Check if any approved tool in this category has been updated in the last 7 days
+  const isCategoryTrending = (() => {
+    if (!tools) return false;
+    const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    return tools.some(t => 
+      t.categorySlug === category.slug && 
+      t.status === 'approved' && 
+      t.lastUpdated && 
+      (now - new Date(t.lastUpdated).getTime()) <= SEVEN_DAYS_MS
+    );
+  })();
+
   return (
     <Link
       to={`/categories/${category.slug}`}
@@ -22,7 +38,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, toolCount 
         textDecoration: 'none',
       }}
     >
-      {/* Icon header with counter */}
+      {/* Icon header with counter & badge */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div
           style={{
@@ -38,20 +54,39 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, toolCount 
           <CategoryIcon name={category.iconName} size={24} />
         </div>
 
-        {toolCount > 0 && (
-          <span
-            style={{
-              fontSize: 'var(--text-xs)',
-              fontWeight: 'var(--font-semibold)',
-              backgroundColor: 'var(--bg-tertiary)',
-              color: 'var(--text-secondary)',
-              padding: '4px 10px',
-              borderRadius: 'var(--radius-full)',
-            }}
-          >
-            {toolCount} {toolCount === 1 ? 'tool' : 'tools'}
-          </span>
-        )}
+        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+          {isCategoryTrending && (
+            <span
+              style={{
+                fontSize: '9px',
+                fontWeight: 'bold',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                color: '#10b981',
+                padding: '2px 8px',
+                borderRadius: 'var(--radius-full)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}
+            >
+              Trending
+            </span>
+          )}
+          
+          {toolCount > 0 && (
+            <span
+              style={{
+                fontSize: 'var(--text-xs)',
+                fontWeight: 'var(--font-semibold)',
+                backgroundColor: 'var(--bg-tertiary)',
+                color: 'var(--text-secondary)',
+                padding: '4px 10px',
+                borderRadius: 'var(--radius-full)',
+              }}
+            >
+              {toolCount} {toolCount === 1 ? 'tool' : 'tools'}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Info texts */}

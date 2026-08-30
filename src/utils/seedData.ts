@@ -261,18 +261,18 @@ export interface AuditLog {
 
 // Initial Core Categories
 export const initialCategories: Category[] = [
-  { name: 'AI Writing', slug: 'writing', subcategories: ['Copywriting', 'AI Email', 'AI Summarization', 'Blogging'], iconName: 'Edit', description: 'Enhance your content creation, emails, summaries, and copy with AI.' },
-  { name: 'AI Image Generation', slug: 'image-generation', subcategories: ['Image Creators', 'Photo Editing', 'AI Design', 'Text to Image'], iconName: 'Image', description: 'Generate custom graphics, realistic photos, and artistic templates.' },
-  { name: 'AI Video', slug: 'video', subcategories: ['Video Generation', 'Video Editing', 'Avatars', 'Animations'], iconName: 'Video', description: 'Create high-quality AI videos, adjust clips, and generate human avatars.' },
-  { name: 'AI Audio', slug: 'audio', subcategories: ['Voiceovers', 'Music Generation', 'Audio Editing', 'Transcription'], iconName: 'Mic', description: 'Convert text to natural speech, produce custom audio tracks, and transcribe voice logs.' },
-  { name: 'AI Coding', slug: 'coding', subcategories: ['Coding Assistant', 'Code Generation', 'Testing & QA', 'DevOps'], iconName: 'Code', description: 'Autogenerate syntax, review repositories, and test apps with intelligent compilers.' },
-  { name: 'AI Marketing', slug: 'marketing', subcategories: ['SEO Optimizers', 'Social Media Ads', 'Analytics', 'Email Marketing'], iconName: 'TrendingUp', description: 'Automate marketing campaigns, research search engine keyphrases, and build ad copies.' },
+  { name: 'AI Writing', slug: 'writing', subcategories: ['Copywriting', 'AI Email', 'AI Summarization', 'Blogging'], iconName: 'Edit', description: 'Enhance content creation, drafts, summaries, and copywriting with AI tools.' },
+  { name: 'AI Image Generation', slug: 'image-generation', subcategories: ['Image Creators', 'Photo Editing', 'AI Design', 'Text to Image'], iconName: 'Image', description: 'Generate custom graphics, realistic photos, vectors, and design templates.' },
+  { name: 'AI Video', slug: 'video', subcategories: ['Video Generation', 'Video Editing', 'Avatars', 'Animations'], iconName: 'Video', description: 'Produce high-quality AI videos, adjust clips, and generate human avatars.' },
+  { name: 'AI Audio', slug: 'audio', subcategories: ['Voiceovers', 'Music Generation', 'Audio Editing', 'Transcription'], iconName: 'Mic', description: 'Convert text to speech, generate audio tracks, and transcribe voice recordings.' },
+  { name: 'AI Coding', slug: 'coding', subcategories: ['Coding Assistant', 'Code Generation', 'Testing & QA', 'DevOps'], iconName: 'Code', description: 'Generate code syntax, review repositories, and test apps with AI compilers.' },
+  { name: 'AI Marketing', slug: 'marketing', subcategories: ['SEO Optimizers', 'Social Media Ads', 'Analytics', 'Email Marketing'], iconName: 'TrendingUp', description: 'Automate marketing campaigns, research SEO keyphrases, and write ad copies.' },
   { name: 'AI Productivity', slug: 'productivity', subcategories: ['Task Automation', 'Note Taking', 'Meeting Assistants', 'Time Trackers'], iconName: 'CheckSquare', description: 'Optimize your workflows, record notes, and automate administrative tasks.' },
-  { name: 'AI Design', slug: 'design', subcategories: ['UI/UX Prototyping', 'Vector Generation', 'Logo Design', 'Interior Styling'], iconName: 'Compass', description: 'Generate brand logos, construct website mockups, and draw vector assets.' },
-  { name: 'AI Research', slug: 'research', subcategories: ['Literature Review', 'Data Extraction', 'Fact Checking', 'Scientific Analysis'], iconName: 'BookOpen', description: 'Synthesize academic publications, extract datasets, and speed up research paper analysis.' },
-  { name: 'AI Education', slug: 'education', subcategories: ['Tutoring', 'Course Creation', 'Flashcards', 'Language Learning'], iconName: 'Award', description: 'AI learning aids, virtual tutors, flashcard study tools, and customized curriculum outlines.' },
-  { name: 'AI Business', slug: 'business', subcategories: ['Contract Analysis', 'HR & Recruiting', 'Customer Feedback', 'Presentation Builders'], iconName: 'Briefcase', description: 'Automate contracts reviews, draft client presentations, and manage human resources.' },
-  { name: 'AI Finance', slug: 'finance', subcategories: ['Market Analysis', 'Tax Planning', 'Expense Tracking', 'Algorithmic Trading'], iconName: 'DollarSign', description: 'Forecast expense reports, audit taxes, and evaluate stock markets.' },
+  { name: 'AI Design', slug: 'design', subcategories: ['UI/UX Prototyping', 'Vector Generation', 'Logo Design', 'Interior Styling'], iconName: 'Compass', description: 'Generate brand logos, build website mockups, and draw vector assets.' },
+  { name: 'AI Research', slug: 'research', subcategories: ['Literature Review', 'Data Extraction', 'Fact Checking', 'Scientific Analysis'], iconName: 'BookOpen', description: 'Synthesize academic publications, extract datasets, and speed up research.' },
+  { name: 'AI Education', slug: 'education', subcategories: ['Tutoring', 'Course Creation', 'Flashcards', 'Language Learning'], iconName: 'Award', description: 'Explore AI learning assistants, virtual tutors, and study tools.' },
+  { name: 'AI Business', slug: 'business', subcategories: ['Contract Analysis', 'HR & Recruiting', 'Customer Feedback', 'Presentation Builders'], iconName: 'Briefcase', description: 'Automate contract reviews, client presentations, and HR management.' },
+  { name: 'AI Finance', slug: 'finance', subcategories: ['Market Analysis', 'Tax Planning', 'Expense Tracking', 'Algorithmic Trading'], iconName: 'DollarSign', description: 'Forecast expense reports, audit tax returns, and evaluate stock markets.' },
 ];
 
 // Initial preloaded Tools
