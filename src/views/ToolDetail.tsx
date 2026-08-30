@@ -331,8 +331,19 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
           <div style={{ flex: 1, minWidth: '240px' }}>
             <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap' }}>
               <h1 style={{ fontSize: 'var(--text-3xl)', fontWeight: 'var(--font-bold)', margin: 0 }}>{tool.name}</h1>
-              {tool.isVerified && <span className="badge badge-verified">Verified</span>}
               {tool.isSponsored && <span className="badge badge-sponsored">Sponsored</span>}
+              {(() => {
+                if (!tool.lastUpdated || !tool.isVerified) return null;
+                const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+                const isRecent = (Date.now() - new Date(tool.lastUpdated).getTime()) <= THIRTY_DAYS_MS;
+                return isRecent ? <span className="badge badge-verified">✓ Verified</span> : null;
+              })()}
+              {(() => {
+                if (!tool.lastUpdated) return null;
+                const FOURTEEN_DAYS_MS = 14 * 24 * 60 * 60 * 1000;
+                const isNew = (Date.now() - new Date(tool.lastUpdated).getTime()) <= FOURTEEN_DAYS_MS;
+                return isNew ? <span className="badge badge-new" style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.2)', fontSize: '10px', fontWeight: 'bold', padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>🆕 New</span> : null;
+              })()}
             </div>
             <p style={{ fontSize: 'var(--text-base)', color: 'var(--text-secondary)', marginBottom: '12px', lineHeight: '1.4' }}>
               {tool.tagline}
