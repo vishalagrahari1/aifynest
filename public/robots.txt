@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 
 # Sitemap Location
-Sitemap: https://ai-hub-directory.com/sitemap.xml
+Sitemap: https://aifynest.com/sitemap.xml

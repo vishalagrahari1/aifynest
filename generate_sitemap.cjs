@@ -22,7 +22,7 @@ try {
 }
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://izjpavrrcbglrdvrqeng.supabase.co';
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
 const SITE_URL = process.env.VITE_SITE_URL || 'https://aifynest.com';
 
 function writeSitemap(categories, tools) {

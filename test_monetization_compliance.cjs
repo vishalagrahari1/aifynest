@@ -3,15 +3,25 @@ const { createClient } = require('@supabase/supabase-js');
 
 const supabaseUrl = 'https://izjpavrrcbglrdvrqeng.supabase.co';
 const anonKey = 'sb_publishable_mwuzxPcr8pPb6-SmURgBoA_NRqL0jna';
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || anonKey;
 
-const serviceClient = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
+const initClient = createClient(supabaseUrl, anonKey, { auth: { persistSession: false } });
 
 async function runTests() {
   console.log('--- START STEP 11 MONETIZATION COMPLIANCE & CONCURRENCY TESTS ---');
 
+  const anonClient = createClient(supabaseUrl, anonKey, { auth: { persistSession: false } });
+  const ownerClient = createClient(supabaseUrl, anonKey, { auth: { persistSession: false } });
+  const normalClient = createClient(supabaseUrl, anonKey, { auth: { persistSession: false } });
+  const adminClient = createClient(supabaseUrl, anonKey, { auth: { persistSession: false } });
+
+  // Log in authenticated clients
+  await adminClient.auth.signInWithPassword({ email: 'mevishal1130@gmail.com', password: 'password123' });
+  await ownerClient.auth.signInWithPassword({ email: 'owner@synthesia.io', password: 'password123' });
+  await normalClient.auth.signInWithPassword({ email: 'john@gmail.com', password: 'password123' });
+
   // Load test users
-  const { data: profiles, error: profErr } = await serviceClient.from('profiles').select('id, email, role');
+  const { data: profiles, error: profErr } = await adminClient.from('profiles').select('id, email, role');
   if (profErr || !profiles) {
     console.error('Failed to load profiles:', profErr?.message);
     process.exit(1);
@@ -31,7 +41,7 @@ async function runTests() {
   console.log(`Normal User ID: ${normalUser.id} (${normalUser.email})`);
 
   // Temporarily assign "Zoice" to ownerUser for testing
-  const { data: zoiceTool, error: zoiceErr } = await serviceClient
+  const { data: zoiceTool, error: zoiceErr } = await adminClient
     .from('tools')
     .select('id, owner_id')
     .eq('name', 'Zoice')
@@ -43,21 +53,10 @@ async function runTests() {
   }
 
   const originalOwnerId = zoiceTool.owner_id;
-  await serviceClient.from('tools').update({ owner_id: ownerUser.id }).eq('id', zoiceTool.id);
+  await adminClient.from('tools').update({ owner_id: ownerUser.id }).eq('id', zoiceTool.id);
 
   const testTool = { id: zoiceTool.id, name: 'Zoice' };
   console.log(`Owner Tool Assigned: "${testTool.name}" (${testTool.id})`);
-
-  // Initialize clients
-  const anonClient = createClient(supabaseUrl, anonKey, { auth: { persistSession: false } });
-  const ownerClient = createClient(supabaseUrl, anonKey, { auth: { persistSession: false } });
-  const normalClient = createClient(supabaseUrl, anonKey, { auth: { persistSession: false } });
-  const adminClient = createClient(supabaseUrl, anonKey, { auth: { persistSession: false } });
-
-  // Log in clients
-  await ownerClient.auth.signInWithPassword({ email: ownerUser.email, password: 'password123' });
-  await normalClient.auth.signInWithPassword({ email: normalUser.email, password: 'password123' });
-  await adminClient.auth.signInWithPassword({ email: adminUser.email, password: 'password123' });
 
   // ==========================================
   // TEST 1: Guest Restrictions
@@ -106,7 +105,7 @@ async function runTests() {
   console.log('\n[TEST 3] Verifying Owner Campaign creation & status overrides...');
   
   // Clean old campaigns for testTool
-  await serviceClient.from('campaigns').delete().eq('tool_id', testTool.id);
+  await adminClient.from('campaigns').delete().eq('tool_id', testTool.id);
 
   // Owners can create campaign, but status must be 'draft'
   const { data: oCamp, error: oCampErr } = await ownerClient
@@ -139,7 +138,7 @@ async function runTests() {
       .update({ status: 'active' })
       .eq('id', oCamp.id);
 
-    const { data: verifyCamp } = await serviceClient.from('campaigns').select('status').eq('id', oCamp.id).single();
+    const { data: verifyCamp } = await adminClient.from('campaigns').select('status').eq('id', oCamp.id).single();
     if (verifyCamp.status === 'active') {
       console.error('FAIL: Owner successfully activated campaign directly!');
     } else {
@@ -153,9 +152,9 @@ async function runTests() {
   console.log('\n[TEST 4] Verifying Deposit and Verification flow...');
   
   // Reset owner wallet
-  await serviceClient.from('owner_wallets').delete().eq('owner_id', ownerUser.id);
-  await serviceClient.from('payments').delete().eq('owner_id', ownerUser.id);
-  await serviceClient.from('financial_ledger').delete().eq('owner_id', ownerUser.id);
+  await adminClient.from('owner_wallets').delete().eq('owner_id', ownerUser.id);
+  await adminClient.from('payments').delete().eq('owner_id', ownerUser.id);
+  await adminClient.from('financial_ledger').delete().eq('owner_id', ownerUser.id);
 
   // Simulate pending deposit
   const mockRef = 'mock_tx_' + Math.random().toString(36).substr(2, 9);
@@ -171,11 +170,11 @@ async function runTests() {
   } else {
     console.log('SUCCESS: Deposit simulation created.');
 
-    const { data: payRow } = await serviceClient.from('payments').select('*').eq('provider_payment_id', mockRef).single();
+    const { data: payRow } = await adminClient.from('payments').select('*').eq('provider_payment_id', mockRef).single();
     console.log(`Payment Status: ${payRow.status} | Amount: $${payRow.amount}`);
 
     // Verify wallet balance is still 0 (not credited yet)
-    const { data: walletPre } = await serviceClient.from('owner_wallets').select('available_balance').eq('owner_id', ownerUser.id).maybeSingle();
+    const { data: walletPre } = await adminClient.from('owner_wallets').select('available_balance').eq('owner_id', ownerUser.id).maybeSingle();
     console.log(`Wallet Balance (Pre-Verification): $${walletPre?.available_balance || 0}`);
 
     // Verify deposit using Admin client
@@ -186,7 +185,7 @@ async function runTests() {
     if (verErr) {
       console.error('FAIL: Payment verification failed:', verErr.message);
     } else {
-      const { data: walletPost } = await serviceClient.from('owner_wallets').select('available_balance').eq('owner_id', ownerUser.id).single();
+      const { data: walletPost } = await adminClient.from('owner_wallets').select('available_balance').eq('owner_id', ownerUser.id).single();
       console.log(`Wallet Balance (Post-Verification): $${walletPost.available_balance}`);
       if (Number(walletPost.available_balance) === 100.00) {
         console.log('SUCCESS: Wallet successfully credited via admin verification.');
@@ -210,8 +209,8 @@ async function runTests() {
     if (fundErr) {
       console.error('FAIL: Campaign funding failed:', fundErr.message);
     } else {
-      const { data: walletAfter } = await serviceClient.from('owner_wallets').select('available_balance').eq('owner_id', ownerUser.id).single();
-      const { data: campAfter } = await serviceClient.from('campaigns').select('total_budget, remaining_budget, status').eq('id', oCamp.id).single();
+      const { data: walletAfter } = await adminClient.from('owner_wallets').select('available_balance').eq('owner_id', ownerUser.id).single();
+      const { data: campAfter } = await adminClient.from('campaigns').select('total_budget, remaining_budget, status').eq('id', oCamp.id).single();
       
       console.log(`Wallet remaining: $${walletAfter.available_balance}`);
       console.log(`Campaign budget funded: $${campAfter.total_budget} | Status: ${campAfter.status}`);
@@ -224,8 +223,8 @@ async function runTests() {
       if (appErr) {
         console.error('FAIL: Campaign approval failed:', appErr.message);
       } else {
-        const { data: campActive } = await serviceClient.from('campaigns').select('status').eq('id', oCamp.id).single();
-        const { data: toolActive } = await serviceClient.from('tools').select('is_sponsored').eq('id', testTool.id).single();
+        const { data: campActive } = await adminClient.from('campaigns').select('status').eq('id', oCamp.id).single();
+        const { data: toolActive } = await adminClient.from('tools').select('is_sponsored').eq('id', testTool.id).single();
         console.log(`Campaign approved status: ${campActive.status} | Tool is_sponsored: ${toolActive.is_sponsored}`);
         if (campActive.status === 'active' && toolActive.is_sponsored) {
           console.log('SUCCESS: Campaign activated and tool status synchronized.');
@@ -243,7 +242,7 @@ async function runTests() {
   const sessId = 'test_session_' + Math.random().toString(36).substr(2, 9);
   
   // Click 1 (Clean Click)
-  const { data: click1, error: c1Err } = await serviceClient
+  const { data: click1, error: c1Err } = await adminClient
     .from('analytics_events')
     .insert({
       event_type: 'website_click',
@@ -257,14 +256,14 @@ async function runTests() {
     console.error('FAIL: Clean click insertion failed:', c1Err.message);
   } else {
     await new Promise(r => setTimeout(r, 1000));
-    const { data: campChecked1 } = await serviceClient.from('campaigns').select('remaining_budget, spent').eq('id', oCamp.id).single();
-    const { data: eventChecked1 } = await serviceClient.from('analytics_events').select('cpc_charged, is_duplicate').eq('id', click1.id).single();
+    const { data: campChecked1 } = await adminClient.from('campaigns').select('remaining_budget, spent').eq('id', oCamp.id).single();
+    const { data: eventChecked1 } = await adminClient.from('analytics_events').select('cpc_charged, is_duplicate').eq('id', click1.id).single();
     
     console.log(`Clean Click Charge: $${eventChecked1.cpc_charged} | Is Duplicate: ${eventChecked1.is_duplicate}`);
     console.log(`Campaign Remaining: $${campChecked1.remaining_budget} | Spent: $${campChecked1.spent}`);
     
     // Click 2 (Duplicate Click in same session)
-    const { data: click2, error: c2Err } = await serviceClient
+    const { data: click2, error: c2Err } = await adminClient
       .from('analytics_events')
       .insert({
         event_type: 'website_click',
@@ -278,8 +277,8 @@ async function runTests() {
       console.error('FAIL: Duplicate click insertion failed:', c2Err.message);
     } else {
       await new Promise(r => setTimeout(r, 1000));
-      const { data: campChecked2 } = await serviceClient.from('campaigns').select('remaining_budget, spent').eq('id', oCamp.id).single();
-      const { data: eventChecked2 } = await serviceClient.from('analytics_events').select('cpc_charged, is_duplicate').eq('id', click2.id).single();
+      const { data: campChecked2 } = await adminClient.from('campaigns').select('remaining_budget, spent').eq('id', oCamp.id).single();
+      const { data: eventChecked2 } = await adminClient.from('analytics_events').select('cpc_charged, is_duplicate').eq('id', click2.id).single();
       
       console.log(`Duplicate Click Charge: $${eventChecked2.cpc_charged} | Is Duplicate: ${eventChecked2.is_duplicate}`);
       console.log(`Campaign Remaining (After Dup): $${campChecked2.remaining_budget} | Spent: $${campChecked2.spent}`);
@@ -298,13 +297,13 @@ async function runTests() {
   console.log('\n[TEST 7] Running Concurrency & hard budget exhaust tests...');
   
   // Set budget remaining to exactly $0.50 and bid to $0.20
-  await serviceClient
+  await adminClient
     .from('campaigns')
     .update({ remaining_budget: 0.50, total_budget: 50.00, spent: 49.50, status: 'active' })
     .eq('id', oCamp.id);
 
   // Sync tool sponsored status back
-  await serviceClient.from('tools').update({ is_sponsored: true }).eq('id', testTool.id);
+  await adminClient.from('tools').update({ is_sponsored: true }).eq('id', testTool.id);
 
   console.log('Sending 5 simultaneous click inserts with $0.50 remaining budget...');
   
@@ -312,7 +311,7 @@ async function runTests() {
   const sessions = Array.from({ length: 5 }, (_, i) => `parallel_sess_${i}_` + Math.random().toString(36).substr(2, 9));
   
   const clickPromises = sessions.map(sess => 
-    serviceClient.from('analytics_events').insert({
+    adminClient.from('analytics_events').insert({
       event_type: 'website_click',
       tool_id: testTool.id,
       session_id: sess
@@ -322,8 +321,8 @@ async function runTests() {
   await Promise.all(clickPromises);
   await new Promise(r => setTimeout(r, 2000));
 
-  const { data: campFinal } = await serviceClient.from('campaigns').select('remaining_budget, spent, status').eq('id', oCamp.id).single();
-  const { data: toolFinal } = await serviceClient.from('tools').select('is_sponsored').eq('id', testTool.id).single();
+  const { data: campFinal } = await adminClient.from('campaigns').select('remaining_budget, spent, status').eq('id', oCamp.id).single();
+  const { data: toolFinal } = await adminClient.from('tools').select('is_sponsored').eq('id', testTool.id).single();
 
   console.log(`Final Campaign Budget: $${campFinal.remaining_budget} | Spent: $${campFinal.spent} | Status: ${campFinal.status}`);
   console.log(`Final Tool is_sponsored: ${toolFinal.is_sponsored}`);
@@ -349,7 +348,7 @@ async function runTests() {
   if (adjErr) {
     console.error('FAIL: Admin adjustment failed:', adjErr.message);
   } else {
-    const { data: logChecked } = await serviceClient
+    const { data: logChecked } = await adminClient
       .from('audit_logs')
       .select('action, details')
       .eq('action', 'monetization_adjustment')
@@ -357,7 +356,7 @@ async function runTests() {
       .limit(1)
       .single();
 
-    const { data: ledgerChecked } = await serviceClient
+    const { data: ledgerChecked } = await adminClient
       .from('financial_ledger')
       .select('amount, transaction_type')
       .eq('transaction_type', 'adjustment')
@@ -376,7 +375,7 @@ async function runTests() {
   }
 
   // Restore original owner of Zoice tool
-  await serviceClient.from('tools').update({ owner_id: originalOwnerId }).eq('id', zoiceTool.id);
+  await adminClient.from('tools').update({ owner_id: originalOwnerId }).eq('id', zoiceTool.id);
 
   console.log('\n--- COMPLETED STEP 11 MONETIZATION COMPLIANCE & CONCURRENCY TESTS ---');
 }

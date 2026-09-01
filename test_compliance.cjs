@@ -3,15 +3,16 @@ const { createClient } = require('@supabase/supabase-js');
 
 const supabaseUrl = 'https://izjpavrrcbglrdvrqeng.supabase.co';
 const anonKey = 'sb_publishable_mwuzxPcr8pPb6-SmURgBoA_NRqL0jna';
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || anonKey;
 
-const serviceClient = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
+const adminClient = createClient(supabaseUrl, anonKey, { auth: { persistSession: false } });
 
 async function runTests() {
+  await adminClient.auth.signInWithPassword({ email: 'mevishal1130@gmail.com', password: 'password123' });
   console.log('--- START STEP 10 COMPLIANCE & TRIGGER TESTS ---');
 
   // Fetch approved tools to run tests against
-  const { data: toolsList, error: fetchErr } = await serviceClient
+  const { data: toolsList, error: fetchErr } = await adminClient
     .from('tools')
     .select('*')
     .eq('status', 'approved')
@@ -36,7 +37,7 @@ async function runTests() {
   const tempSess1 = 'sess_' + Math.random().toString(36).substr(2, 9);
   
   // Insert website_click event
-  const { error: clickErr } = await serviceClient
+  const { error: clickErr } = await adminClient
     .from('analytics_events')
     .insert({
       event_type: 'website_click',
@@ -51,7 +52,7 @@ async function runTests() {
   }
 
   // Insert tool_view event
-  const { error: viewErr } = await serviceClient
+  const { error: viewErr } = await adminClient
     .from('analytics_events')
     .insert({
       event_type: 'tool_view',
@@ -68,7 +69,7 @@ async function runTests() {
   // Wait for triggers to propagate
   await new Promise(r => setTimeout(r, 1500));
 
-  const { data: updatedTool } = await serviceClient
+  const { data: updatedTool } = await adminClient
     .from('tools')
     .select('views_count, clicks_count')
     .eq('id', toolId)
@@ -95,7 +96,7 @@ async function runTests() {
     .update({ views_count: 8888, clicks_count: 8888 })
     .eq('id', toolId);
 
-  const { data: checkedToolAnon } = await serviceClient
+  const { data: checkedToolAnon } = await adminClient
     .from('tools')
     .select('views_count, clicks_count')
     .eq('id', toolId)
@@ -123,7 +124,7 @@ async function runTests() {
       .update({ views_count: 7777, clicks_count: 7777 })
       .eq('id', toolId);
 
-    const { data: checkedToolUser } = await serviceClient
+    const { data: checkedToolUser } = await adminClient
       .from('tools')
       .select('views_count, clicks_count')
       .eq('id', toolId)
@@ -152,7 +153,7 @@ async function runTests() {
       .update({ views_count: 6666, clicks_count: 6666 })
       .eq('id', toolId);
 
-    const { data: checkedToolOwner } = await serviceClient
+    const { data: checkedToolOwner } = await adminClient
       .from('tools')
       .select('views_count, clicks_count')
       .eq('id', toolId)
@@ -167,7 +168,7 @@ async function runTests() {
 
   // Test 6: Verify existing analytics data integrity
   console.log('\n[TEST 5] Checking analytics data integrity...');
-  const { data: eventsCount, error: countErr } = await serviceClient
+  const { data: eventsCount, error: countErr } = await adminClient
     .from('analytics_events')
     .select('id', { count: 'exact' });
 
@@ -184,13 +185,13 @@ async function runTests() {
     const initialViews2 = testTool2.views_count || 0;
     
     // Increment tool 1 view again
-    await serviceClient
+    await adminClient
       .from('analytics_events')
       .insert({ event_type: 'tool_view', tool_id: toolId, session_id: tempSess1 });
 
     await new Promise(r => setTimeout(r, 1000));
 
-    const { data: checkedTool2 } = await serviceClient
+    const { data: checkedTool2 } = await adminClient
       .from('tools')
       .select('views_count')
       .eq('id', toolId2)
@@ -210,9 +211,9 @@ async function runTests() {
   if (ownerLoginErr) {
     console.log('Skipped (owner log in failed).');
   } else {
-    const { data: ownerProfile } = await serviceClient.from('profiles').select('id').eq('email', 'owner@synthesia.io').single();
+    const { data: ownerProfile } = await adminClient.from('profiles').select('id').eq('email', 'owner@synthesia.io').single();
 
-    const { data: otherTool, error: otherToolErr } = await serviceClient
+    const { data: otherTool, error: otherToolErr } = await adminClient
       .from('tools')
       .select('id, name, owner_id')
       .eq('status', 'approved')
@@ -232,7 +233,7 @@ async function runTests() {
         .eq('id', otherTool.id);
 
       // Verify name remains unchanged
-      const { data: verifiedOtherTool } = await serviceClient
+      const { data: verifiedOtherTool } = await adminClient
         .from('tools')
         .select('name')
         .eq('id', otherTool.id)

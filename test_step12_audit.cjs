@@ -5,7 +5,7 @@ const path = require('path');
 
 const SUPABASE_URL = 'https://izjpavrrcbglrdvrqeng.supabase.co';
 const ANON_KEY = 'sb_publishable_mwuzxPcr8pPb6-SmURgBoA_NRqL0jna';
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || ANON_KEY;
 
 const adminCreds = { email: 'mevishal1130@gmail.com', password: 'password123' };
 const ownerCreds = { email: 'owner@synthesia.io', password: 'password123' };
@@ -15,7 +15,6 @@ async function runAudit() {
   console.log('=== STARTING STEP 12 PRODUCTION & TRUST AUDIT ===\n');
 
   // Initialize clients
-  const serviceClient = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
   const guestClient = createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false } });
   
   const ownerClient = createClient(SUPABASE_URL, ANON_KEY, { auth: { persistSession: false } });
@@ -28,7 +27,7 @@ async function runAudit() {
   const { data: adminUser } = await adminClient.auth.signInWithPassword(adminCreds);
 
   // Fetch a base tool for testing
-  const { data: baseTools } = await serviceClient.from('tools').select('*').limit(1);
+  const { data: baseTools } = await adminClient.from('tools').select('*').limit(1);
   const testTool = baseTools[0];
   if (!testTool) {
     console.error('No tools found in the database to run tests against.');
@@ -37,10 +36,10 @@ async function runAudit() {
   console.log(`Using tool "${testTool.name}" (${testTool.id}) for verification tests.`);
 
   // Cleanup old reports & requests
-  await serviceClient.from('reports').delete().eq('tool_id', testTool.id);
-  await serviceClient.from('tool_verification_requests').delete().eq('tool_id', testTool.id);
+  await adminClient.from('reports').delete().eq('tool_id', testTool.id);
+  await adminClient.from('tool_verification_requests').delete().eq('tool_id', testTool.id);
   // Restore verification status & assign owner_id to ownerUser
-  await serviceClient.from('tools').update({ 
+  await adminClient.from('tools').update({ 
     owner_id: ownerUser.user.id,
     verification_status: 'unverified', 
     is_verified: false 
@@ -108,7 +107,7 @@ async function runAudit() {
   console.log('dupErr:', dupErr?.message || 'null (succeeded!)');
 
   // Rate limiting test: insert 4 reports on different tools to bypass duplicate check
-  const { data: limitTools } = await serviceClient.from('tools').select('id').limit(5);
+  const { data: limitTools } = await adminClient.from('tools').select('id').limit(5);
   const limitSess = 'limit_sess_' + Math.random().toString(36).substr(2, 9);
   let rateLimitCaught = false;
   let finalRateLimitErr = null;
@@ -116,7 +115,7 @@ async function runAudit() {
   if (limitTools) {
     // Delete any old reports for these tools by this session
     const limitToolIds = limitTools.map(t => t.id);
-    await serviceClient.from('reports').delete().in('tool_id', limitToolIds);
+    await adminClient.from('reports').delete().in('tool_id', limitToolIds);
 
     for (let i = 0; i < limitTools.length; i++) {
       const { error: err } = await guestClient.from('reports').insert({
@@ -149,7 +148,7 @@ async function runAudit() {
     notes: 'Please verify Synthesia.'
   });
   
-  const { data: reqRows } = await serviceClient.from('tool_verification_requests').select('*').eq('tool_id', testTool.id);
+  const { data: reqRows } = await adminClient.from('tool_verification_requests').select('*').eq('tool_id', testTool.id);
   const testRequest = reqRows[0];
 
   let ownerApproveCaught = false;
@@ -172,7 +171,7 @@ async function runAudit() {
   // 6. Owner cannot directly set verification_status = verified
   // =========================================================================
   await ownerClient.from('tools').update({ verification_status: 'verified', is_verified: true }).eq('id', testTool.id);
-  const { data: toolAfterDirectUpdate } = await serviceClient.from('tools').select('verification_status, is_verified').eq('id', testTool.id).single();
+  const { data: toolAfterDirectUpdate } = await adminClient.from('tools').select('verification_status, is_verified').eq('id', testTool.id).single();
   
   report(6, 'Owner cannot directly bypass verification checks to self-verify listings',
     toolAfterDirectUpdate.verification_status === 'unverified' && !toolAfterDirectUpdate.is_verified
@@ -188,13 +187,13 @@ async function runAudit() {
   if (testRequest) {
     const { error: errA } = await adminClient.rpc('approve_tool_verification', { p_request_id: testRequest.id });
     appErr = errA;
-    const { data: toolAfterApproval } = await serviceClient.from('tools').select('verification_status, is_verified').eq('id', testTool.id).single();
+    const { data: toolAfterApproval } = await adminClient.from('tools').select('verification_status, is_verified').eq('id', testTool.id).single();
     
     adminApproveSuccess = !errA && toolAfterApproval.verification_status === 'verified' && toolAfterApproval.is_verified;
 
     const { error: errR } = await adminClient.rpc('revoke_tool_verification', { p_tool_id: testTool.id, p_reason: 'Audit cleanup' });
     revErr = errR;
-    const { data: toolAfterRevoke } = await serviceClient.from('tools').select('verification_status, is_verified').eq('id', testTool.id).single();
+    const { data: toolAfterRevoke } = await adminClient.from('tools').select('verification_status, is_verified').eq('id', testTool.id).single();
 
     adminRevokeSuccess = !errR && toolAfterRevoke.verification_status === 'unverified' && !toolAfterRevoke.is_verified;
   }
@@ -215,7 +214,7 @@ async function runAudit() {
   if (pendingReports && pendingReports.length > 0) {
     const targetRep = pendingReports[0];
     const { error: resErr } = await adminClient.from('reports').update({ status: 'resolved' }).eq('id', targetRep.id);
-    const { data: checkedRep } = await serviceClient.from('reports').select('status').eq('id', targetRep.id).single();
+    const { data: checkedRep } = await adminClient.from('reports').select('status').eq('id', targetRep.id).single();
     reportsResolved = !resErr && checkedRep.status === 'resolved';
   }
 
@@ -254,7 +253,7 @@ async function runAudit() {
   if (sitemapExists) {
     const sitemapContent = fs.readFileSync(sitemapPath, 'utf8');
     // Check that draft tools are NOT included
-    const { data: draftTools } = await serviceClient.from('tools').select('slug, status').neq('status', 'approved');
+    const { data: draftTools } = await adminClient.from('tools').select('slug, status').neq('status', 'approved');
     if (draftTools) {
       for (const t of draftTools) {
         if (sitemapContent.includes(`/tools/${t.slug}</loc>`)) {
@@ -275,8 +274,8 @@ async function runAudit() {
   // =========================================================================
   // Cleanup test database changes
   // =========================================================================
-  await serviceClient.from('reports').delete().eq('tool_id', testTool.id);
-  await serviceClient.from('tool_verification_requests').delete().eq('tool_id', testTool.id);
+  await adminClient.from('reports').delete().eq('tool_id', testTool.id);
+  await adminClient.from('tool_verification_requests').delete().eq('tool_id', testTool.id);
   console.log('\n=== COMPLETED STEP 12 AUDIT TESTS ===');
 
   const allPassed = Object.values(reportResults).every(v => v === true);
