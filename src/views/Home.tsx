@@ -767,59 +767,149 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px' }}>
             <div>
-              <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', marginBottom: '8px' }}>
-                Comparison Showdowns
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)', fontSize: '11px', fontWeight: 'bold', padding: '4px 10px', borderRadius: 'var(--radius-full)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                <Sparkles size={12} />
+                Side-by-Side Analysis
+              </div>
+              <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', margin: 0 }}>
+                Popular Head-to-Head Showdowns
               </h2>
-              <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: 0 }}>
-                Compare head-to-head parameters of leading artificial intelligence engines side-by-side.
+              <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: '6px 0 0 0' }}>
+                Compare head-to-head parameters, ratings, pricing, and pros of industry-leading AI models.
               </p>
             </div>
-            <Link to="/compare" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }}>
-              <span>Start Comparison</span>
+            <Link to="/compare" className="btn btn-outline btn-sm" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', fontWeight: 'bold' }}>
+              <span>Open Comparison Studio</span>
               <ArrowRight size={14} />
             </Link>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }} className="showdowns-grid">
-            <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', border: '1px solid var(--border-color)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px' }}>
+            {/* Showdown 1: AI Chatbots */}
+            <div className="card glass" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '18px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-xl)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '11px', backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)', padding: '2px 8px', borderRadius: '4px', fontWeight: 'bold' }}>AI CHATBOTS</span>
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Side-by-Side</span>
+                <span style={{ fontSize: '10px', backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)', padding: '3px 8px', borderRadius: '4px', fontWeight: 'bold', textTransform: 'uppercase' }}>
+                  AI CHATBOTS
+                </span>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '500' }}>4.8 ★ vs 4.9 ★</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', margin: '10px 0' }}>
-                <div style={{ textAlign: 'center' }}>
-                  <img src="https://images.unsplash.com/photo-1678787150117-cdca2776c5b0?w=100&h=100&fit=crop" style={{ width: '48px', height: '48px', borderRadius: '8px', marginBottom: '8px' }} />
-                  <div style={{ fontWeight: 'bold', fontSize: '13px' }}>ChatGPT</div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '8px 0', position: 'relative' }}>
+                <div style={{ textAlign: 'center', flex: 1 }}>
+                  <img src="https://images.unsplash.com/photo-1678787150117-cdca2776c5b0?w=100&h=100&fit=crop" style={{ width: '52px', height: '52px', borderRadius: '12px', marginBottom: '8px', border: '1px solid var(--border-color)', objectFit: 'cover' }} alt="ChatGPT" />
+                  <div style={{ fontWeight: 'bold', fontSize: '13px', color: 'var(--text-primary)' }}>ChatGPT</div>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>OpenAI</span>
                 </div>
-                <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', color: 'var(--text-muted)' }}>VS</div>
-                <div style={{ textAlign: 'center' }}>
-                  <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop" style={{ width: '48px', height: '48px', borderRadius: '8px', marginBottom: '8px' }} />
-                  <div style={{ fontWeight: 'bold', fontSize: '13px' }}>Claude AI</div>
+                
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 'bold', boxShadow: '0 2px 8px rgba(124, 58, 237, 0.3)', flexShrink: 0, zIndex: 2 }}>
+                  VS
+                </div>
+                
+                <div style={{ textAlign: 'center', flex: 1 }}>
+                  <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop" style={{ width: '52px', height: '52px', borderRadius: '12px', marginBottom: '8px', border: '1px solid var(--border-color)', objectFit: 'cover' }} alt="Claude" />
+                  <div style={{ fontWeight: 'bold', fontSize: '13px', color: 'var(--text-primary)' }}>Claude AI</div>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Anthropic</span>
                 </div>
               </div>
-              <Link to="/compare/chatgpt-vs-claude" className="btn btn-outline btn-sm" style={{ alignSelf: 'stretch', justifyContent: 'center' }}>
+
+              <Link to="/compare/chatgpt-vs-claude" className="btn btn-outline btn-sm" style={{ width: '100%', justifyContent: 'center', padding: '8px 12px', fontWeight: 'bold' }}>
                 Compare ChatGPT vs Claude
               </Link>
             </div>
 
-            <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', border: '1px solid var(--border-color)' }}>
+            {/* Showdown 2: Code AI */}
+            <div className="card glass" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '18px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-xl)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '11px', backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)', padding: '2px 8px', borderRadius: '4px', fontWeight: 'bold' }}>CODE ASSISTANTS</span>
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Side-by-Side</span>
+                <span style={{ fontSize: '10px', backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)', padding: '3px 8px', borderRadius: '4px', fontWeight: 'bold', textTransform: 'uppercase' }}>
+                  DEVELOPER TOOLS
+                </span>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '500' }}>IDE vs Engine</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', margin: '10px 0' }}>
-                <div style={{ textAlign: 'center' }}>
-                  <img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=100&h=100&fit=crop" style={{ width: '48px', height: '48px', borderRadius: '8px', marginBottom: '8px' }} />
-                  <div style={{ fontWeight: 'bold', fontSize: '13px' }}>Cursor IDE</div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '8px 0', position: 'relative' }}>
+                <div style={{ textAlign: 'center', flex: 1 }}>
+                  <img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=100&h=100&fit=crop" style={{ width: '52px', height: '52px', borderRadius: '12px', marginBottom: '8px', border: '1px solid var(--border-color)', objectFit: 'cover' }} alt="Cursor" />
+                  <div style={{ fontWeight: 'bold', fontSize: '13px', color: 'var(--text-primary)' }}>Cursor IDE</div>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Anysphere</span>
                 </div>
-                <div style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', color: 'var(--text-muted)' }}>VS</div>
-                <div style={{ textAlign: 'center' }}>
-                  <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=100&h=100&fit=crop" style={{ width: '48px', height: '48px', borderRadius: '8px', marginBottom: '8px' }} />
-                  <div style={{ fontWeight: 'bold', fontSize: '13px' }}>Phind</div>
+                
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 'bold', boxShadow: '0 2px 8px rgba(124, 58, 237, 0.3)', flexShrink: 0, zIndex: 2 }}>
+                  VS
+                </div>
+                
+                <div style={{ textAlign: 'center', flex: 1 }}>
+                  <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=100&h=100&fit=crop" style={{ width: '52px', height: '52px', borderRadius: '12px', marginBottom: '8px', border: '1px solid var(--border-color)', objectFit: 'cover' }} alt="Phind" />
+                  <div style={{ fontWeight: 'bold', fontSize: '13px', color: 'var(--text-primary)' }}>Phind</div>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Phind Inc</span>
                 </div>
               </div>
-              <Link to="/compare/cursor-vs-phind" className="btn btn-outline btn-sm" style={{ alignSelf: 'stretch', justifyContent: 'center' }}>
+
+              <Link to="/compare/cursor-vs-phind" className="btn btn-outline btn-sm" style={{ width: '100%', justifyContent: 'center', padding: '8px 12px', fontWeight: 'bold' }}>
                 Compare Cursor vs Phind
+              </Link>
+            </div>
+
+            {/* Showdown 3: Image Generation */}
+            <div className="card glass" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '18px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-xl)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '10px', backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)', padding: '3px 8px', borderRadius: '4px', fontWeight: 'bold', textTransform: 'uppercase' }}>
+                  IMAGE & VISUAL AI
+                </span>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '500' }}>Photorealism</span>
+              </div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '8px 0', position: 'relative' }}>
+                <div style={{ textAlign: 'center', flex: 1 }}>
+                  <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&h=100&fit=crop" style={{ width: '52px', height: '52px', borderRadius: '12px', marginBottom: '8px', border: '1px solid var(--border-color)', objectFit: 'cover' }} alt="Midjourney" />
+                  <div style={{ fontWeight: 'bold', fontSize: '13px', color: 'var(--text-primary)' }}>Midjourney</div>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>v6 Engine</span>
+                </div>
+                
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 'bold', boxShadow: '0 2px 8px rgba(124, 58, 237, 0.3)', flexShrink: 0, zIndex: 2 }}>
+                  VS
+                </div>
+                
+                <div style={{ textAlign: 'center', flex: 1 }}>
+                  <img src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=100&h=100&fit=crop" style={{ width: '52px', height: '52px', borderRadius: '12px', marginBottom: '8px', border: '1px solid var(--border-color)', objectFit: 'cover' }} alt="DALL-E 3" />
+                  <div style={{ fontWeight: 'bold', fontSize: '13px', color: 'var(--text-primary)' }}>DALL-E 3</div>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>OpenAI</span>
+                </div>
+              </div>
+
+              <Link to="/compare/midjourney-vs-dall-e-3" className="btn btn-outline btn-sm" style={{ width: '100%', justifyContent: 'center', padding: '8px 12px', fontWeight: 'bold' }}>
+                Compare Midjourney vs DALL-E 3
+              </Link>
+            </div>
+
+            {/* Showdown 4: Voice & Audio AI */}
+            <div className="card glass" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '18px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-xl)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '10px', backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)', padding: '3px 8px', borderRadius: '4px', fontWeight: 'bold', textTransform: 'uppercase' }}>
+                  VOICE & AUDIO AI
+                </span>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '500' }}>TTS Synthesis</span>
+              </div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '8px 0', position: 'relative' }}>
+                <div style={{ textAlign: 'center', flex: 1 }}>
+                  <img src="https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=100&h=100&fit=crop" style={{ width: '52px', height: '52px', borderRadius: '12px', marginBottom: '8px', border: '1px solid var(--border-color)', objectFit: 'cover' }} alt="ElevenLabs" />
+                  <div style={{ fontWeight: 'bold', fontSize: '13px', color: 'var(--text-primary)' }}>ElevenLabs</div>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Cloning</span>
+                </div>
+                
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 'bold', boxShadow: '0 2px 8px rgba(124, 58, 237, 0.3)', flexShrink: 0, zIndex: 2 }}>
+                  VS
+                </div>
+                
+                <div style={{ textAlign: 'center', flex: 1 }}>
+                  <img src="https://images.unsplash.com/photo-1589254065878-42c9da997008?w=100&h=100&fit=crop" style={{ width: '52px', height: '52px', borderRadius: '12px', marginBottom: '8px', border: '1px solid var(--border-color)', objectFit: 'cover' }} alt="Murf AI" />
+                  <div style={{ fontWeight: 'bold', fontSize: '13px', color: 'var(--text-primary)' }}>Murf AI</div>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Studio</span>
+                </div>
+              </div>
+
+              <Link to="/compare/elevenlabs-vs-murf-ai" className="btn btn-outline btn-sm" style={{ width: '100%', justifyContent: 'center', padding: '8px 12px', fontWeight: 'bold' }}>
+                Compare ElevenLabs vs Murf
               </Link>
             </div>
           </div>

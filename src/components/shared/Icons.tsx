@@ -283,6 +283,19 @@ export const MessageSquare: React.FC<IconProps> = ({ size = 20, className, ...pr
   </svg>
 );
 
+export const Zap: React.FC<IconProps> = ({ size = 20, className, ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+  </svg>
+);
+
+export const ShieldCheck: React.FC<IconProps> = ({ size = 20, className, ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+    <polyline points="9 12 11 14 15 10"></polyline>
+  </svg>
+);
+
 export const Info: React.FC<IconProps> = ({ size = 20, className, ...props }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
     <circle cx="12" cy="12" r="10"></circle>
@@ -290,3 +303,4 @@ export const Info: React.FC<IconProps> = ({ size = 20, className, ...props }) =>
     <line x1="12" y1="8" x2="12.01" y2="8"></line>
   </svg>
 );
+
