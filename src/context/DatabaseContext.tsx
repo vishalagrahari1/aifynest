@@ -113,6 +113,11 @@ interface DatabaseContextType {
   requestToolVerification: (toolId: string, notes: string) => Promise<void>;
   approveToolVerification: (requestId: string) => Promise<void>;
   revokeToolVerification: (toolId: string, reason: string) => Promise<void>;
+
+  // Sponsorship System
+  sponsorshipPlans: any[];
+  sponsorships: any[];
+  sponsorshipPayments: any[];
 }
 
 const DatabaseContext = createContext<DatabaseContextType | undefined>(undefined);
@@ -137,6 +142,14 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [ledger, setLedger] = useState<any[]>([]);
   const [verificationRequests, setVerificationRequests] = useState<any[]>([]);
   const [reports, setReports] = useState<any[]>([]);
+  const [sponsorshipPlans] = useState<any[]>([
+    { id: 'plan_starter', name: 'Starter', duration_days: 30, price: 25.00, currency: 'USD', active: true },
+    { id: 'plan_growth', name: 'Growth', duration_days: 90, price: 49.00, currency: 'USD', active: true },
+    { id: 'plan_longterm', name: 'Long-Term', duration_days: 180, price: 79.00, currency: 'USD', active: true },
+    { id: 'plan_annual', name: 'Annual', duration_days: 365, price: 99.00, currency: 'USD', active: true },
+  ]);
+  const [sponsorships] = useState<any[]>([]);
+  const [sponsorshipPayments] = useState<any[]>([]);
 
   // DB Row to frontend UI model mapper helpers
   const mapToolRow = (t: any): Tool => ({
@@ -1825,6 +1838,9 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         auditLogs,
         affiliateLinks,
         notifications,
+        sponsorshipPlans,
+        sponsorships,
+        sponsorshipPayments,
         addTool,
         updateTool,
         deleteTool,

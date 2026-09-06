@@ -119,11 +119,12 @@ export const Footer: React.FC = () => {
           {/* Links Column 3: Trust & Legal */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <h4 style={{ fontSize: 'var(--text-xs)', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-primary)' }}>Trust & Transparency</h4>
-            <Link to="/editorial" style={footerLinkStyle}>Editorial Guidelines</Link>
-            <Link to="/reviews" style={footerLinkStyle}>Review Policy</Link>
-            <Link to="/disclosure" style={footerLinkStyle}>Ad Disclosure</Link>
+            <Link to="/about" style={footerLinkStyle}>About AIFynest</Link>
+            <Link to="/contact" style={footerLinkStyle}>Contact & Support</Link>
+            <Link to="/terms" style={footerLinkStyle}>Terms & Conditions</Link>
             <Link to="/privacy" style={footerLinkStyle}>Privacy Policy</Link>
-            <Link to="/terms" style={footerLinkStyle}>Terms of Service</Link>
+            <Link to="/refund-policy" style={footerLinkStyle}>Refund Policy</Link>
+            <Link to="/disclosure" style={footerLinkStyle}>Ad Disclosure</Link>
           </div>
         </div>
 

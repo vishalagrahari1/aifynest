@@ -22,6 +22,11 @@ import { Blog } from './views/Blog';
 import { BlogDetail } from './views/BlogDetail';
 import { Pricing } from './views/Pricing';
 import { Advertise } from './views/Advertise';
+import { About } from './views/About';
+import { Contact } from './views/Contact';
+import { Terms } from './views/Terms';
+import { Privacy } from './views/Privacy';
+import { RefundPolicy } from './views/RefundPolicy';
 import { Login } from './views/Login';
 import { Signup } from './views/Signup';
 import { VerifyEmail } from './views/VerifyEmail';
@@ -188,12 +193,15 @@ const AppContent: React.FC<{
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogDetail />} />
 
-          {/* Policy & Info routes */}
+          {/* Policy & Legal routes */}
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact onToast={showToast} />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/editorial" element={<Info initialTab="editorial" />} />
           <Route path="/reviews" element={<Info initialTab="reviews" />} />
           <Route path="/disclosure" element={<Info initialTab="disclosure" />} />
-          <Route path="/privacy" element={<Info initialTab="privacy" />} />
-          <Route path="/terms" element={<Info initialTab="terms" />} />
 
           {/* Authentication routes */}
           <Route path="/login" element={<Login onToast={showToast} />} />

@@ -12,8 +12,10 @@ import {
   Eye,
   MousePointer,
   TrendingUp,
-  Shield
+  Shield,
+  Lock
 } from '../../components/shared/Icons';
+import { paymentProvider } from '../../services/payments/paymentProvider';
 
 interface OwnerDashboardProps {
   onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
@@ -23,7 +25,6 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
   const {
     tools,
     reviews,
-    campaigns,
     notifications,
     addCampaign,
     updateTool,
@@ -34,14 +35,17 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
     getOwnerAnalytics,
     ownerWallet,
     ledger,
-    fundCampaign,
     simulateTopup,
-    updateCampaign,
     requestToolVerification,
+    sponsorships,
   } = useDatabase();
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const isPaymentsDisabled = !paymentProvider.isPaymentsEnabled();
+  const [selectedSponsorshipTool, setSelectedSponsorshipTool] = useState<Tool | null>(null);
+  const [isSponsorshipModalOpen, setIsSponsorshipModalOpen] = useState<boolean>(false);
 
   // Tab tracker for Builder View: 'overview' | 'listings' | 'analytics' | 'reviews' | 'promotions' | 'billing' | 'settings' | 'notifications'
   const [activeTab, setActiveTab] = useState<'overview' | 'listings' | 'analytics' | 'reviews' | 'promotions' | 'billing' | 'settings' | 'notifications'>('overview');
@@ -348,8 +352,6 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
 
   // Filter reviews for owner tools
   const ownerReviews = reviews.filter((r) => ownerToolIds.includes(r.toolId));
-  // Filter campaigns for owner tools
-  const ownerCampaigns = campaigns.filter((c) => ownerToolIds.includes(c.toolId));
   // Edit Listing Action
   const handleEditClick = (toolId: string) => {
     const t = tools.find((tool) => tool.id === toolId);
@@ -1203,127 +1205,129 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
             {/* TAB 5: SPONSORSHIPS PROMOTION */}
             {activeTab === 'promotions' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                {/* Wallet available card */}
-                <div style={{ padding: '20px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 'bold' }}>OWNER WALLET BALANCE</span>
-                    <h3 style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold', margin: '4px 0 0 0', color: 'var(--color-success)' }}>
-                      ${ownerWallet?.availableBalance?.toFixed(2) || '0.00'} <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>USD</span>
-                    </h3>
+                <div style={{ padding: '24px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+                    <div>
+                      <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', margin: 0 }}>Sponsor Your AI Tool</h3>
+                      <p style={{ margin: '4px 0 0 0', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
+                        Increase your tool's visibility with a simple fixed-duration sponsorship. Pay once — no CPC fees or per-click charges.
+                      </p>
+                    </div>
                   </div>
-                  <button onClick={() => { setPromoToolId(ownerTools[0]?.id || ''); setIsPromoModalOpen(true); }} className="btn btn-gold btn-sm">
-                    + Launch New Campaign
-                  </button>
-                </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'bold', margin: 0 }}>My Bidding Campaigns</h3>
-                </div>
+                  {/* Payments Coming Soon Alert */}
+                  {isPaymentsDisabled && (
+                    <div style={{ padding: '12px 16px', backgroundColor: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderLeft: '4px solid var(--color-primary)', borderRadius: 'var(--radius-md)', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <Lock size={18} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
+                      <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
+                        <strong>Sponsorship Payments Coming Soon:</strong> Online payments are currently being configured through Stripe. You can review sponsorship plans now.
+                      </span>
+                    </div>
+                  )}
 
-                {ownerCampaigns.length > 0 ? (
+                  {/* Owned Tools Sponsorship Cards */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    {ownerCampaigns.map((camp) => {
-                      const toolObj = tools.find((t) => t.id === camp.toolId);
+                    {ownerTools.map((tool) => {
+                      const isSponsored = tool.isSponsored && tool.status === 'approved';
                       return (
-                        <div key={camp.id} style={{ padding: '20px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+                        <div key={tool.id} style={{ padding: '20px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+                          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                            <img src={tool.logoUrl} alt={tool.name} style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover' }} />
                             <div>
-                              <h4 style={{ margin: '0 0 4px 0', fontSize: 'var(--text-sm)', fontWeight: 'bold' }}>{camp.campaignName}</h4>
-                              <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>
-                                Tool: <strong>{toolObj?.name}</strong> | Placement: <strong>{camp.placement}</strong>
-                              </span>
-                            </div>
-                            <div style={{ display: 'flex', gap: '8px' }}>
-                              <span className={`badge ${camp.status === 'active' ? 'badge-approved' : 'badge-pending'}`}>
-                                {camp.status.toUpperCase()}
-                              </span>
-                              {camp.status === 'active' && (
-                                <button
-                                  onClick={() => updateCampaign(camp.id, { status: 'paused' })}
-                                  className="btn btn-outline btn-xs"
-                                >
-                                  Pause
-                                </button>
-                              )}
-                              {camp.status === 'paused' && (
-                                <button
-                                  onClick={() => updateCampaign(camp.id, { status: 'active' })}
-                                  className="btn btn-outline btn-xs"
-                                >
-                                  Resume
-                                </button>
-                              )}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <h4 style={{ margin: 0, fontSize: 'var(--text-sm)', fontWeight: 'bold' }}>{tool.name}</h4>
+                                {isSponsored ? (
+                                  <span className="badge" style={{ backgroundColor: 'var(--color-gold-light)', color: 'var(--color-gold-hover)', fontSize: '10px', fontWeight: 'bold' }}>
+                                    ★ SPONSORED ACTIVE
+                                  </span>
+                                ) : (
+                                  <span className="badge" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-muted)', fontSize: '10px' }}>
+                                    NOT SPONSORED
+                                  </span>
+                                )}
+                              </div>
+                              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>{tool.tagline}</span>
                             </div>
                           </div>
 
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '12px' }}>
-                            <div style={{ padding: '8px', border: '1px solid var(--border-color)', borderRadius: '4px', textAlign: 'center' }}>
-                              <span style={{ fontSize: '9px', color: 'var(--text-muted)', display: 'block' }}>CPC Bid</span>
-                              <strong style={{ fontSize: 'var(--text-xs)' }}>${camp.cpc?.toFixed(2) || '0.20'}</strong>
-                            </div>
-                            <div style={{ padding: '8px', border: '1px solid var(--border-color)', borderRadius: '4px', textAlign: 'center' }}>
-                              <span style={{ fontSize: '9px', color: 'var(--text-muted)', display: 'block' }}>Total Budget</span>
-                              <strong style={{ fontSize: 'var(--text-xs)' }}>${camp.budget?.toFixed(2) || '0.00'}</strong>
-                            </div>
-                            <div style={{ padding: '8px', border: '1px solid var(--border-color)', borderRadius: '4px', textAlign: 'center' }}>
-                              <span style={{ fontSize: '9px', color: 'var(--text-muted)', display: 'block' }}>Spent</span>
-                              <strong style={{ fontSize: 'var(--text-xs)', color: 'var(--color-danger)' }}>${camp.spent?.toFixed(2) || '0.00'}</strong>
-                            </div>
-                            <div style={{ padding: '8px', border: '1px solid var(--border-color)', borderRadius: '4px', textAlign: 'center' }}>
-                              <span style={{ fontSize: '9px', color: 'var(--text-muted)', display: 'block' }}>Remaining</span>
-                              <strong style={{ fontSize: 'var(--text-xs)', color: 'var(--color-success)' }}>${camp.remainingBudget?.toFixed(2) || '0.00'}</strong>
-                            </div>
-                            <div style={{ padding: '8px', border: '1px solid var(--border-color)', borderRadius: '4px', textAlign: 'center' }}>
-                              <span style={{ fontSize: '9px', color: 'var(--text-muted)', display: 'block' }}>Clicks</span>
-                              <strong style={{ fontSize: 'var(--text-xs)' }}>{camp.clicks || 0}</strong>
-                            </div>
-                          </div>
-
-                          {/* Budget Transfer Simulator Panel */}
-                          <div style={{ padding: '12px', backgroundColor: 'var(--bg-primary)', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-                            <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
-                              Transfer funds from your available wallet balance to this campaign:
-                            </span>
-                            <form
-                              onSubmit={async (e) => {
-                                e.preventDefault();
-                                const fd = new FormData(e.currentTarget);
-                                const amount = Number(fd.get('fund_amount'));
-                                try {
-                                  await fundCampaign(camp.id, amount);
-                                  onToast('Campaign funded successfully! Pending admin approval.', 'success');
-                                  e.currentTarget.reset();
-                                } catch (err: any) {
-                                  onToast(err.message || 'Funding failed', 'error');
-                                }
-                              }}
-                              style={{ display: 'flex', gap: '8px' }}
-                            >
-                              <input
-                                name="fund_amount"
-                                type="number"
-                                step="1"
-                                min="10"
-                                max="1000"
-                                className="form-input btn-xs"
-                                style={{ width: '80px', padding: '4px 8px' }}
-                                placeholder="$10"
-                                required
-                              />
-                              <button type="submit" className="btn btn-primary btn-xs">
-                                Fund Campaign
+                          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                            {isPaymentsDisabled ? (
+                              <button 
+                                onClick={() => {
+                                  setSelectedSponsorshipTool(tool);
+                                  setIsSponsorshipModalOpen(true);
+                                }}
+                                className="btn btn-primary btn-sm"
+                              >
+                                View Sponsorship Plans
                               </button>
-                            </form>
+                            ) : (
+                              <button 
+                                onClick={() => {
+                                  setSelectedSponsorshipTool(tool);
+                                  setIsSponsorshipModalOpen(true);
+                                }}
+                                className="btn btn-gold btn-sm"
+                              >
+                                {isSponsored ? 'Renew Sponsorship' : 'Sponsor This Tool'}
+                              </button>
+                            )}
                           </div>
                         </div>
                       );
                     })}
                   </div>
-                ) : (
-                  <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)' }}>
-                    No campaigns configured. Click "+ Launch New Campaign" to get started.
-                  </div>
-                )}
+                </div>
+
+                {/* Sponsorship History Table */}
+                <div style={{ padding: '24px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
+                  <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'bold', margin: '0 0 16px 0' }}>Sponsorship History</h3>
+                  {sponsorships && sponsorships.filter(s => ownerTools.some(ot => ot.id === s.tool_id)).length > 0 ? (
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-xs)', textAlign: 'left' }}>
+                        <thead>
+                          <tr style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-tertiary)' }}>
+                            <th style={{ padding: '10px' }}>Tool</th>
+                            <th style={{ padding: '10px' }}>Plan</th>
+                            <th style={{ padding: '10px' }}>Amount</th>
+                            <th style={{ padding: '10px' }}>Payment Status</th>
+                            <th style={{ padding: '10px' }}>Sponsorship Status</th>
+                            <th style={{ padding: '10px' }}>Started</th>
+                            <th style={{ padding: '10px' }}>Expires</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {sponsorships.filter(s => ownerTools.some(ot => ot.id === s.tool_id)).map((s) => {
+                            const t = ownerTools.find(ot => ot.id === s.tool_id);
+                            return (
+                              <tr key={s.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                                <td style={{ padding: '10px', fontWeight: 'bold' }}>{t?.name || 'Tool'}</td>
+                                <td style={{ padding: '10px' }}>{s.duration_days} Days</td>
+                                <td style={{ padding: '10px' }}>${s.price?.toFixed(2)} USD</td>
+                                <td style={{ padding: '10px', textTransform: 'capitalize' }}>
+                                  <span className={`badge ${s.payment_status === 'paid' ? 'badge-approved' : 'badge-pending'}`}>
+                                    {s.payment_status}
+                                  </span>
+                                </td>
+                                <td style={{ padding: '10px', textTransform: 'capitalize' }}>
+                                  <span className={`badge ${s.status === 'active' ? 'badge-approved' : s.status === 'expired' ? 'badge-rejected' : 'badge-pending'}`}>
+                                    {s.status}
+                                  </span>
+                                </td>
+                                <td style={{ padding: '10px' }}>{s.starts_at ? new Date(s.starts_at).toLocaleDateString() : '—'}</td>
+                                <td style={{ padding: '10px' }}>{s.expires_at ? new Date(s.expires_at).toLocaleDateString() : '—'}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div style={{ color: 'var(--text-muted)', fontSize: 'var(--text-xs)', textAlign: 'center', padding: '20px 0' }}>
+                      No previous sponsorship records found.
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
@@ -1573,6 +1577,56 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
             </button>
           </div>
         </form>
+      </Modal>
+
+      {/* SPONSORSHIP SELECTION & REVIEW MODAL */}
+      <Modal isOpen={isSponsorshipModalOpen} title="Select Sponsorship Plan" onClose={() => setIsSponsorshipModalOpen(false)}>
+        <div style={{ padding: '16px', maxWidth: '480px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {selectedSponsorshipTool && (
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', backgroundColor: 'var(--bg-tertiary)', padding: '12px', borderRadius: 'var(--radius-md)' }}>
+              <img src={selectedSponsorshipTool.logoUrl} alt={selectedSponsorshipTool.name} style={{ width: '36px', height: '36px', borderRadius: '4px', objectFit: 'cover' }} />
+              <div>
+                <strong style={{ fontSize: 'var(--text-sm)', display: 'block' }}>{selectedSponsorshipTool.name}</strong>
+                <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{selectedSponsorshipTool.tagline}</span>
+              </div>
+            </div>
+          )}
+
+          {isPaymentsDisabled && (
+            <div style={{ padding: '12px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderLeft: '4px solid var(--color-primary)', borderRadius: 'var(--radius-md)', display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <Lock size={16} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
+              <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
+                <strong>Payments Coming Soon:</strong> Sponsorship payments via Stripe are currently being configured. You can review available plan durations below.
+              </span>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {[
+              { id: 'plan_starter', name: 'Starter', duration: '30 Days', price: '$25' },
+              { id: 'plan_growth', name: 'Growth', duration: '90 Days', price: '$49' },
+              { id: 'plan_longterm', name: 'Long-Term', duration: '180 Days', price: '$79' },
+              { id: 'plan_annual', name: 'Annual', duration: '365 Days', price: '$99 (BEST VALUE)' },
+            ].map((p) => (
+              <div key={p.id} style={{ padding: '12px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <strong style={{ fontSize: 'var(--text-xs)', display: 'block' }}>{p.name} ({p.duration})</strong>
+                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Fixed period promotion</span>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{ fontWeight: 'bold', fontSize: 'var(--text-sm)' }}>{p.price}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '8px' }}>
+            <button type="button" onClick={() => setIsSponsorshipModalOpen(false)} className="btn btn-outline">Close</button>
+            <button type="button" disabled className="btn btn-primary" style={{ opacity: 0.7, cursor: 'not-allowed' }}>
+              Payments Coming Soon
+            </button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

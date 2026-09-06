@@ -1,6 +1,9 @@
-# robots.txt for AI Hub Directory
+# robots.txt for AIFynest Directory
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /verify-email
 
 # Sitemap Location
 Sitemap: https://aifynest.com/sitemap.xml

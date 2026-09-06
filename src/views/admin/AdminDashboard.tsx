@@ -49,16 +49,14 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
     bulkDeleteTools,
     seedTenToolsPerCategory,
     campaigns,
-    payments,
     ledger,
-    verifyPayment,
-    approveCampaign,
     adjustWalletBalance,
     reports,
     verificationRequests,
     resolveReport,
     approveToolVerification,
     revokeToolVerification,
+    sponsorships,
   } = useDatabase();
   const { user } = useAuth();
 
@@ -2667,85 +2665,119 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
             </div>
           )}
 
-          {/* TAB: MONETIZATION MANAGEMENT */}
+          {/* TAB: SPONSORSHIPS & PAYMENTS MANAGEMENT */}
           {activeTab === 'monetization' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
               <div>
-                <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', margin: 0 }}>Monetization Moderation Queue</h3>
-                <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Review bidding campaigns activation requests and verify simulated deposits.</span>
+                <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', margin: 0 }}>Sponsorships & Payments Management</h3>
+                <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
+                  Monitor fixed-duration sponsorship performance, review transactions, and audit payment provider statuses.
+                </span>
               </div>
 
-              {/* 1. Pending Campaigns */}
-              <div style={{ padding: '20px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-card)' }}>
-                <h4 style={{ margin: '0 0 16px 0', fontSize: 'var(--text-sm)', fontWeight: 'bold' }}>Pending Campaigns ({campaigns ? campaigns.filter(c => c.status === 'pending').length : 0})</h4>
-                {campaigns && campaigns.filter(c => c.status === 'pending').length > 0 ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {campaigns.filter(c => c.status === 'pending').map((camp) => {
-                      const toolObj = tools.find((t) => t.id === camp.toolId);
-                      return (
-                        <div key={camp.id} style={{ padding: '12px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <div>
-                            <span style={{ fontWeight: 'bold', display: 'block' }}>{camp.campaignName}</span>
-                            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                              Tool: {toolObj?.name} | Placement: {camp.placement} | Budget: ${Number(camp.remainingBudget || camp.budget).toFixed(2)} | Bid: ${Number(camp.cpc || 0.20).toFixed(2)}
-                            </span>
-                          </div>
-                          <button
-                            onClick={async () => {
-                              try {
-                                await approveCampaign(camp.id);
-                                onToast('Campaign approved and marked ACTIVE successfully!', 'success');
-                              } catch (err: any) {
-                                onToast(err.message || 'Approval failed', 'error');
-                              }
-                            }}
-                            className="btn btn-success btn-xs"
-                          >
-                            Approve & Activate
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div style={{ color: 'var(--text-muted)', fontSize: 'var(--text-xs)' }}>
-                    No campaigns awaiting approval.
-                  </div>
-                )}
+              {/* Sponsorship Statistics Cards */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }} className="stats-box-grid">
+                <div style={{ padding: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', display: 'block' }}>Active Sponsorships</span>
+                  <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold', color: 'var(--color-success)' }}>
+                    {sponsorships ? sponsorships.filter(s => s.status === 'active').length : 0}
+                  </span>
+                </div>
+                <div style={{ padding: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', display: 'block' }}>Pending Sponsorships</span>
+                  <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold', color: 'var(--color-warning)' }}>
+                    {sponsorships ? sponsorships.filter(s => s.status === 'pending').length : 0}
+                  </span>
+                </div>
+                <div style={{ padding: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', display: 'block' }}>Expired Sponsorships</span>
+                  <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold', color: 'var(--text-muted)' }}>
+                    {sponsorships ? sponsorships.filter(s => s.status === 'expired').length : 0}
+                  </span>
+                </div>
+                <div style={{ padding: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', display: 'block' }}>Total Revenue</span>
+                  <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold', color: 'var(--color-primary)' }}>
+                    ${sponsorships ? sponsorships.filter(s => s.payment_status === 'paid').reduce((acc, s) => acc + (s.price || 0), 0).toFixed(2) : '0.00'} <span style={{ fontSize: '10px' }}>USD</span>
+                  </span>
+                </div>
               </div>
 
-              {/* 2. Pending Payments Verification */}
+              {/* Sponsorships Table */}
               <div style={{ padding: '20px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', backgroundColor: 'var(--bg-card)' }}>
-                <h4 style={{ margin: '0 0 16px 0', fontSize: 'var(--text-sm)', fontWeight: 'bold' }}>Pending Deposits Verification ({payments ? payments.filter(p => p.status === 'pending').length : 0})</h4>
-                {payments && payments.filter(p => p.status === 'pending').length > 0 ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {payments.filter(p => p.status === 'pending').map((pay) => (
-                       <div key={pay.id} style={{ padding: '12px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div>
-                          <span style={{ fontWeight: 'bold', display: 'block' }}>Simulated Deposit of ${Number(pay.amount).toFixed(2)} USD</span>
-                          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                            Owner ID: {pay.userId} | TX Ref: {pay.invoiceNumber}
-                          </span>
-                        </div>
-                        <button
-                          onClick={async () => {
-                            try {
-                              await verifyPayment(pay.id);
-                              onToast('Deposit verified and credited to owner wallet successfully!', 'success');
-                            } catch (err: any) {
-                              onToast(err.message || 'Verification failed', 'error');
-                            }
-                          }}
-                          className="btn btn-primary btn-xs"
-                        >
-                          Verify & Credit Balance
-                        </button>
-                      </div>
-                    ))}
+                <h4 style={{ margin: '0 0 16px 0', fontSize: 'var(--text-sm)', fontWeight: 'bold' }}>All Sponsorship Records</h4>
+                {sponsorships && sponsorships.length > 0 ? (
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-xs)', textAlign: 'left' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-tertiary)' }}>
+                          <th style={{ padding: '10px' }}>Tool</th>
+                          <th style={{ padding: '10px' }}>Owner</th>
+                          <th style={{ padding: '10px' }}>Plan</th>
+                          <th style={{ padding: '10px' }}>Amount</th>
+                          <th style={{ padding: '10px' }}>Payment Status</th>
+                          <th style={{ padding: '10px' }}>Sponsorship Status</th>
+                          <th style={{ padding: '10px' }}>Starts</th>
+                          <th style={{ padding: '10px' }}>Expires</th>
+                          <th style={{ padding: '10px', textAlign: 'right' }}>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sponsorships.map((s) => {
+                          const t = tools.find((tool) => tool.id === s.tool_id);
+                          return (
+                            <tr key={s.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                              <td style={{ padding: '10px', fontWeight: 'bold' }}>{t?.name || s.tool_id.slice(0, 8)}</td>
+                              <td style={{ padding: '10px' }}>{s.owner_id.slice(0, 8)}...</td>
+                              <td style={{ padding: '10px' }}>{s.duration_days} Days</td>
+                              <td style={{ padding: '10px' }}>${s.price?.toFixed(2)} USD</td>
+                              <td style={{ padding: '10px', textTransform: 'capitalize' }}>
+                                <span className={`badge ${s.payment_status === 'paid' ? 'badge-approved' : 'badge-pending'}`}>
+                                  {s.payment_status}
+                                </span>
+                              </td>
+                              <td style={{ padding: '10px', textTransform: 'capitalize' }}>
+                                <span className={`badge ${s.status === 'active' ? 'badge-approved' : s.status === 'expired' ? 'badge-rejected' : 'badge-pending'}`}>
+                                  {s.status} {s.is_manual_override && '(Override)'}
+                                </span>
+                              </td>
+                              <td style={{ padding: '10px' }}>{s.starts_at ? new Date(s.starts_at).toLocaleDateString() : '—'}</td>
+                              <td style={{ padding: '10px' }}>{s.expires_at ? new Date(s.expires_at).toLocaleDateString() : '—'}</td>
+                              <td style={{ padding: '10px', textAlign: 'right' }}>
+                                {s.status === 'pending' && (
+                                  <button
+                                    onClick={async () => {
+                                      const reason = window.prompt('Enter mandatory reason for Super Admin Emergency Manual Override:');
+                                      if (reason && reason.trim()) {
+                                        try {
+                                          const { supabase } = await import('../../utils/supabase');
+                                          const { error } = await supabase.rpc('emergency_manual_override_activation', {
+                                            p_sponsorship_id: s.id,
+                                            p_reason: reason.trim()
+                                          });
+                                          if (error) throw error;
+                                          onToast('Super Admin Override Activated with mandatory audit log reason.', 'success');
+                                        } catch (err: any) {
+                                          onToast(err.message || 'Override failed', 'error');
+                                        }
+                                      }
+                                    }}
+                                    className="btn btn-outline btn-xs"
+                                    style={{ borderColor: 'var(--color-gold)', color: 'var(--color-gold-hover)', fontSize: '10px' }}
+                                  >
+                                    Super Admin Override
+                                  </button>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
                   </div>
                 ) : (
-                  <div style={{ color: 'var(--text-muted)', fontSize: 'var(--text-xs)' }}>
-                    No pending deposits.
+                  <div style={{ color: 'var(--text-muted)', fontSize: 'var(--text-xs)', textAlign: 'center', padding: '20px 0' }}>
+                    No sponsorship records found.
                   </div>
                 )}
               </div>

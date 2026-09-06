@@ -29,8 +29,14 @@ function writeSitemap(categories, tools) {
   const staticUrls = [
     '',
     '/ai-tools',
-    '/claim',
+    '/about',
+    '/contact',
+    '/terms',
+    '/privacy',
+    '/refund-policy',
+    '/advertise',
     '/submit-tool',
+    '/claim',
     '/login'
   ];
 
