@@ -6,7 +6,7 @@ import { supabase } from '../utils/supabase';
 
 import { ToolCard } from '../components/shared/ToolCard';
 import { SEOHead } from '../components/shared/SEOHead';
-import { Search, Sparkles, ArrowRight, Award, DollarSign, MousePointer, CategoryIcon } from '../components/shared/Icons';
+import { Search, Sparkles, ArrowRight, Award, DollarSign, MousePointer, CategoryIcon, ChevronLeft, ChevronRight } from '../components/shared/Icons';
 
 interface HomeProps {
   onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
@@ -25,6 +25,53 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
 
   const sponsoredContainerRef = useRef<HTMLDivElement>(null);
   const isHoveredRef = useRef(false);
+
+  const categoryContainerRef = useRef<HTMLDivElement>(null);
+  const isCategoryHoveredRef = useRef(false);
+
+  // Auto-slide effect for category row
+  useEffect(() => {
+    const el = categoryContainerRef.current;
+    if (!el) return;
+
+    const interval = setInterval(() => {
+      if (isCategoryHoveredRef.current) return;
+
+      const maxScroll = el.scrollWidth - el.clientWidth;
+      if (maxScroll <= 0) return;
+
+      let nextScroll = el.scrollLeft + 260; // Card width + gap
+      if (nextScroll >= maxScroll - 10) {
+        nextScroll = 0;
+      }
+
+      el.scrollTo({
+        left: nextScroll,
+        behavior: 'smooth'
+      });
+    }, 3500); // Slide every 3.5 seconds
+
+    return () => clearInterval(interval);
+  }, [categories]);
+
+  // Scroll Category Left & Right manually
+  const scrollCategoryLeft = () => {
+    if (categoryContainerRef.current) {
+      categoryContainerRef.current.scrollBy({ left: -320, behavior: 'smooth' });
+    }
+  };
+
+  const scrollCategoryRight = () => {
+    if (categoryContainerRef.current) {
+      const el = categoryContainerRef.current;
+      const maxScroll = el.scrollWidth - el.clientWidth;
+      if (el.scrollLeft >= maxScroll - 10) {
+        el.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        el.scrollBy({ left: 320, behavior: 'smooth' });
+      }
+    }
+  };
 
   // Auto-slide effect for sponsored carousel
   useEffect(() => {
@@ -439,76 +486,132 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                 Browse AI Tools by Category
               </h2>
             </div>
-            <Link to="/categories" className="btn btn-outline btn-sm" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 'bold', borderRadius: 'var(--radius-full)' }}>
-              <span>View All ({categories.length})</span>
-              <ArrowRight size={13} />
-            </Link>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              {/* Arrow navigation buttons (< and >) */}
+              <button
+                onClick={scrollCategoryLeft}
+                aria-label="Scroll Categories Left"
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'var(--bg-card)',
+                  color: 'var(--text-primary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: 'var(--shadow-sm)',
+                  transition: 'all 0.2s ease'
+                }}
+                className="category-nav-btn"
+                title="Slide Left (<)"
+              >
+                <ChevronLeft size={18} />
+              </button>
+
+              <button
+                onClick={scrollCategoryRight}
+                aria-label="Scroll Categories Right"
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'var(--bg-card)',
+                  color: 'var(--text-primary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: 'var(--shadow-sm)',
+                  transition: 'all 0.2s ease'
+                }}
+                className="category-nav-btn"
+                title="Slide Right (>)"
+              >
+                <ChevronRight size={18} />
+              </button>
+
+              <Link to="/categories" className="btn btn-outline btn-sm" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 'bold', borderRadius: 'var(--radius-full)', marginLeft: '6px' }}>
+                <span>View All ({categories.length})</span>
+                <ArrowRight size={13} />
+              </Link>
+            </div>
           </div>
 
-          {/* Presentable Horizontal scrollable row of Category Cards */}
-          <div 
-            style={{ 
-              display: 'flex', 
-              gap: '14px', 
-              overflowX: 'auto', 
-              padding: '6px 4px 12px 4px',
-              WebkitOverflowScrolling: 'touch',
-            }}
-            className="category-scroll-bar"
-          >
-            {categories.map((cat) => {
-              const count = getToolCount(cat.slug);
-              return (
-                <Link
-                  key={cat.slug}
-                  to={`/categories/${cat.slug}`}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '12px 20px',
-                    borderRadius: 'var(--radius-xl)',
-                    border: '1px solid var(--border-color)',
-                    backgroundColor: 'var(--bg-card)',
-                    color: 'var(--text-primary)',
-                    textDecoration: 'none',
-                    fontSize: 'var(--text-sm)',
-                    whiteSpace: 'nowrap',
-                    boxShadow: 'var(--shadow-sm)',
-                    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                    flexShrink: 0
-                  }}
-                  className="category-pill-box"
-                >
-                  <div className="category-icon-box">
-                    <CategoryIcon name={cat.name} size={18} />
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                    <span style={{ fontWeight: 'bold', color: 'var(--text-primary)', fontSize: 'var(--text-xs)' }}>
-                      {cat.name}
-                    </span>
-                    <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
-                      {count} {count === 1 ? 'tool' : 'tools'}
-                    </span>
-                  </div>
-
-                  <span 
-                    style={{ 
-                      fontSize: '10px', 
-                      backgroundColor: 'var(--color-primary-light)', 
-                      color: 'var(--color-primary)', 
-                      padding: '2px 8px', 
-                      borderRadius: 'var(--radius-full)',
-                      fontWeight: 'bold',
-                      marginLeft: '4px'
+          {/* Presentable Horizontal scrollable row of Category Cards with Refs & Hover Handlers */}
+          <div style={{ position: 'relative' }}>
+            <div 
+              ref={categoryContainerRef}
+              onMouseEnter={() => { isCategoryHoveredRef.current = true; }}
+              onMouseLeave={() => { isCategoryHoveredRef.current = false; }}
+              style={{ 
+                display: 'flex', 
+                gap: '14px', 
+                overflowX: 'auto', 
+                padding: '6px 4px 12px 4px',
+                WebkitOverflowScrolling: 'touch',
+                scrollBehavior: 'smooth'
+              }}
+              className="category-scroll-bar"
+            >
+              {categories.map((cat) => {
+                const count = getToolCount(cat.slug);
+                return (
+                  <Link
+                    key={cat.slug}
+                    to={`/categories/${cat.slug}`}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '12px 20px',
+                      borderRadius: 'var(--radius-xl)',
+                      border: '1px solid var(--border-color)',
+                      backgroundColor: 'var(--bg-card)',
+                      color: 'var(--text-primary)',
+                      textDecoration: 'none',
+                      fontSize: 'var(--text-sm)',
+                      whiteSpace: 'nowrap',
+                      boxShadow: 'var(--shadow-sm)',
+                      transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                      flexShrink: 0
                     }}
+                    className="category-pill-box"
                   >
-                    →
-                  </span>
-                </Link>
-              );
-            })}
+                    <div className="category-icon-box">
+                      <CategoryIcon name={cat.name} size={18} />
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <span style={{ fontWeight: 'bold', color: 'var(--text-primary)', fontSize: 'var(--text-xs)' }}>
+                        {cat.name}
+                      </span>
+                      <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                        {count} {count === 1 ? 'tool' : 'tools'}
+                      </span>
+                    </div>
+
+                    <span 
+                      style={{ 
+                        fontSize: '10px', 
+                        backgroundColor: 'var(--color-primary-light)', 
+                        color: 'var(--color-primary)', 
+                        padding: '2px 8px', 
+                        borderRadius: 'var(--radius-full)',
+                        fontWeight: 'bold',
+                        marginLeft: '4px'
+                      }}
+                    >
+                      →
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>

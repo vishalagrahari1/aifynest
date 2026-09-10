@@ -398,3 +398,15 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+.category-nav-btn:hover {
+  background-color: var(--color-primary-light) !important;
+  color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2) !important;
+}
+
+.category-nav-btn:active {
+  transform: scale(0.95);
+}
