@@ -79,8 +79,9 @@ export const Directory: React.FC<DirectoryProps> = ({
   // Load items per page setting
   const itemsPerPage = 9;
 
-  // Active search input state (client-side override before submission)
+  // Active search input & mobile filter drawer state
   const [searchInput, setSearchInput] = useState(qParam);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   // Synchronize local search input with URL search string when URL updates
   useEffect(() => {
@@ -610,8 +611,21 @@ export const Directory: React.FC<DirectoryProps> = ({
               <Search size={15} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             </form>
 
-            {/* Toolbar Sort Selectors */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: 'var(--text-sm)', flexWrap: 'wrap' }}>
+            {/* Toolbar Sort Selectors & Mobile Filter Toggle */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: 'var(--text-sm)', flexWrap: 'wrap' }}>
+              <button
+                onClick={() => setShowMobileFilters(!showMobileFilters)}
+                className="btn btn-outline btn-sm mobile-filter-btn"
+                style={{ display: 'none', gap: '6px', fontWeight: 'bold' }}
+              >
+                <span>⚙️ Filters</span>
+                {hasActiveFilters && (
+                  <span style={{ backgroundColor: 'var(--color-primary)', color: 'white', fontSize: '10px', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    !
+                  </span>
+                )}
+              </button>
+
               <span style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', fontWeight: '500' }}>
                 Found <strong>{totalItems}</strong> matching tools
               </span>
@@ -644,6 +658,68 @@ export const Directory: React.FC<DirectoryProps> = ({
               </div>
             </div>
           </div>
+
+          {/* Mobile Filter Drawer Overlay */}
+          {showMobileFilters && (
+            <div
+              onClick={() => setShowMobileFilters(false)}
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                backdropFilter: 'blur(4px)',
+                zIndex: 9999,
+                display: 'flex',
+                justifyContent: 'flex-end',
+              }}
+            >
+              <div
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  width: '85%',
+                  maxWidth: '360px',
+                  height: '100%',
+                  backgroundColor: 'var(--bg-card)',
+                  padding: '20px',
+                  overflowY: 'auto',
+                  boxShadow: 'var(--shadow-xl)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '16px',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
+                  <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>Filter Tools</h3>
+                  <button
+                    onClick={() => setShowMobileFilters(false)}
+                    className="btn btn-outline btn-sm"
+                    style={{ padding: '4px 10px' }}
+                  >
+                    Close ✕
+                  </button>
+                </div>
+
+                <SidebarFilter
+                  categories={categories}
+                  filters={filters}
+                  onChange={(newFilters) => {
+                    handleFilterChange(newFilters);
+                  }}
+                />
+
+                <button
+                  onClick={() => setShowMobileFilters(false)}
+                  className="btn btn-primary w-full"
+                  style={{ marginTop: 'auto', padding: '12px' }}
+                >
+                  Apply & View Results ({totalItems})
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Quick Filter Chips Bar */}
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -1009,6 +1085,9 @@ export const Directory: React.FC<DirectoryProps> = ({
           }
           .directory-sidebar {
             display: none !important;
+          }
+          .mobile-filter-btn {
+            display: inline-flex !important;
           }
         }
 

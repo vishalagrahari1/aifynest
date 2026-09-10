@@ -208,7 +208,7 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({ tools, onRemov
 
                       <div>
                         <Link 
-                          to={`/tool/${tool.slug}`}
+                          to={`/tools/${tool.slug}`}
                           style={{ 
                             fontWeight: 'var(--font-bold)', 
                             color: 'var(--text-primary)', 
@@ -472,7 +472,7 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({ tools, onRemov
                       <span>Visit {tool.name}</span>
                     </a>
                     <Link
-                      to={`/tool/${tool.slug}`}
+                      to={`/tools/${tool.slug}`}
                       className="btn btn-outline btn-sm"
                       style={{ 
                         width: '100%', 
