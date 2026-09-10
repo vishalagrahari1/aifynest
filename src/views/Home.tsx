@@ -316,7 +316,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
             <span style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--text-primary)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
               <span>Trusted by</span>
               <strong style={{ color: '#E2603A', fontWeight: 800 }}>50,000+</strong>
-              <span>creators, developers & founders</span>
+              <span>monthly visitors, creators & developers</span>
             </span>
           </div>
 
