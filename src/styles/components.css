@@ -588,6 +588,67 @@
   #benefits {
     grid-template-columns: 1fr !important;
   }
+
+  .cta-banner-card {
+    flex-direction: column !important;
+    padding: 24px 18px !important;
+    text-align: center !important;
+    align-items: center !important;
+    gap: 20px !important;
+  }
+
+  .cta-banner-content {
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 12px !important;
+    align-items: center !important;
+    max-width: 100% !important;
+  }
+
+  .cta-banner-icon {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 24px !important;
+  }
+
+  .cta-banner-text {
+    text-align: center !important;
+  }
+
+  .cta-banner-text h3 {
+    font-size: 1.15rem !important;
+    margin-bottom: 6px !important;
+  }
+
+  .cta-banner-text p {
+    font-size: 0.85rem !important;
+    line-height: 1.45 !important;
+  }
+
+  .cta-banner-actions {
+    width: 100% !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  .cta-banner-actions .btn {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 12px 16px !important;
+    box-sizing: border-box !important;
+  }
+
+  .claim-listing-banner {
+    flex-direction: column !important;
+    text-align: center !important;
+    align-items: center !important;
+    padding: 16px !important;
+  }
+
+  .claim-listing-banner .btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
 }
 
 

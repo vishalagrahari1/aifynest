@@ -1054,6 +1054,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
       <section className="section" style={{ position: 'relative', zIndex: 1, padding: '24px 0 36px 0' }}>
         <div className="container">
           <div
+            className="cta-banner-card"
             style={{
               background: 'linear-gradient(135deg, #0b0f19 0%, #151e30 100%)',
               borderRadius: 'var(--radius-xl)',
@@ -1072,8 +1073,9 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
             {/* Ambient Background Glow */}
             <div style={{ position: 'absolute', top: 0, right: 0, width: '300px', height: '100%', background: 'radial-gradient(circle at 100% 50%, rgba(226, 96, 58, 0.15), transparent 70%)', pointerEvents: 'none' }}></div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', position: 'relative', zIndex: 1, maxWidth: '600px' }}>
+            <div className="cta-banner-content" style={{ display: 'flex', alignItems: 'center', gap: '20px', position: 'relative', zIndex: 1, maxWidth: '600px' }}>
               <div
+                className="cta-banner-icon"
                 style={{
                   width: '56px',
                   height: '56px',
@@ -1089,7 +1091,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
               >
                 🚀
               </div>
-              <div>
+              <div className="cta-banner-text">
                 <h3 style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: '#ffffff', margin: 0, marginBottom: '6px' }}>
                   Built an AI Tool? Get Discovered.
                 </h3>
@@ -1099,10 +1101,10 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
               </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', position: 'relative', zIndex: 1 }}>
+            <div className="cta-banner-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', position: 'relative', zIndex: 1 }}>
               <Link
                 to="/submit-tool"
-                className="btn btn-primary"
+                className="btn btn-primary cta-btn-main"
                 style={{ padding: '12px 24px', borderRadius: 'var(--radius-lg)', fontWeight: 'bold' }}
               >
                 <span>Submit Your Tool</span>
@@ -1110,7 +1112,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
               </Link>
               <Link
                 to="/advertise"
-                className="btn btn-outline"
+                className="btn btn-outline cta-btn-sub"
                 style={{ color: '#ffffff', borderColor: 'rgba(255, 255, 255, 0.2)', padding: '12px 20px', borderRadius: 'var(--radius-lg)' }}
               >
                 View Listing Plans
@@ -1726,6 +1728,47 @@ const styleInjection = (
       }
       .badge-short-text {
         display: inline !important;
+      }
+      .cta-banner-card {
+        flex-direction: column !important;
+        padding: 24px 18px !important;
+        text-align: center !important;
+        align-items: center !important;
+        gap: 20px !important;
+      }
+      .cta-banner-content {
+        flex-direction: column !important;
+        text-align: center !important;
+        gap: 12px !important;
+        align-items: center !important;
+        max-width: 100% !important;
+      }
+      .cta-banner-icon {
+        width: 48px !important;
+        height: 48px !important;
+        font-size: 24px !important;
+      }
+      .cta-banner-text {
+        text-align: center !important;
+      }
+      .cta-banner-text h3 {
+        font-size: 1.15rem !important;
+        margin-bottom: 6px !important;
+      }
+      .cta-banner-text p {
+        font-size: 0.85rem !important;
+        line-height: 1.45 !important;
+      }
+      .cta-banner-actions {
+        width: 100% !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+      }
+      .cta-banner-actions .btn {
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 12px 16px !important;
+        box-sizing: border-box !important;
       }
       .build-cta-section {
         padding: 32px 16px !important;
