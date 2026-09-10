@@ -252,115 +252,52 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
       <div className="hero-glow" style={{ top: '-100px', left: '5%' }}></div>
       <div className="hero-glow" style={{ top: '150px', right: '5%', background: 'radial-gradient(circle, rgba(160, 68, 244, 0.08) 0%, rgba(99, 102, 241, 0.02) 60%, rgba(0, 0, 0, 0) 100%)' }}></div>
 
-      {/* Hero Search Section - Redesigned to ToolboxAI Premium style */}
+      {/* Hero Search Section - Simple & Compact */}
       <section
         style={{
           background: 'var(--gradient-hero)',
-          padding: '100px 0 80px 0',
+          padding: '48px 0 36px 0',
           borderBottom: '1px solid var(--border-color)',
           textAlign: 'center',
           position: 'relative',
           zIndex: 1,
         }}
       >
-        <div className="container" style={{ maxWidth: '850px' }}>
-          {/* Dynamic Pill above H1 */}
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              backgroundColor: 'var(--color-primary-light)',
-              color: 'var(--color-primary)',
-              padding: '6px 14px',
-              borderRadius: 'var(--radius-full)',
-              fontSize: 'var(--text-xs)',
-              fontWeight: 'var(--font-semibold)',
-              marginBottom: '24px',
-            }}
-          >
-            <Sparkles size={14} />
-            <span>🔥 {(() => {
-              if (!tools) return 5;
-              const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
-              const now = Date.now();
-              const count = tools.filter(t => {
-                if (!t.lastUpdated) return false;
-                const tDate = new Date(t.lastUpdated).getTime();
-                return (now - tDate) <= SEVEN_DAYS_MS;
-              }).length;
-              return count > 0 ? count : 5; // Fallback to 5 for demo display
-            })()} tools added this week</span>
-          </div>
-
+        <div className="container" style={{ maxWidth: '780px' }}>
           <h1
             style={{
-              fontSize: 'clamp(2.5rem, 6vw, 3.8rem)',
-              lineHeight: '1.1',
+              fontSize: 'clamp(2rem, 4.5vw, 2.8rem)',
+              lineHeight: '1.15',
               fontWeight: 'var(--font-bold)',
-              letterSpacing: '-0.03em',
-              marginBottom: '20px',
+              letterSpacing: '-0.02em',
+              marginBottom: '10px',
               color: 'var(--text-primary)',
             }}
           >
-            Discover the Best <span style={{ background: 'var(--gradient-brand)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>AI Tools</span> For Every Job
+            Discover the Best <span style={{ background: 'var(--gradient-brand)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>AI Tools</span>
           </h1>
 
           <p
             style={{
-              fontSize: 'var(--text-lg)',
+              fontSize: 'var(--text-base)',
               color: 'var(--text-secondary)',
-              maxWidth: '650px',
-              margin: '0 auto 16px auto',
-              lineHeight: '1.6',
+              maxWidth: '560px',
+              margin: '0 auto 20px auto',
+              lineHeight: '1.5',
             }}
           >
-            Your daily-updated hub for AI tools: <strong>{tools ? tools.filter(t => t.status === 'approved').length : 0} entries</strong> in <strong>{categories ? categories.length : 0} categories</strong>, including models, coding assistants, and voice generators.
+            Explore, compare, and review <strong>{tools ? tools.filter(t => t.status === 'approved').length : 0}+ AI tools</strong> across <strong>{categories ? categories.length : 0} categories</strong>.
           </p>
 
-          {/* Trust-Signal Row */}
-          <div 
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center', 
-              gap: '12px', 
-              fontSize: 'var(--text-xs)', 
-              color: 'var(--text-muted)', 
-              marginBottom: '32px',
-              flexWrap: 'wrap',
-              fontWeight: '500'
-            }}
-            className="hero-trust-signals"
-          >
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>✓ Verified Reviews</span>
-            <span style={{ opacity: 0.3 }}>•</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>🔄 Updated Daily</span>
-            <span style={{ opacity: 0.3 }}>•</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              ⚡ <strong>{(() => {
-                if (!tools) return 0;
-                const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
-                const now = Date.now();
-                const count = tools.filter(t => {
-                  if (t.status !== 'approved' || !t.lastUpdated) return false;
-                  const tDate = new Date(t.lastUpdated).getTime();
-                  return (now - tDate) <= THIRTY_DAYS_MS;
-                }).length;
-                return count > 0 ? count : tools.filter(t => t.status === 'approved').length;
-              })()}</strong> Tools Active This Month
-            </span>
-          </div>
-
           {/* Interactive Search Bar wrapper */}
-          <div ref={suggestionsRef} style={{ position: 'relative', maxWidth: '680px', margin: '0 auto' }}>
+          <div ref={suggestionsRef} style={{ position: 'relative', maxWidth: '640px', margin: '0 auto' }}>
             <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '8px' }}>
               <div style={{ position: 'relative', flex: 1 }}>
                 <Search
-                  size={20}
+                  size={18}
                   style={{
                     position: 'absolute',
-                    left: '18px',
+                    left: '16px',
                     top: '50%',
                     transform: 'translateY(-50%)',
                     color: 'var(--text-muted)',
@@ -368,18 +305,18 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                 />
                 <input
                   type="text"
-                  placeholder={`Search over ${tools ? tools.filter(t => t.status === 'approved').length : 0}+ AI tools, categories, or use cases...`}
+                  placeholder={`Search ${tools ? tools.filter(t => t.status === 'approved').length : 0}+ AI tools, categories, or tags...`}
                   value={searchQuery}
                   onChange={handleSearchChange}
                   onFocus={() => setShowSuggestions(suggestions.length > 0)}
                   style={{
-                    padding: '18px 18px 18px 52px',
+                    padding: '14px 16px 14px 44px',
                     fontSize: 'var(--text-base)',
                     borderRadius: 'var(--radius-lg)',
                     border: '1px solid var(--border-color)',
                     backgroundColor: 'var(--bg-secondary)',
                     color: 'var(--text-primary)',
-                    boxShadow: 'var(--shadow-xl)',
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)',
                     width: '100%',
                     outline: 'none',
                     transition: 'all var(--transition-normal)',
@@ -388,7 +325,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                   className="search-input-glow"
                 />
               </div>
-              <button type="submit" className="btn btn-primary btn-lg" style={{ borderRadius: 'var(--radius-lg)' }}>
+              <button type="submit" className="btn btn-primary" style={{ borderRadius: 'var(--radius-lg)', padding: '12px 24px', fontWeight: 'bold' }}>
                 Search
               </button>
             </form>
@@ -416,7 +353,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                     key={index}
                     onClick={() => handleSuggestionClick(suggestion)}
                     style={{
-                      padding: '12px 16px',
+                      padding: '10px 14px',
                       fontSize: 'var(--text-sm)',
                       cursor: 'pointer',
                       borderBottom: index < suggestions.length - 1 ? '1px solid var(--border-color)' : 'none',
@@ -434,9 +371,9 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
           </div>
 
           {/* Dynamic Trending weekly chips */}
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center', marginTop: '24px' }}>
+          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'center', marginTop: '16px' }}>
             <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', alignSelf: 'center', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <span>🔥</span> Trending this week:
+              <span>🔥</span> Trending:
             </span>
             {(() => {
               const trending = getTrendingTools ? getTrendingTools(5) : [];
@@ -457,7 +394,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                     fontSize: 'var(--text-xs)',
                     color: 'var(--text-secondary)',
                     backgroundColor: 'var(--bg-tertiary)',
-                    padding: '5px 12px',
+                    padding: '4px 10px',
                     borderRadius: 'var(--radius-full)',
                     fontWeight: '500',
                     border: '1px solid var(--border-color)',
