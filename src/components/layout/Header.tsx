@@ -798,165 +798,207 @@ export const Header: React.FC = () => {
           </button>
         </div>
 
-      {/* Responsive Mobile Drawer Menu */}
+      {/* Floating Compact Mobile Menu Card */}
       {mobileMenuOpen && (
         <div
+          onClick={() => setMobileMenuOpen(false)}
           style={{
             position: 'fixed',
             top: '70px',
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'var(--bg-primary)',
+            backgroundColor: 'rgba(0, 0, 0, 0.45)',
+            backdropFilter: 'blur(6px)',
+            WebkitBackdropFilter: 'blur(6px)',
             zIndex: 99,
-            padding: '20px 24px 32px 24px',
+            padding: '12px 16px 24px 16px',
             display: 'flex',
-            flexDirection: 'column',
-            gap: '14px',
-            overflowY: 'auto',
-            borderTop: '1px solid var(--border-color)',
+            justifyContent: 'center',
+            alignItems: 'flex-start',
             animation: 'fade-in-overlay 150ms ease-out',
           }}
         >
-          {/* Quick Utility Row: Theme, Language, Saved Favorites */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid var(--border-color)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              {/* Theme Toggle */}
-              <button
-                onClick={toggleTheme}
-                className="header-icon-btn theme-btn"
-                title="Toggle light/dark theme"
-                style={{ ...iconBtnStyle, border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '6px 12px', display: 'flex', gap: '6px', alignItems: 'center' }}
-              >
-                {theme === 'dark' ? (
-                  <>
-                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                    <span style={{ fontSize: '12px' }}>Light</span>
-                  </>
-                ) : (
-                  <>
-                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                    <span style={{ fontSize: '12px' }}>Dark</span>
-                  </>
-                )}
-              </button>
-
-              {/* Saved Favorites Link */}
-              <Link
-                to={user ? "/dashboard?tab=saved" : "/login"}
-                onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  fontSize: '12px',
-                  fontWeight: '600',
-                  color: 'var(--text-primary)',
-                  textDecoration: 'none',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: '6px 12px',
-                  backgroundColor: 'var(--bg-card)'
-                }}
-              >
-                <Bookmark size={16} />
-                <span>{t('savedTitle')}</span>
-                {user && savedToolsList.length > 0 && (
-                  <span className="badge badge-pricing" style={{ fontSize: '10px', padding: '1px 5px' }}>
-                    {savedToolsList.length}
-                  </span>
-                )}
-              </Link>
-            </div>
-
-            {/* Language Selector Indicator */}
-            <select
-              value={activeLanguage}
-              onChange={(e) => {
-                const lang = e.target.value;
-                setActiveLanguage(lang);
-                localStorage.setItem('app_lang', lang);
-              }}
-              style={{
-                fontSize: '12px',
-                padding: '6px 10px',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border-color)',
-                backgroundColor: 'var(--bg-card)',
-                color: 'var(--text-primary)',
-                cursor: 'pointer'
-              }}
-            >
-              {LANGUAGES.map((lang) => (
-                <option key={lang.code} value={lang.code}>
-                  {lang.flag} {lang.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Main Navigation Links */}
-          <Link to="/ai-tools" style={mobileNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>{t('allTools')}</Link>
-          <a href="/#popular-tools" style={mobileNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>{t('popularTools')}</a>
-          <Link to="/trending" style={mobileNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>{t('trending')}</Link>
-          <Link to="/new" style={mobileNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>{t('newest')}</Link>
-          <Link to="/collections" style={mobileNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>{t('collections')}</Link>
-          <Link to="/compare" style={mobileNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>{t('compare')}</Link>
-          <Link to="/blog" style={mobileNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>{t('blog')}</Link>
-          <Link to="/advertise" style={mobileNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>{t('sponsorship')}</Link>
-
-          <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '4px 0' }} />
-
-          {/* Mobile Auth Actions */}
-          {!user ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <Link to="/login" className="btn btn-outline w-full" style={{ padding: '12px', justifyContent: 'center' }} onClick={() => setMobileMenuOpen(false)}>
-                <User size={16} />
-                <span>{t('login')}</span>
-              </Link>
-              <Link to="/signup" className="btn btn-primary w-full" style={{ padding: '12px', justifyContent: 'center' }} onClick={() => setMobileMenuOpen(false)}>
-                <span>{t('getStarted')}</span>
-              </Link>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <Link to="/dashboard" style={mobileNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>{t('dashboard')}</Link>
-              {isOwner() && <Link to="/dashboard?tab=listings" style={mobileNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>{t('myTools')}</Link>}
-              {isAdmin() && <Link to="/admin" style={{ ...mobileNavLinkStyle, color: 'var(--color-gold)' }} onClick={() => setMobileMenuOpen(false)}>{t('adminConsole')}</Link>}
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  handleLogout();
-                }}
-                className="btn btn-outline w-full"
-                style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)', padding: '10px', justifyContent: 'center', marginTop: '4px' }}
-              >
-                <LogOut size={16} />
-                <span>{t('logout')}</span>
-              </button>
-            </div>
-          )}
-
-          {/* Submit Tool CTA Button */}
-          <Link
-            to="/submit-tool"
-            className="btn w-full"
-            onClick={() => setMobileMenuOpen(false)}
+          {/* Card Container */}
+          <div
+            onClick={(e) => e.stopPropagation()}
             style={{
-              marginTop: 'auto',
-              padding: '14px',
-              justifyContent: 'center',
-              background: 'linear-gradient(135deg, #E2603A 0%, #ee6f47 100%)',
-              color: 'white',
-              border: 'none',
-              borderRadius: 'var(--radius-md)',
-              fontWeight: 'var(--font-bold)',
-              boxShadow: '0 4px 14px rgba(226, 96, 58, 0.35)',
-              textAlign: 'center',
+              width: '100%',
+              maxWidth: '460px',
+              maxHeight: 'calc(100vh - 90px)',
+              backgroundColor: 'var(--bg-card)',
+              border: '1.5px solid var(--border-color)',
+              borderRadius: '20px',
+              boxShadow: '0 20px 50px -10px rgba(0, 0, 0, 0.35), 0 0 25px rgba(226, 96, 58, 0.12)',
+              padding: '18px 20px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+              overflowY: 'auto',
+              boxSizing: 'border-box',
             }}
           >
-            <span>{t('submitTool')}</span>
-          </Link>
+            {/* Quick Utility Row: Theme, Language, Saved Favorites */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid var(--border-color)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                {/* Theme Toggle */}
+                <button
+                  onClick={toggleTheme}
+                  className="header-icon-btn theme-btn"
+                  title="Toggle light/dark theme"
+                  style={{ ...iconBtnStyle, border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '6px 10px', display: 'flex', gap: '6px', alignItems: 'center' }}
+                >
+                  {theme === 'dark' ? (
+                    <>
+                      <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                      <span style={{ fontSize: '12px' }}>Light</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                      <span style={{ fontSize: '12px' }}>Dark</span>
+                    </>
+                  )}
+                </button>
+
+                {/* Saved Favorites Link */}
+                <Link
+                  to={user ? "/dashboard?tab=saved" : "/login"}
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    color: 'var(--text-primary)',
+                    textDecoration: 'none',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '6px 10px',
+                    backgroundColor: 'var(--bg-secondary)'
+                  }}
+                >
+                  <Bookmark size={15} />
+                  <span>{t('savedTitle')}</span>
+                  {user && savedToolsList.length > 0 && (
+                    <span className="badge badge-pricing" style={{ fontSize: '10px', padding: '1px 5px' }}>
+                      {savedToolsList.length}
+                    </span>
+                  )}
+                </Link>
+              </div>
+
+              {/* Language Selector Indicator */}
+              <select
+                value={activeLanguage}
+                onChange={(e) => {
+                  const lang = e.target.value;
+                  setActiveLanguage(lang);
+                  localStorage.setItem('app_lang', lang);
+                }}
+                style={{
+                  fontSize: '12px',
+                  padding: '6px 8px',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'var(--bg-secondary)',
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer'
+                }}
+              >
+                {LANGUAGES.map((lang) => (
+                  <option key={lang.code} value={lang.code}>
+                    {lang.flag} {lang.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Main Navigation Links Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+              <Link to="/ai-tools" style={mobileGridNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>
+                <span>🛠️</span> {t('allTools')}
+              </Link>
+              <a href="/#popular-tools" style={mobileGridNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>
+                <span>⭐</span> {t('popularTools')}
+              </a>
+              <Link to="/trending" style={mobileGridNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>
+                <span>🔥</span> {t('trending')}
+              </Link>
+              <Link to="/new" style={mobileGridNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>
+                <span>⚡</span> {t('newest')}
+              </Link>
+              <Link to="/collections" style={mobileGridNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>
+                <span>📦</span> {t('collections')}
+              </Link>
+              <Link to="/compare" style={mobileGridNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>
+                <span>⚖️</span> {t('compare')}
+              </Link>
+              <Link to="/blog" style={mobileGridNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>
+                <span>📝</span> {t('blog')}
+              </Link>
+              <Link to="/advertise" style={mobileGridNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>
+                <span>🚀</span> {t('sponsorship')}
+              </Link>
+            </div>
+
+            <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '2px 0' }} />
+
+            {/* Mobile Auth Actions */}
+            {!user ? (
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <Link to="/login" className="btn btn-outline" style={{ flex: 1, padding: '10px', justifyContent: 'center', fontSize: '13px' }} onClick={() => setMobileMenuOpen(false)}>
+                  <User size={15} />
+                  <span>{t('login')}</span>
+                </Link>
+                <Link to="/signup" className="btn btn-primary" style={{ flex: 1, padding: '10px', justifyContent: 'center', fontSize: '13px' }} onClick={() => setMobileMenuOpen(false)}>
+                  <span>{t('getStarted')}</span>
+                </Link>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <Link to="/dashboard" style={{ ...mobileGridNavLinkStyle, flex: 1 }} onClick={() => setMobileMenuOpen(false)}>{t('dashboard')}</Link>
+                  {isOwner() && <Link to="/dashboard?tab=listings" style={{ ...mobileGridNavLinkStyle, flex: 1 }} onClick={() => setMobileMenuOpen(false)}>{t('myTools')}</Link>}
+                </div>
+                {isAdmin() && <Link to="/admin" style={{ ...mobileGridNavLinkStyle, color: 'var(--color-gold)' }} onClick={() => setMobileMenuOpen(false)}>{t('adminConsole')}</Link>}
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className="btn btn-outline w-full"
+                  style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)', padding: '8px', justifyContent: 'center', fontSize: '12px' }}
+                >
+                  <LogOut size={14} />
+                  <span>{t('logout')}</span>
+                </button>
+              </div>
+            )}
+
+            {/* Submit Tool CTA Button */}
+            <Link
+              to="/submit-tool"
+              className="btn w-full"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                marginTop: '4px',
+                padding: '12px',
+                justifyContent: 'center',
+                background: 'linear-gradient(135deg, #E2603A 0%, #ee6f47 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                fontWeight: 'var(--font-bold)',
+                boxShadow: '0 4px 14px rgba(226, 96, 58, 0.35)',
+                textAlign: 'center',
+                fontSize: '14px'
+              }}
+            >
+              <span>+ {t('submitTool')}</span>
+            </Link>
+          </div>
         </div>
       )}
 
@@ -1104,14 +1146,7 @@ const navLinkStyle: React.CSSProperties = {
   textDecoration: 'none',
 };
 
-const mobileNavLinkStyle: React.CSSProperties = {
-  fontSize: 'var(--text-base)',
-  fontWeight: 'var(--font-semibold)',
-  color: 'var(--text-primary)',
-  padding: '8px 0',
-  borderBottom: '1px solid var(--border-color)',
-  textDecoration: 'none',
-};
+
 
 const cleanSignupBtnStyle: React.CSSProperties = {
   border: '1px solid var(--border-color)',
@@ -1141,3 +1176,19 @@ const iconBtnStyle: React.CSSProperties = {
   transition: 'color 0.2s, background-color 0.2s',
   textDecoration: 'none',
 };
+
+const mobileGridNavLinkStyle: React.CSSProperties = {
+  fontSize: '13px',
+  fontWeight: '600',
+  color: 'var(--text-primary)',
+  padding: '10px 12px',
+  borderRadius: 'var(--radius-md)',
+  border: '1px solid var(--border-color)',
+  backgroundColor: 'var(--bg-secondary)',
+  textDecoration: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  transition: 'all 0.2s ease',
+};
+
