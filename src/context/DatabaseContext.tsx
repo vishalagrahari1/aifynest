@@ -125,18 +125,68 @@ const DatabaseContext = createContext<DatabaseContextType | undefined>(undefined
 const useSupabase = !import.meta.env.VITE_SUPABASE_URL?.includes('placeholder-url');
 
 export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [tools, setTools] = useState<Tool[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const [payments, setPayments] = useState<Payment[]>([]);
+  const [tools, setTools] = useState<Tool[]>(() => {
+    const cached = localStorage.getItem('ai_tools');
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {}
+    }
+    return initialTools;
+  });
+
+  const [categories, setCategories] = useState<Category[]>(() => {
+    const cached = localStorage.getItem('ai_categories');
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {}
+    }
+    return initialCategories;
+  });
+
+  const [reviews, setReviews] = useState<Review[]>(() => {
+    const cached = localStorage.getItem('ai_reviews');
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {}
+    }
+    return initialReviews;
+  });
+
+  const [campaigns, setCampaigns] = useState<Campaign[]>(() => {
+    const cached = localStorage.getItem('ai_campaigns');
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {}
+    }
+    return initialCampaigns;
+  });
+
+  const [payments, setPayments] = useState<Payment[]>(() => {
+    const cached = localStorage.getItem('ai_payments');
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {}
+    }
+    return initialPayments;
+  });
+
   const [analyticsEvents, setAnalyticsEvents] = useState<AnalyticsEvent[]>([]);
   const [claims, setClaims] = useState<any[]>([]);
-  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
-  const [collections, setCollections] = useState<Collection[]>([]);
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
-  const [affiliateLinks, setAffiliateLinks] = useState<AffiliateLink[]>([]);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>(() => initialBlogPosts);
+  const [collections, setCollections] = useState<Collection[]>(() => initialCollections);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(() => initialAuditLogs);
+  const [affiliateLinks, setAffiliateLinks] = useState<AffiliateLink[]>(() => initialAffiliateLinks);
+  const [notifications, setNotifications] = useState<Notification[]>(() => initialNotifications);
   const [dbError, setDbError] = useState<string | null>(null);
   const [ownerWallet, setOwnerWallet] = useState<{ availableBalance: number; currency: string } | null>(null);
   const [ledger, setLedger] = useState<any[]>([]);
@@ -191,14 +241,16 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       // 1. Categories
       const { data: catData } = await supabase.from('categories').select('*').order('name');
-      if (catData) {
-        setCategories(catData.map(c => ({
+      if (catData && catData.length > 0) {
+        const mappedCats = catData.map(c => ({
           name: c.name,
           slug: c.slug,
           iconName: c.icon_name,
           description: c.description,
           subcategories: c.subcategories || [],
-        })));
+        }));
+        setCategories(mappedCats);
+        try { localStorage.setItem('ai_categories', JSON.stringify(mappedCats)); } catch (e) {}
       }
 
       // 2. Tools & Submissions (Hybrid list compilation)
@@ -206,8 +258,10 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const { data: subsData } = await supabase.from('tool_submissions').select('*');
 
       let compiledTools: Tool[] = [];
-      if (toolsData) {
+      if (toolsData && toolsData.length > 0) {
         compiledTools = toolsData.map(t => mapToolRow(t));
+      } else {
+        compiledTools = [...initialTools];
       }
 
       if (subsData) {
@@ -282,7 +336,10 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           }
         });
       }
-      setTools(compiledTools);
+      if (compiledTools.length > 0) {
+        setTools(compiledTools);
+        try { localStorage.setItem('ai_tools', JSON.stringify(compiledTools)); } catch (e) {}
+      }
 
       // 3. Claims
       const { data: claimsData } = await supabase.from('tool_claims').select('*');
