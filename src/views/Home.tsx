@@ -316,7 +316,8 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
             <span style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--text-primary)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
               <span>Trusted by</span>
               <strong style={{ color: '#E2603A', fontWeight: 800 }}>50,000+</strong>
-              <span>monthly visitors, creators & developers</span>
+              <span className="badge-long-text">monthly visitors, creators & developers</span>
+              <span className="badge-short-text">monthly users</span>
             </span>
           </div>
 
@@ -1672,7 +1673,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
       </section>
 
       {/* Building an AI Tool CTA Section */}
-      <section className="section bg-secondary" style={{ borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)', padding: '60px 0', marginTop: '40px' }}>
+      <section className="section bg-secondary build-cta-section" style={{ borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)', padding: '60px 0', marginTop: '40px' }}>
         <div className="container" style={{ textAlign: 'center', maxWidth: '700px' }}>
           <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'bold', margin: '0 0 12px 0' }}>
             Building an AI Tool? Get Discovered on AIFynest.
@@ -1680,7 +1681,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
           <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', lineHeight: '1.6', marginBottom: '24px' }}>
             Create your listing, showcase your product, collect reviews, understand your audience, and reach users searching for AI tools.
           </p>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+          <div className="build-cta-buttons" style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
             <Link to="/submit-tool" className="btn btn-primary" style={{ padding: '12px 24px' }}>
               + Submit Your AI Tool
             </Link>
@@ -1708,6 +1709,42 @@ const styleInjection = (
     .sponsored-scroll-container {
       -ms-overflow-style: none;
       scrollbar-width: none;
+    }
+
+    @media (max-width: 640px) {
+      .hero-trust-badge {
+        padding: 6px 10px !important;
+        gap: 6px !important;
+        font-size: 11px !important;
+        border-radius: 20px !important;
+      }
+      .badge-divider {
+        display: none !important;
+      }
+      .badge-long-text {
+        display: none !important;
+      }
+      .badge-short-text {
+        display: inline !important;
+      }
+      .build-cta-section {
+        padding: 32px 16px !important;
+      }
+      .build-cta-buttons {
+        flex-direction: column !important;
+        width: 100% !important;
+      }
+      .build-cta-buttons > a {
+        width: 100% !important;
+        justify-content: center !important;
+        text-align: center !important;
+      }
+    }
+
+    @media (min-width: 641px) {
+      .badge-short-text {
+        display: none !important;
+      }
     }
   `}</style>
 );
