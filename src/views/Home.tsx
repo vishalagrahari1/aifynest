@@ -251,13 +251,13 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
 
       {/* Hero Glowing background effect */}
       <div className="hero-glow" style={{ top: '-100px', left: '5%' }}></div>
-      <div className="hero-glow" style={{ top: '150px', right: '5%', background: 'radial-gradient(circle, rgba(160, 68, 244, 0.08) 0%, rgba(99, 102, 241, 0.02) 60%, rgba(0, 0, 0, 0) 100%)' }}></div>
+      <div className="hero-glow" style={{ top: '150px', right: '5%', background: 'radial-gradient(circle, rgba(226, 96, 58, 0.05) 0%, rgba(226, 96, 58, 0.01) 60%, rgba(0, 0, 0, 0) 100%)' }}></div>
 
       {/* Hero Search Section - Simple & Compact */}
       <section
         style={{
           background: 'var(--gradient-hero)',
-          padding: '48px 0 36px 0',
+          padding: '44px 0 36px 0',
           borderBottom: '1px solid var(--border-color)',
           textAlign: 'center',
           position: 'relative',
@@ -265,6 +265,26 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
         }}
       >
         <div className="container" style={{ maxWidth: '780px' }}>
+          {/* Trust Signal Badge */}
+          <div 
+            style={{ 
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              gap: '8px', 
+              backgroundColor: 'var(--bg-card)', 
+              border: '1px solid var(--border-color)', 
+              borderRadius: 'var(--radius-full)', 
+              padding: '5px 14px', 
+              marginBottom: '16px',
+              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.02)'
+            }}
+          >
+            <span style={{ fontSize: '13px' }}>✨</span>
+            <span style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--text-secondary)' }}>
+              Trusted by <strong>50,000+</strong> creators, developers & founders
+            </span>
+          </div>
+
           <h1
             style={{
               fontSize: 'clamp(2rem, 4.5vw, 2.8rem)',
@@ -275,7 +295,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
               color: 'var(--text-primary)',
             }}
           >
-            Discover the Best <span style={{ background: 'var(--gradient-brand)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>AI Tools</span>
+            Discover the Best <span style={{ color: '#E2603A' }}>AI Tools</span>
           </h1>
 
           <p
@@ -317,7 +337,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                     border: '1px solid var(--border-color)',
                     backgroundColor: 'var(--bg-secondary)',
                     color: 'var(--text-primary)',
-                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02)',
                     width: '100%',
                     outline: 'none',
                     transition: 'all var(--transition-normal)',
@@ -394,7 +414,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                   style={{
                     fontSize: 'var(--text-xs)',
                     color: 'var(--text-secondary)',
-                    backgroundColor: 'var(--bg-tertiary)',
+                    backgroundColor: 'var(--bg-card)',
                     padding: '4px 10px',
                     borderRadius: 'var(--radius-full)',
                     fontWeight: '500',
@@ -574,7 +594,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '24px' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-                  <span className="badge badge-sponsored">
+                  <span className="badge badge-featured">
                     <Sparkles size={11} /> Featured
                   </span>
                   <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', margin: 0 }}>
@@ -582,7 +602,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                   </h2>
                 </div>
                 <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: 0 }}>
-                  Handpicked & promoted AI solutions curated by our community and partners.
+                  Handpicked AI solutions curated by our community and partners.
                 </p>
               </div>
               
@@ -720,7 +740,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                   ))}
                 </div>
 
-                {/* Numbered Ranked Items (01 - 05) with balanced padding */}
+                {/* Numbered Ranked Items (01 - 05) with balanced padding & pricing badge */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {(() => {
                     const approved = tools.filter(t => t.status === 'approved');
@@ -735,7 +755,6 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                     }
 
                     const top5 = sorted.slice(0, 5);
-                    const rankChanges = ['+2', '+1', '+3', '+1', '+2'];
 
                     return top5.map((tool, idx) => (
                       <div
@@ -753,9 +772,9 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                           transition: 'all 0.2s ease',
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.borderColor = '#E2603A';
+                          e.currentTarget.style.borderColor = 'var(--border-color-hover)';
                           e.currentTarget.style.transform = 'translateY(-2px)';
-                          e.currentTarget.style.boxShadow = '0 4px 14px rgba(226, 96, 58, 0.1)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.04)';
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.borderColor = 'var(--border-color)';
@@ -769,23 +788,25 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                         <img
                           src={tool.logoUrl}
                           alt={tool.name}
-                          style={{ width: '38px', height: '38px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)' }}
+                          style={{ width: '36px', height: '36px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)' }}
                           onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop'; }}
                         />
                         <div style={{ flexGrow: 1, overflow: 'hidden' }}>
-                          <div style={{ fontWeight: '700', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          <div style={{ fontWeight: '700', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {tool.name}
                           </div>
-                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '3px' }}>
                             {tool.tagline}
                           </div>
+                          <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                            <span className="badge badge-pricing" style={{ fontSize: '9px', padding: '1px 5px', borderRadius: 'var(--radius-full)', textTransform: 'capitalize' }}>
+                              {tool.pricing}
+                            </span>
+                          </div>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
                           <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-primary)' }}>
                             ★ {tool.rating > 0 ? tool.rating : '4.8'}
-                          </span>
-                          <span style={{ fontSize: '9px', fontWeight: '700', color: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', padding: '2px 6px', borderRadius: '50px' }}>
-                            {rankChanges[idx]}
                           </span>
                         </div>
                       </div>
@@ -861,9 +882,9 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                         boxShadow: '0 2px 6px rgba(0, 0, 0, 0.02)'
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = '#E2603A';
+                        e.currentTarget.style.borderColor = 'var(--border-color-hover)';
                         e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.boxShadow = '0 6px 16px rgba(226, 96, 58, 0.12)';
+                        e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.05)';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.borderColor = 'var(--border-color)';
@@ -871,7 +892,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                         e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.02)';
                       }}
                     >
-                      <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'rgba(226, 96, 58, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>
+                      <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
                         {useCase.icon}
                       </div>
                       <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-primary)', lineHeight: '1.2' }}>
@@ -916,7 +937,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                   </Link>
                 </div>
 
-                {/* Recent tools list - 5 items balanced padding */}
+                {/* Recent tools list - 5 items normalized */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {(() => {
                     const recent = tools
@@ -943,9 +964,9 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                           boxShadow: '0 2px 6px rgba(0, 0, 0, 0.02)'
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.borderColor = '#E2603A';
+                          e.currentTarget.style.borderColor = 'var(--border-color-hover)';
                           e.currentTarget.style.transform = 'translateY(-2px)';
-                          e.currentTarget.style.boxShadow = '0 4px 14px rgba(226, 96, 58, 0.1)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.04)';
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.borderColor = 'var(--border-color)';
@@ -956,21 +977,18 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                         <img
                           src={tool.logoUrl}
                           alt={tool.name}
-                          style={{ width: '38px', height: '38px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)' }}
+                          style={{ width: '36px', height: '36px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)' }}
                           onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop'; }}
                         />
                         <div style={{ flexGrow: 1, overflow: 'hidden' }}>
-                          <div style={{ fontWeight: '700', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          <div style={{ fontWeight: '700', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {tool.name}
                           </div>
-                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '4px' }}>
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '3px' }}>
                             {tool.tagline}
                           </div>
                           <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                            <span className="badge badge-platform" style={{ fontSize: '9px', padding: '1px 5px', borderRadius: 'var(--radius-full)' }}>
-                              {tool.subCategory || 'AI'}
-                            </span>
-                            <span className="badge badge-pricing" style={{ fontSize: '9px', padding: '1px 5px', borderRadius: 'var(--radius-full)' }}>
+                            <span className="badge badge-pricing" style={{ fontSize: '9px', padding: '1px 5px', borderRadius: 'var(--radius-full)', textTransform: 'capitalize' }}>
                               {tool.pricing}
                             </span>
                           </div>
@@ -1316,7 +1334,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                   <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>OpenAI</span>
                 </div>
                 
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 'bold', boxShadow: '0 2px 8px rgba(124, 58, 237, 0.3)', flexShrink: 0, zIndex: 2 }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#E2603A', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 'bold', boxShadow: '0 2px 8px rgba(226, 96, 58, 0.25)', flexShrink: 0, zIndex: 2 }}>
                   VS
                 </div>
                 
@@ -1348,7 +1366,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                   <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Anysphere</span>
                 </div>
                 
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 'bold', boxShadow: '0 2px 8px rgba(124, 58, 237, 0.3)', flexShrink: 0, zIndex: 2 }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#E2603A', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 'bold', boxShadow: '0 2px 8px rgba(226, 96, 58, 0.25)', flexShrink: 0, zIndex: 2 }}>
                   VS
                 </div>
                 
@@ -1380,7 +1398,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                   <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>v6 Engine</span>
                 </div>
                 
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 'bold', boxShadow: '0 2px 8px rgba(124, 58, 237, 0.3)', flexShrink: 0, zIndex: 2 }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#E2603A', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 'bold', boxShadow: '0 2px 8px rgba(226, 96, 58, 0.25)', flexShrink: 0, zIndex: 2 }}>
                   VS
                 </div>
                 
@@ -1412,7 +1430,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                   <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Cloning</span>
                 </div>
                 
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 'bold', boxShadow: '0 2px 8px rgba(124, 58, 237, 0.3)', flexShrink: 0, zIndex: 2 }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#E2603A', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 'bold', boxShadow: '0 2px 8px rgba(226, 96, 58, 0.25)', flexShrink: 0, zIndex: 2 }}>
                   VS
                 </div>
                 
@@ -1602,7 +1620,7 @@ const styleInjection = (
   <style>{`
     .search-input-glow:focus {
       border-color: var(--color-primary) !important;
-      box-shadow: 0 0 20px rgba(124, 58, 237, 0.2) !important;
+      box-shadow: 0 0 20px rgba(226, 96, 58, 0.2) !important;
     }
     .sponsored-scroll-container::-webkit-scrollbar {
       display: none;

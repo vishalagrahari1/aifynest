@@ -94,7 +94,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({
     <div
       onClick={handleCardClick}
       onMouseLeave={() => setShowShare(false)}
-      className={`card ${tool.isSponsored ? 'glass' : ''}`}
+      className="card"
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -102,13 +102,9 @@ export const ToolCard: React.FC<ToolCardProps> = ({
         height: '100%',
         width: '100%',
         aspectRatio: isSquare ? '1 / 1' : 'auto',
-        padding: isSquare ? '14px' : 'var(--space-6)',
+        padding: isSquare ? '14px' : 'var(--space-5)',
         cursor: 'pointer',
-        border: tool.isFeatured
-          ? '1.5px solid #f59e0b'
-          : tool.isSponsored
-          ? '1.5px solid #E2603A'
-          : '1px solid var(--border-color)',
+        border: '1px solid var(--border-color)',
         backgroundColor: 'var(--bg-card)',
         boxSizing: 'border-box',
       }}
@@ -123,19 +119,13 @@ export const ToolCard: React.FC<ToolCardProps> = ({
         }}
       >
         <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-          {tool.isSponsored && <span className="badge badge-sponsored">Sponsored</span>}
           {tool.isFeatured && <span className="badge badge-featured">Featured</span>}
+          {tool.isSponsored && !tool.isFeatured && <span className="badge badge-sponsored">Sponsored</span>}
           {(() => {
             if (!tool.lastUpdated || !tool.isVerified) return null;
             const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
             const isRecent = (Date.now() - new Date(tool.lastUpdated).getTime()) <= THIRTY_DAYS_MS;
             return isRecent ? <span className="badge badge-verified">✓ Verified</span> : null;
-          })()}
-          {(() => {
-            if (!tool.lastUpdated) return null;
-            const FOURTEEN_DAYS_MS = 14 * 24 * 60 * 60 * 1000;
-            const isNew = (Date.now() - new Date(tool.lastUpdated).getTime()) <= FOURTEEN_DAYS_MS;
-            return isNew ? <span className="badge badge-new" style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.2)', fontSize: '10px', fontWeight: 'bold', padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>🆕 New</span> : null;
           })()}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginLeft: 'auto' }}>
