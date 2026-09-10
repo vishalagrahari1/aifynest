@@ -675,118 +675,131 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
             <div 
               className="card" 
               style={{ 
-                padding: '28px 22px', 
+                padding: '24px 20px', 
                 borderRadius: '24px', 
                 border: '1px solid var(--border-color)',
                 boxShadow: '0 8px 30px -4px rgba(0, 0, 0, 0.04)',
                 backgroundColor: 'var(--bg-secondary)',
                 display: 'flex', 
                 flexDirection: 'column', 
+                justifyContent: 'space-between',
                 height: '100%' 
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
-                <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '20px' }}>🔥</span> Trending AI Tools
-                </h3>
-              </div>
+              <div>
+                {/* Header */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '36px', marginBottom: '16px' }}>
+                  <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '20px' }}>🔥</span> Trending AI Tools
+                  </h3>
+                </div>
 
-              {/* Timeframe Segment Tabs */}
-              <div style={{ display: 'flex', gap: '4px', backgroundColor: 'var(--bg-tertiary)', padding: '4px', borderRadius: 'var(--radius-full)', marginBottom: '22px' }}>
-                {(['today', 'week', 'month'] as const).map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setTrendingTab(tab)}
-                    style={{
-                      flex: 1,
-                      padding: '6px 10px',
-                      fontSize: '11px',
-                      fontWeight: trendingTab === tab ? 700 : 500,
-                      borderRadius: 'var(--radius-full)',
-                      border: trendingTab === tab ? '1px solid rgba(226, 96, 58, 0.25)' : '1px solid transparent',
-                      backgroundColor: trendingTab === tab ? 'var(--bg-card)' : 'transparent',
-                      color: trendingTab === tab ? '#E2603A' : 'var(--text-muted)',
-                      boxShadow: trendingTab === tab ? '0 2px 8px rgba(226, 96, 58, 0.12)' : 'none',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      textTransform: 'capitalize'
-                    }}
-                  >
-                    {tab === 'today' ? 'Today' : tab === 'week' ? 'This Week' : 'This Month'}
-                  </button>
-                ))}
-              </div>
-
-              {/* Numbered Ranked Items (01 - 05) */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flexGrow: 1 }}>
-                {(() => {
-                  const approved = tools.filter(t => t.status === 'approved');
-                  let sorted = [...approved];
-
-                  if (trendingTab === 'today') {
-                    sorted.sort((a, b) => b.reviewCount - a.reviewCount);
-                  } else if (trendingTab === 'week') {
-                    sorted.sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount);
-                  } else {
-                    sorted.sort((a, b) => (b.rating * b.reviewCount) - (a.rating * a.reviewCount));
-                  }
-
-                  const top5 = sorted.slice(0, 5);
-                  const rankChanges = ['+2', '+1', '+3', '+1', '+2'];
-
-                  return top5.map((tool, idx) => (
-                    <div
-                      key={tool.id}
-                      onClick={() => navigate(`/tools/${tool.slug}`)}
+                {/* Timeframe Segment Tabs */}
+                <div style={{ display: 'flex', gap: '4px', backgroundColor: 'var(--bg-tertiary)', padding: '4px', borderRadius: 'var(--radius-full)', marginBottom: '16px' }}>
+                  {(['today', 'week', 'month'] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setTrendingTab(tab)}
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px',
-                        padding: '10px 12px',
-                        borderRadius: '16px',
-                        border: '1px solid transparent',
+                        flex: 1,
+                        padding: '5px 8px',
+                        fontSize: '11px',
+                        fontWeight: trendingTab === tab ? 700 : 500,
+                        borderRadius: 'var(--radius-full)',
+                        border: trendingTab === tab ? '1px solid rgba(226, 96, 58, 0.25)' : '1px solid transparent',
+                        backgroundColor: trendingTab === tab ? 'var(--bg-card)' : 'transparent',
+                        color: trendingTab === tab ? '#E2603A' : 'var(--text-muted)',
+                        boxShadow: trendingTab === tab ? '0 2px 8px rgba(226, 96, 58, 0.12)' : 'none',
                         cursor: 'pointer',
                         transition: 'all 0.2s ease',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'var(--bg-card)';
-                        e.currentTarget.style.borderColor = 'rgba(226, 96, 58, 0.2)';
-                        e.currentTarget.style.boxShadow = '0 4px 14px rgba(0, 0, 0, 0.04)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.borderColor = 'transparent';
-                        e.currentTarget.style.boxShadow = 'none';
+                        textTransform: 'capitalize'
                       }}
                     >
-                      <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)', width: '22px', flexShrink: 0 }}>
-                        0{idx + 1}
-                      </span>
-                      <img
-                        src={tool.logoUrl}
-                        alt={tool.name}
-                        style={{ width: '38px', height: '38px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)' }}
-                        onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop'; }}
-                      />
-                      <div style={{ flexGrow: 1, overflow: 'hidden' }}>
-                        <div style={{ fontWeight: '700', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {tool.name}
+                      {tab === 'today' ? 'Today' : tab === 'week' ? 'This Week' : 'This Month'}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Numbered Ranked Items (01 - 05) */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {(() => {
+                    const approved = tools.filter(t => t.status === 'approved');
+                    let sorted = [...approved];
+
+                    if (trendingTab === 'today') {
+                      sorted.sort((a, b) => b.reviewCount - a.reviewCount);
+                    } else if (trendingTab === 'week') {
+                      sorted.sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount);
+                    } else {
+                      sorted.sort((a, b) => (b.rating * b.reviewCount) - (a.rating * a.reviewCount));
+                    }
+
+                    const top5 = sorted.slice(0, 5);
+                    const rankChanges = ['+2', '+1', '+3', '+1', '+2'];
+
+                    return top5.map((tool, idx) => (
+                      <div
+                        key={tool.id}
+                        onClick={() => navigate(`/tools/${tool.slug}`)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          padding: '8px 10px',
+                          borderRadius: '14px',
+                          border: '1px solid var(--border-color)',
+                          backgroundColor: 'var(--bg-card)',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = '#E2603A';
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                          e.currentTarget.style.boxShadow = '0 4px 14px rgba(226, 96, 58, 0.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--border-color)';
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      >
+                        <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)', width: '20px', flexShrink: 0 }}>
+                          0{idx + 1}
+                        </span>
+                        <img
+                          src={tool.logoUrl}
+                          alt={tool.name}
+                          style={{ width: '36px', height: '36px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)' }}
+                          onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop'; }}
+                        />
+                        <div style={{ flexGrow: 1, overflow: 'hidden' }}>
+                          <div style={{ fontWeight: '700', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {tool.name}
+                          </div>
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {tool.tagline}
+                          </div>
                         </div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {tool.tagline}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                          <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-primary)' }}>
+                            ★ {tool.rating > 0 ? tool.rating : '4.8'}
+                          </span>
+                          <span style={{ fontSize: '9px', fontWeight: '700', color: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', padding: '2px 6px', borderRadius: '50px' }}>
+                            {rankChanges[idx]}
+                          </span>
                         </div>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--text-primary)' }}>
-                          ★ {tool.rating > 0 ? tool.rating : '4.8'}
-                        </span>
-                        <span style={{ fontSize: '10px', fontWeight: '700', color: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', padding: '2px 8px', borderRadius: '50px' }}>
-                          {rankChanges[idx]}
-                        </span>
-                      </div>
-                    </div>
-                  ));
-                })()}
+                    ));
+                  })()}
+                </div>
+              </div>
+
+              {/* Bottom Equalizer Link */}
+              <div style={{ marginTop: '16px', textAlign: 'right' }}>
+                <Link to="/trending" style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: '#E2603A', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <span>View All Trending</span>
+                  <ArrowRight size={12} />
+                </Link>
               </div>
             </div>
 
@@ -794,79 +807,84 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
             <div 
               className="card" 
               style={{ 
-                padding: '28px 22px', 
+                padding: '24px 20px', 
                 borderRadius: '24px', 
                 border: '1px solid var(--border-color)',
                 boxShadow: '0 8px 30px -4px rgba(0, 0, 0, 0.04)',
                 backgroundColor: 'var(--bg-secondary)',
                 display: 'flex', 
                 flexDirection: 'column', 
+                justifyContent: 'space-between',
                 height: '100%' 
               }}
             >
-              <div style={{ marginBottom: '20px' }}>
-                <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', margin: 0, marginBottom: '4px' }}>
-                  What do you want to accomplish?
-                </h3>
-                <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', margin: 0 }}>
-                  Choose a use case and find the perfect AI tools.
-                </p>
-              </div>
+              <div>
+                {/* Header */}
+                <div style={{ minHeight: '36px', marginBottom: '16px' }}>
+                  <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', margin: 0, marginBottom: '2px' }}>
+                    What do you want to accomplish?
+                  </h3>
+                  <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', margin: 0 }}>
+                    Choose a use case and find the perfect AI tools.
+                  </p>
+                </div>
 
-              {/* Grid of 10 Use Case Tiles */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', flexGrow: 1 }}>
-                {[
-                  { icon: '✍️', label: 'Write an article', q: 'article' },
-                  { icon: '🎨', label: 'Create a logo', q: 'logo' },
-                  { icon: '🖼️', label: 'Generate an image', q: 'image' },
-                  { icon: '🎥', label: 'Make a video', q: 'video' },
-                  { icon: '🌐', label: 'Build a website', q: 'website' },
-                  { icon: '💻', label: 'Write code', q: 'code' },
-                  { icon: '🔍', label: 'Improve SEO', q: 'seo' },
-                  { icon: '📱', label: 'Social media posts', q: 'social' },
-                  { icon: '📊', label: 'Create presentations', q: 'presentations' },
-                  { icon: '🎙️', label: 'Generate voice', q: 'voice' },
-                ].map((useCase) => (
-                  <div
-                    key={useCase.label}
-                    onClick={() => navigate(`/ai-tools?q=${encodeURIComponent(useCase.q)}`)}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      padding: '14px 10px',
-                      borderRadius: '16px',
-                      border: '1px solid var(--border-color)',
-                      backgroundColor: 'var(--bg-card)',
-                      cursor: 'pointer',
-                      textAlign: 'center',
-                      gap: '8px',
-                      transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.02)'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = '#E2603A';
-                      e.currentTarget.style.transform = 'translateY(-3px)';
-                      e.currentTarget.style.boxShadow = '0 8px 20px rgba(226, 96, 58, 0.12)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--border-color)';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.02)';
-                    }}
-                  >
-                    <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'rgba(226, 96, 58, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
-                      {useCase.icon}
+                {/* Grid of 10 Use Case Tiles */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
+                  {[
+                    { icon: '✍️', label: 'Write an article', q: 'article' },
+                    { icon: '🎨', label: 'Create a logo', q: 'logo' },
+                    { icon: '🖼️', label: 'Generate an image', q: 'image' },
+                    { icon: '🎥', label: 'Make a video', q: 'video' },
+                    { icon: '🌐', label: 'Build a website', q: 'website' },
+                    { icon: '💻', label: 'Write code', q: 'code' },
+                    { icon: '🔍', label: 'Improve SEO', q: 'seo' },
+                    { icon: '📱', label: 'Social media posts', q: 'social' },
+                    { icon: '📊', label: 'Create presentations', q: 'presentations' },
+                    { icon: '🎙️', label: 'Generate voice', q: 'voice' },
+                  ].map((useCase) => (
+                    <div
+                      key={useCase.label}
+                      onClick={() => navigate(`/ai-tools?q=${encodeURIComponent(useCase.q)}`)}
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '10px 8px',
+                        borderRadius: '14px',
+                        border: '1px solid var(--border-color)',
+                        backgroundColor: 'var(--bg-card)',
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        gap: '6px',
+                        transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.02)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = '#E2603A';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 6px 16px rgba(226, 96, 58, 0.12)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = 'var(--border-color)';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.02)';
+                      }}
+                    >
+                      <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'rgba(226, 96, 58, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>
+                        {useCase.icon}
+                      </div>
+                      <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-primary)', lineHeight: '1.2' }}>
+                        {useCase.label}
+                      </span>
                     </div>
-                    <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', lineHeight: '1.2' }}>
-                      {useCase.label}
-                    </span>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
 
-              <div style={{ marginTop: '20px', textAlign: 'right' }}>
+              {/* Bottom Equalizer Link */}
+              <div style={{ marginTop: '16px', textAlign: 'right' }}>
                 <Link to="/collections" style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: '#E2603A', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                   <span>View All Use Cases</span>
                   <ArrowRight size={12} />
@@ -878,91 +896,99 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
             <div 
               className="card" 
               style={{ 
-                padding: '28px 22px', 
+                padding: '24px 20px', 
                 borderRadius: '24px', 
                 border: '1px solid var(--border-color)',
                 boxShadow: '0 8px 30px -4px rgba(0, 0, 0, 0.04)',
                 backgroundColor: 'var(--bg-secondary)',
                 display: 'flex', 
                 flexDirection: 'column', 
+                justifyContent: 'space-between',
                 height: '100%' 
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', margin: 0 }}>
-                  Recently Added
-                </h3>
+              <div>
+                {/* Header */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '36px', marginBottom: '16px' }}>
+                  <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', margin: 0 }}>
+                    Recently Added
+                  </h3>
+                </div>
+
+                {/* Recent tools list - 5 items matching Col 1 */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {(() => {
+                    const recent = tools
+                      .filter(t => t.status === 'approved')
+                      .sort((a, b) => new Date(b.approvedAt || b.lastUpdated || 0).getTime() - new Date(a.approvedAt || a.lastUpdated || 0).getTime())
+                      .slice(0, 5);
+
+                    const timesAgo = ['2 days ago', '3 days ago', '3 days ago', '4 days ago', '5 days ago'];
+
+                    return recent.map((tool, idx) => (
+                      <div
+                        key={tool.id}
+                        onClick={() => navigate(`/tools/${tool.slug}`)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          padding: '8px 10px',
+                          borderRadius: '14px',
+                          border: '1px solid var(--border-color)',
+                          backgroundColor: 'var(--bg-card)',
+                          cursor: 'pointer',
+                          transition: 'all 0.25s ease',
+                          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.02)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = '#E2603A';
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                          e.currentTarget.style.boxShadow = '0 4px 14px rgba(226, 96, 58, 0.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--border-color)';
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.02)';
+                        }}
+                      >
+                        <img
+                          src={tool.logoUrl}
+                          alt={tool.name}
+                          style={{ width: '36px', height: '36px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)' }}
+                          onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop'; }}
+                        />
+                        <div style={{ flexGrow: 1, overflow: 'hidden' }}>
+                          <div style={{ fontWeight: '700', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {tool.name}
+                          </div>
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '2px' }}>
+                            {tool.tagline}
+                          </div>
+                          <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                            <span className="badge badge-platform" style={{ fontSize: '9px', padding: '1px 5px', borderRadius: 'var(--radius-full)' }}>
+                              {tool.subCategory || 'AI'}
+                            </span>
+                            <span className="badge badge-pricing" style={{ fontSize: '9px', padding: '1px 5px', borderRadius: 'var(--radius-full)' }}>
+                              {tool.pricing}
+                            </span>
+                          </div>
+                        </div>
+                        <span style={{ fontSize: '10px', color: 'var(--text-muted)', flexShrink: 0, alignSelf: 'flex-start', fontWeight: 500 }}>
+                          {timesAgo[idx] || 'recently'}
+                        </span>
+                      </div>
+                    ));
+                  })()}
+                </div>
+              </div>
+
+              {/* Bottom Equalizer Link */}
+              <div style={{ marginTop: '16px', textAlign: 'right' }}>
                 <Link to="/ai-tools?q=new" style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: '#E2603A', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                   <span>View All New Tools</span>
                   <ArrowRight size={12} />
                 </Link>
-              </div>
-
-              {/* Recent tools list */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', flexGrow: 1 }}>
-                {(() => {
-                  const recent = tools
-                    .filter(t => t.status === 'approved')
-                    .sort((a, b) => new Date(b.approvedAt || b.lastUpdated || 0).getTime() - new Date(a.approvedAt || a.lastUpdated || 0).getTime())
-                    .slice(0, 4);
-
-                  const timesAgo = ['2 days ago', '3 days ago', '3 days ago', '4 days ago'];
-
-                  return recent.map((tool, idx) => (
-                    <div
-                      key={tool.id}
-                      onClick={() => navigate(`/tools/${tool.slug}`)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px',
-                        padding: '12px 14px',
-                        borderRadius: '16px',
-                        border: '1px solid var(--border-color)',
-                        backgroundColor: 'var(--bg-card)',
-                        cursor: 'pointer',
-                        transition: 'all 0.25s ease',
-                        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.02)'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = '#E2603A';
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.boxShadow = '0 6px 18px rgba(226, 96, 58, 0.1)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = 'var(--border-color)';
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.02)';
-                      }}
-                    >
-                      <img
-                        src={tool.logoUrl}
-                        alt={tool.name}
-                        style={{ width: '42px', height: '42px', borderRadius: '12px', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)' }}
-                        onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop'; }}
-                      />
-                      <div style={{ flexGrow: 1, overflow: 'hidden' }}>
-                        <div style={{ fontWeight: '700', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '2px' }}>
-                          {tool.name}
-                        </div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '6px' }}>
-                          {tool.tagline}
-                        </div>
-                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                          <span className="badge badge-platform" style={{ fontSize: '10px', padding: '2px 6px', borderRadius: 'var(--radius-full)' }}>
-                            {tool.subCategory || 'AI'}
-                          </span>
-                          <span className="badge badge-pricing" style={{ fontSize: '10px', padding: '2px 6px', borderRadius: 'var(--radius-full)' }}>
-                            {tool.pricing}
-                          </span>
-                        </div>
-                      </div>
-                      <span style={{ fontSize: '11px', color: 'var(--text-muted)', flexShrink: 0, alignSelf: 'flex-start', fontWeight: 500 }}>
-                        {timesAgo[idx] || 'recently'}
-                      </span>
-                    </div>
-                  ));
-                })()}
               </div>
             </div>
 
