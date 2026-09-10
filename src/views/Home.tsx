@@ -265,23 +265,58 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
         }}
       >
         <div className="container" style={{ maxWidth: '780px' }}>
-          {/* Trust Signal Badge */}
+          {/* Enhanced Premium Trust Signal Badge */}
           <div 
             style={{ 
               display: 'inline-flex', 
               alignItems: 'center', 
-              gap: '8px', 
+              gap: '10px', 
               backgroundColor: 'var(--bg-card)', 
-              border: '1px solid var(--border-color)', 
+              border: '1px solid rgba(226, 96, 58, 0.25)', 
               borderRadius: 'var(--radius-full)', 
-              padding: '5px 14px', 
-              marginBottom: '16px',
-              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.02)'
+              padding: '6px 16px', 
+              marginBottom: '20px',
+              boxShadow: '0 4px 16px rgba(226, 96, 58, 0.08)',
+              transition: 'all 0.25s ease',
+              cursor: 'default',
+              maxWidth: '100%',
+              flexWrap: 'wrap',
+              justifyContent: 'center'
             }}
+            className="hero-trust-badge"
           >
-            <span style={{ fontSize: '13px' }}>✨</span>
-            <span style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--text-secondary)' }}>
-              Trusted by <strong>50,000+</strong> creators, developers & founders
+            {/* Overlapping User Avatars Stack */}
+            <div style={{ display: 'flex', alignItems: 'center', marginLeft: '-2px' }}>
+              <img 
+                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&h=60&fit=crop&crop=faces" 
+                alt="Creator avatar" 
+                style={{ width: '22px', height: '22px', borderRadius: '50%', border: '2px solid var(--bg-card)', objectFit: 'cover' }} 
+              />
+              <img 
+                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&h=60&fit=crop&crop=faces" 
+                alt="Developer avatar" 
+                style={{ width: '22px', height: '22px', borderRadius: '50%', border: '2px solid var(--bg-card)', objectFit: 'cover', marginLeft: '-8px' }} 
+              />
+              <img 
+                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&h=60&fit=crop&crop=faces" 
+                alt="Founder avatar" 
+                style={{ width: '22px', height: '22px', borderRadius: '50%', border: '2px solid var(--bg-card)', objectFit: 'cover', marginLeft: '-8px' }} 
+              />
+            </div>
+
+            {/* Stars rating */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '2px', color: '#f59e0b', fontSize: '11px' }}>
+              <span>★★★★★</span>
+              <span style={{ color: 'var(--text-primary)', fontWeight: 'bold', marginLeft: '2px' }}>4.9/5</span>
+            </div>
+
+            <span style={{ color: 'var(--border-color)', fontSize: '12px' }} className="badge-divider">|</span>
+
+            {/* Trust text */}
+            <span style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--text-primary)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              <span>Trusted by</span>
+              <strong style={{ color: '#E2603A', fontWeight: 800 }}>50,000+</strong>
+              <span>creators, developers & founders</span>
             </span>
           </div>
 
@@ -1329,7 +1364,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
               <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}>Indexed AI Tools</div>
             </div>
             <div>
-              <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '4px' }}>45,000+</div>
+              <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'bold', color: '#E2603A', marginBottom: '4px' }}>50,000+</div>
               <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}>Monthly Discoveries</div>
             </div>
             <div>
