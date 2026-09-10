@@ -729,45 +729,48 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
             
             {/* Column 1: 🔥 Trending AI Tools */}
             <div 
-              className="card" 
+              className="dashboard-col-card" 
               style={{ 
-                padding: '24px 20px', 
+                padding: '28px 24px', 
                 borderRadius: '24px', 
                 border: '1px solid var(--border-color)',
-                boxShadow: '0 8px 30px -4px rgba(0, 0, 0, 0.04)',
+                boxShadow: '0 10px 30px -5px rgba(0, 0, 0, 0.04), 0 0 1px rgba(226, 96, 58, 0.2)',
                 backgroundColor: 'var(--bg-secondary)',
                 display: 'flex', 
                 flexDirection: 'column', 
                 justifyContent: 'space-between',
-                height: '100%' 
+                height: '100%',
+                position: 'relative',
+                overflow: 'hidden'
               }}
             >
               <div>
                 {/* Header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '32px', marginBottom: '14px' }}>
-                  <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '20px' }}>🔥</span> Trending AI Tools
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '10px', letterSpacing: '-0.01em' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '34px', height: '34px', borderRadius: '12px', backgroundColor: 'rgba(226, 96, 58, 0.12)', border: '1px solid rgba(226, 96, 58, 0.3)', fontSize: '18px' }}>🔥</span>
+                    <span>Trending AI Tools</span>
                   </h3>
                 </div>
 
                 {/* Timeframe Segment Tabs */}
-                <div style={{ display: 'flex', gap: '4px', backgroundColor: 'var(--bg-tertiary)', padding: '4px', borderRadius: 'var(--radius-full)', marginBottom: '14px' }}>
+                <div style={{ display: 'flex', gap: '4px', backgroundColor: 'var(--bg-tertiary)', padding: '5px', borderRadius: 'var(--radius-full)', marginBottom: '16px', border: '1px solid var(--border-color)' }}>
                   {(['today', 'week', 'month'] as const).map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setTrendingTab(tab)}
                       style={{
                         flex: 1,
-                        padding: '6px 8px',
-                        fontSize: '11px',
+                        padding: '7px 10px',
+                        fontSize: '12px',
                         fontWeight: trendingTab === tab ? 700 : 500,
                         borderRadius: 'var(--radius-full)',
-                        border: trendingTab === tab ? '1px solid rgba(226, 96, 58, 0.25)' : '1px solid transparent',
+                        border: trendingTab === tab ? '1px solid rgba(226, 96, 58, 0.3)' : '1px solid transparent',
                         backgroundColor: trendingTab === tab ? 'var(--bg-card)' : 'transparent',
                         color: trendingTab === tab ? '#E2603A' : 'var(--text-muted)',
-                        boxShadow: trendingTab === tab ? '0 2px 8px rgba(226, 96, 58, 0.12)' : 'none',
+                        boxShadow: trendingTab === tab ? '0 2px 10px rgba(226, 96, 58, 0.15)' : 'none',
                         cursor: 'pointer',
-                        transition: 'all 0.2s ease',
+                        transition: 'all 0.25s ease',
                         textTransform: 'capitalize'
                       }}
                     >
@@ -776,7 +779,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                   ))}
                 </div>
 
-                {/* Numbered Ranked Items (01 - 05) with balanced padding & pricing badge */}
+                {/* Numbered Ranked Items (01 - 05) with stylish rank badges */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {(() => {
                     const approved = tools.filter(t => t.status === 'approved');
@@ -792,146 +795,149 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
 
                     const top5 = sorted.slice(0, 5);
 
-                    return top5.map((tool, idx) => (
-                      <div
-                        key={tool.id}
-                        onClick={() => navigate(`/tools/${tool.slug}`)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '10px',
-                          padding: '10px 12px',
-                          borderRadius: '14px',
-                          border: '1px solid var(--border-color)',
-                          backgroundColor: 'var(--bg-card)',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease',
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.borderColor = 'var(--border-color-hover)';
-                          e.currentTarget.style.transform = 'translateY(-2px)';
-                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.04)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.borderColor = 'var(--border-color)';
-                          e.currentTarget.style.transform = 'translateY(0)';
-                          e.currentTarget.style.boxShadow = 'none';
-                        }}
-                      >
-                        <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)', width: '20px', flexShrink: 0 }}>
-                          0{idx + 1}
-                        </span>
-                        <img
-                          src={tool.logoUrl}
-                          alt={tool.name}
-                          style={{ width: '36px', height: '36px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)' }}
-                          onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop'; }}
-                        />
-                        <div style={{ flexGrow: 1, overflow: 'hidden' }}>
-                          <div style={{ fontWeight: '700', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            {tool.name}
+                    return top5.map((tool, idx) => {
+                      const isTopRank = idx === 0;
+                      return (
+                        <div
+                          key={tool.id}
+                          onClick={() => navigate(`/tools/${tool.slug}`)}
+                          className="trending-tool-row"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            padding: '11px 14px',
+                            borderRadius: '16px',
+                            border: isTopRank ? '1px solid rgba(226, 96, 58, 0.35)' : '1px solid var(--border-color)',
+                            backgroundColor: isTopRank ? 'rgba(226, 96, 58, 0.04)' : 'var(--bg-card)',
+                            cursor: 'pointer',
+                            transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                            position: 'relative'
+                          }}
+                        >
+                          <span
+                            style={{
+                              fontSize: '11px',
+                              fontWeight: 800,
+                              width: '26px',
+                              height: '26px',
+                              borderRadius: '8px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexShrink: 0,
+                              backgroundColor: isTopRank ? '#E2603A' : idx < 3 ? 'rgba(226, 96, 58, 0.12)' : 'var(--bg-tertiary)',
+                              color: isTopRank ? '#ffffff' : idx < 3 ? '#E2603A' : 'var(--text-muted)',
+                              border: isTopRank ? 'none' : '1px solid var(--border-color)'
+                            }}
+                          >
+                            0{idx + 1}
+                          </span>
+                          <img
+                            src={tool.logoUrl}
+                            alt={tool.name}
+                            style={{ width: '40px', height: '40px', borderRadius: '12px', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+                            onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop'; }}
+                          />
+                          <div style={{ flexGrow: 1, minWidth: 0 }}>
+                            <div style={{ fontWeight: '700', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {tool.name}
+                            </div>
+                            <div style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '4px' }}>
+                              {tool.tagline}
+                            </div>
+                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                              <span className="badge badge-pricing" style={{ fontSize: '10px', padding: '1px 7px', borderRadius: 'var(--radius-full)', textTransform: 'capitalize', fontWeight: 600 }}>
+                                {tool.pricing}
+                              </span>
+                            </div>
                           </div>
-                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '3px' }}>
-                            {tool.tagline}
-                          </div>
-                          <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                            <span className="badge badge-pricing" style={{ fontSize: '9px', padding: '1px 5px', borderRadius: 'var(--radius-full)', textTransform: 'capitalize' }}>
-                              {tool.pricing}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '3px', flexShrink: 0, backgroundColor: 'rgba(245, 158, 11, 0.1)', padding: '4px 8px', borderRadius: 'var(--radius-full)', border: '1px solid rgba(245, 158, 11, 0.25)' }}>
+                            <span style={{ fontSize: '11px', color: '#f59e0b' }}>★</span>
+                            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                              {tool.rating > 0 ? tool.rating : '4.8'}
                             </span>
                           </div>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
-                          <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-primary)' }}>
-                            ★ {tool.rating > 0 ? tool.rating : '4.8'}
-                          </span>
-                        </div>
-                      </div>
-                    ));
+                      );
+                    });
                   })()}
                 </div>
               </div>
 
               {/* Bottom Link */}
-              <div style={{ marginTop: '16px', textAlign: 'center' }}>
-                <Link to="/trending" style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: '#E2603A', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                  <span>View All Trending →</span>
+              <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                <Link to="/trending" className="dashboard-view-all-link">
+                  <span>View All Trending</span>
+                  <ArrowRight size={14} />
                 </Link>
               </div>
             </div>
 
             {/* Column 2: What do you want to accomplish? */}
             <div 
-              className="card" 
+              className="dashboard-col-card" 
               style={{ 
-                padding: '24px 20px', 
+                padding: '28px 24px', 
                 borderRadius: '24px', 
                 border: '1px solid var(--border-color)',
-                boxShadow: '0 8px 30px -4px rgba(0, 0, 0, 0.04)',
+                boxShadow: '0 10px 30px -5px rgba(0, 0, 0, 0.04), 0 0 1px rgba(226, 96, 58, 0.2)',
                 backgroundColor: 'var(--bg-secondary)',
                 display: 'flex', 
                 flexDirection: 'column', 
                 justifyContent: 'space-between',
-                height: '100%' 
+                height: '100%',
+                position: 'relative',
+                overflow: 'hidden'
               }}
             >
               <div>
                 {/* Header */}
-                <div style={{ minHeight: '32px', marginBottom: '14px', textAlign: 'center' }}>
-                  <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', margin: 0, marginBottom: '2px' }}>
-                    What do you want to accomplish?
+                <div style={{ marginBottom: '16px', textAlign: 'left' }}>
+                  <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 800, margin: 0, marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '10px', letterSpacing: '-0.01em' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '34px', height: '34px', borderRadius: '12px', backgroundColor: 'rgba(226, 96, 58, 0.12)', border: '1px solid rgba(226, 96, 58, 0.3)', fontSize: '18px' }}>🎯</span>
+                    <span>What do you want to accomplish?</span>
                   </h3>
-                  <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', margin: 0 }}>
-                    Choose a use case and find the perfect AI tools.
+                  <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', margin: 0, paddingLeft: '44px' }}>
+                    Choose a task & find tailored AI tools.
                   </p>
                 </div>
 
                 {/* Grid of 10 Use Case Tiles */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
                   {[
-                    { icon: '✍️', label: 'Write an article', q: 'article' },
-                    { icon: '🎨', label: 'Create a logo', q: 'logo' },
-                    { icon: '🖼️', label: 'Generate an image', q: 'image' },
-                    { icon: '🎥', label: 'Make a video', q: 'video' },
-                    { icon: '🌐', label: 'Build a website', q: 'website' },
-                    { icon: '💻', label: 'Write code', q: 'code' },
-                    { icon: '🔍', label: 'Improve SEO', q: 'seo' },
-                    { icon: '📱', label: 'Social media posts', q: 'social' },
-                    { icon: '📊', label: 'Create presentations', q: 'presentations' },
-                    { icon: '🎙️', label: 'Generate voice', q: 'voice' },
+                    { icon: '✍️', label: 'Write an article', q: 'article', gradient: 'rgba(59, 130, 246, 0.08)' },
+                    { icon: '🎨', label: 'Create a logo', q: 'logo', gradient: 'rgba(236, 72, 153, 0.08)' },
+                    { icon: '🖼️', label: 'Generate an image', q: 'image', gradient: 'rgba(168, 85, 247, 0.08)' },
+                    { icon: '🎥', label: 'Make a video', q: 'video', gradient: 'rgba(239, 68, 68, 0.08)' },
+                    { icon: '🌐', label: 'Build a website', q: 'website', gradient: 'rgba(16, 185, 129, 0.08)' },
+                    { icon: '💻', label: 'Write code', q: 'code', gradient: 'rgba(245, 158, 11, 0.08)' },
+                    { icon: '🔍', label: 'Improve SEO', q: 'seo', gradient: 'rgba(14, 165, 233, 0.08)' },
+                    { icon: '📱', label: 'Social media posts', q: 'social', gradient: 'rgba(139, 92, 246, 0.08)' },
+                    { icon: '📊', label: 'Create presentations', q: 'presentations', gradient: 'rgba(20, 184, 166, 0.08)' },
+                    { icon: '🎙️', label: 'Generate voice', q: 'voice', gradient: 'rgba(249, 115, 22, 0.08)' },
                   ].map((useCase) => (
                     <div
                       key={useCase.label}
                       onClick={() => navigate(`/ai-tools?q=${encodeURIComponent(useCase.q)}`)}
+                      className="use-case-tile"
                       style={{
                         display: 'flex',
-                        flexDirection: 'column',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        padding: '12px 8px',
-                        borderRadius: '14px',
+                        gap: '10px',
+                        padding: '11px 12px',
+                        borderRadius: '16px',
                         border: '1px solid var(--border-color)',
                         backgroundColor: 'var(--bg-card)',
                         cursor: 'pointer',
-                        textAlign: 'center',
-                        gap: '6px',
                         transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
                         boxShadow: '0 2px 6px rgba(0, 0, 0, 0.02)'
                       }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = 'var(--border-color-hover)';
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.05)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = 'var(--border-color)';
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.02)';
-                      }}
                     >
-                      <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
+                      <div style={{ width: '34px', height: '34px', borderRadius: '10px', backgroundColor: useCase.gradient, border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '17px', flexShrink: 0 }}>
                         {useCase.icon}
                       </div>
-                      <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-primary)', lineHeight: '1.2' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', lineHeight: '1.25', flexGrow: 1 }}>
                         {useCase.label}
                       </span>
                     </div>
@@ -940,40 +946,45 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
               </div>
 
               {/* Bottom Link Centered */}
-              <div style={{ marginTop: '16px', textAlign: 'center' }}>
-                <Link to="/collections" style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: '#E2603A', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                  <span>View All Use Cases →</span>
+              <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                <Link to="/collections" className="dashboard-view-all-link">
+                  <span>View All Use Cases</span>
+                  <ArrowRight size={14} />
                 </Link>
               </div>
             </div>
 
             {/* Column 3: Recently Added */}
             <div 
-              className="card" 
+              className="dashboard-col-card" 
               style={{ 
-                padding: '24px 20px', 
+                padding: '28px 24px', 
                 borderRadius: '24px', 
                 border: '1px solid var(--border-color)',
-                boxShadow: '0 8px 30px -4px rgba(0, 0, 0, 0.04)',
+                boxShadow: '0 10px 30px -5px rgba(0, 0, 0, 0.04), 0 0 1px rgba(226, 96, 58, 0.2)',
                 backgroundColor: 'var(--bg-secondary)',
                 display: 'flex', 
                 flexDirection: 'column', 
                 justifyContent: 'space-between',
-                height: '100%' 
+                height: '100%',
+                position: 'relative',
+                overflow: 'hidden'
               }}
             >
               <div>
-                {/* Header with View All New Tools link matching reference image */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '32px', marginBottom: '14px' }}>
-                  <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', margin: 0 }}>
-                    Recently Added
+                {/* Header with LIVE Status Badge */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '10px', letterSpacing: '-0.01em' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '34px', height: '34px', borderRadius: '12px', backgroundColor: 'rgba(226, 96, 58, 0.12)', border: '1px solid rgba(226, 96, 58, 0.3)', fontSize: '18px' }}>⚡</span>
+                    <span>Recently Added</span>
                   </h3>
-                  <Link to="/ai-tools?q=new" style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: '#E2603A', textDecoration: 'none' }}>
-                    View All New Tools →
-                  </Link>
+                  <span className="badge" style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)', color: '#16a34a', border: '1px solid rgba(34, 197, 94, 0.25)', padding: '3px 9px', borderRadius: 'var(--radius-full)', fontSize: '10px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#22c55e', display: 'inline-block' }}></span>
+                    LIVE
+                  </span>
                 </div>
 
-                {/* Recent tools list - 5 items normalized */}
+                {/* Recent tools list */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {(() => {
                     const recent = tools
@@ -981,55 +992,57 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                       .sort((a, b) => new Date(b.approvedAt || b.lastUpdated || 0).getTime() - new Date(a.approvedAt || a.lastUpdated || 0).getTime())
                       .slice(0, 5);
 
-                    const timesAgo = ['2 days ago', '3 days ago', '3 days ago', '4 days ago', '5 days ago'];
+                    const timesAgo = ['2d ago', '3d ago', '3d ago', '4d ago', '5d ago'];
 
                     return recent.map((tool, idx) => (
                       <div
                         key={tool.id}
                         onClick={() => navigate(`/tools/${tool.slug}`)}
+                        className="trending-tool-row"
                         style={{
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '10px',
-                          padding: '10px 12px',
-                          borderRadius: '14px',
+                          gap: '12px',
+                          padding: '11px 14px',
+                          borderRadius: '16px',
                           border: '1px solid var(--border-color)',
                           backgroundColor: 'var(--bg-card)',
                           cursor: 'pointer',
-                          transition: 'all 0.25s ease',
+                          transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
                           boxShadow: '0 2px 6px rgba(0, 0, 0, 0.02)'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.borderColor = 'var(--border-color-hover)';
-                          e.currentTarget.style.transform = 'translateY(-2px)';
-                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.04)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.borderColor = 'var(--border-color)';
-                          e.currentTarget.style.transform = 'translateY(0)';
-                          e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.02)';
                         }}
                       >
                         <img
                           src={tool.logoUrl}
                           alt={tool.name}
-                          style={{ width: '36px', height: '36px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)' }}
+                          style={{ width: '40px', height: '40px', borderRadius: '12px', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
                           onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop'; }}
                         />
-                        <div style={{ flexGrow: 1, overflow: 'hidden' }}>
-                          <div style={{ fontWeight: '700', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <div style={{ flexGrow: 1, minWidth: 0 }}>
+                          <div style={{ fontWeight: '700', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {tool.name}
                           </div>
-                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '3px' }}>
+                          <div style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '4px' }}>
                             {tool.tagline}
                           </div>
-                          <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                            <span className="badge badge-pricing" style={{ fontSize: '9px', padding: '1px 5px', borderRadius: 'var(--radius-full)', textTransform: 'capitalize' }}>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            <span className="badge badge-pricing" style={{ fontSize: '10px', padding: '1px 7px', borderRadius: 'var(--radius-full)', textTransform: 'capitalize', fontWeight: 600 }}>
                               {tool.pricing}
                             </span>
                           </div>
                         </div>
-                        <span style={{ fontSize: '10px', color: 'var(--text-muted)', flexShrink: 0, alignSelf: 'flex-start', fontWeight: 500 }}>
+                        <span
+                          style={{
+                            fontSize: '10px',
+                            fontWeight: 600,
+                            color: 'var(--text-muted)',
+                            backgroundColor: 'var(--bg-tertiary)',
+                            padding: '3px 8px',
+                            borderRadius: 'var(--radius-full)',
+                            border: '1px solid var(--border-color)',
+                            flexShrink: 0
+                          }}
+                        >
                           {timesAgo[idx] || 'recently'}
                         </span>
                       </div>
@@ -1038,10 +1051,11 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                 </div>
               </div>
 
-              {/* Bottom alignment spacer matching Column 1 and Column 2 */}
-              <div style={{ marginTop: '16px', textAlign: 'center' }}>
-                <Link to="/ai-tools?q=new" style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: '#E2603A', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                  <span>View All New Additions →</span>
+              {/* Bottom Link */}
+              <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                <Link to="/ai-tools?q=new" className="dashboard-view-all-link">
+                  <span>View All New Additions</span>
+                  <ArrowRight size={14} />
                 </Link>
               </div>
             </div>
@@ -1788,6 +1802,48 @@ const styleInjection = (
       .badge-short-text {
         display: none !important;
       }
+    }
+
+    .dashboard-col-card {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+    }
+    .dashboard-col-card:hover {
+      border-color: rgba(226, 96, 58, 0.3) !important;
+      box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.08), 0 0 25px rgba(226, 96, 58, 0.08) !important;
+    }
+    .trending-tool-row:hover {
+      border-color: rgba(226, 96, 58, 0.35) !important;
+      transform: translateY(-2px) translateX(2px) !important;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04) !important;
+    }
+    .use-case-tile:hover {
+      border-color: rgba(226, 96, 58, 0.4) !important;
+      transform: translateY(-2px) scale(1.02) !important;
+      box-shadow: 0 6px 18px rgba(226, 96, 58, 0.1) !important;
+    }
+    .dashboard-view-all-link {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: #E2603A;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      border-radius: var(--radius-full);
+      background-color: rgba(226, 96, 58, 0.08);
+      border: 1px solid rgba(226, 96, 58, 0.2);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .dashboard-view-all-link:hover {
+      background-color: #E2603A;
+      color: #ffffff !important;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(226, 96, 58, 0.3);
+    }
+    .dashboard-view-all-link:hover svg {
+      transform: translateX(4px);
+      transition: transform 0.2s ease;
     }
   `}</style>
 );
