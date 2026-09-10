@@ -427,30 +427,32 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
       </section>
 
       {/* Category Row Section (Middle) */}
-      <section id="categories" className="section" style={{ position: 'relative', zIndex: 1, padding: '32px 0 24px 0', borderBottom: '1px solid var(--border-color)' }}>
+      <section id="categories" className="section" style={{ position: 'relative', zIndex: 1, padding: '36px 0 28px 0', borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-primary)' }}>
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '18px' }}>📂</span>
-              <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', margin: 0, letterSpacing: '-0.01em' }}>
-                Category
+          {/* Header Row */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+            <div>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)', fontSize: '10px', fontWeight: 'bold', padding: '3px 10px', borderRadius: 'var(--radius-full)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                <span>📂</span> EXPLORE CATEGORIES
+              </div>
+              <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', margin: 0, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
+                Browse AI Tools by Category
               </h2>
             </div>
-            <Link to="/categories" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-semibold)', color: 'var(--color-primary)' }}>
-              <span>Browse All Categories</span>
+            <Link to="/categories" className="btn btn-outline btn-sm" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 'bold', borderRadius: 'var(--radius-full)' }}>
+              <span>View All ({categories.length})</span>
               <ArrowRight size={13} />
             </Link>
           </div>
 
-          {/* Horizontal scrollable row of Category Boxes/Pills */}
+          {/* Presentable Horizontal scrollable row of Category Cards */}
           <div 
             style={{ 
               display: 'flex', 
-              gap: '12px', 
+              gap: '14px', 
               overflowX: 'auto', 
-              paddingBottom: '8px',
+              padding: '6px 4px 12px 4px',
               WebkitOverflowScrolling: 'touch',
-              scrollbarWidth: 'thin'
             }}
             className="category-scroll-bar"
           >
@@ -463,37 +465,46 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '10px',
-                    padding: '10px 18px',
-                    borderRadius: 'var(--radius-lg)',
+                    gap: '12px',
+                    padding: '12px 20px',
+                    borderRadius: 'var(--radius-xl)',
                     border: '1px solid var(--border-color)',
                     backgroundColor: 'var(--bg-card)',
                     color: 'var(--text-primary)',
                     textDecoration: 'none',
-                    fontWeight: 'var(--font-medium)',
-                    fontSize: 'var(--text-xs)',
+                    fontSize: 'var(--text-sm)',
                     whiteSpace: 'nowrap',
                     boxShadow: 'var(--shadow-sm)',
-                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                     flexShrink: 0
                   }}
                   className="category-pill-box"
                 >
-                  <span style={{ display: 'inline-flex', alignItems: 'center', color: 'var(--color-primary)' }}>
-                    <CategoryIcon name={cat.name} size={16} />
-                  </span>
-                  <span style={{ fontWeight: 'bold' }}>{cat.name}</span>
+                  <div className="category-icon-box">
+                    <CategoryIcon name={cat.name} size={18} />
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <span style={{ fontWeight: 'bold', color: 'var(--text-primary)', fontSize: 'var(--text-xs)' }}>
+                      {cat.name}
+                    </span>
+                    <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                      {count} {count === 1 ? 'tool' : 'tools'}
+                    </span>
+                  </div>
+
                   <span 
                     style={{ 
                       fontSize: '10px', 
-                      backgroundColor: 'var(--bg-tertiary)', 
-                      color: 'var(--text-muted)', 
-                      padding: '2px 7px', 
+                      backgroundColor: 'var(--color-primary-light)', 
+                      color: 'var(--color-primary)', 
+                      padding: '2px 8px', 
                       borderRadius: 'var(--radius-full)',
-                      fontWeight: 'bold'
+                      fontWeight: 'bold',
+                      marginLeft: '4px'
                     }}
                   >
-                    {count}
+                    →
                   </span>
                 </Link>
               );
