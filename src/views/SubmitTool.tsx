@@ -201,6 +201,72 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
               </p>
             </div>
           </div>
+
+          {/* Submission Tiers Grid including Paid Popular Placement */}
+          <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-xl)', padding: '32px 24px', marginBottom: '40px' }}>
+            <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold', textAlign: 'center', margin: '0 0 8px 0' }}>
+              Choose Your Listing & Placement Tier
+            </h2>
+            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', textAlign: 'center', marginBottom: '24px' }}>
+              Select standard indexing or get instant priority placement in the Popular Tools section.
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+              {/* Option 1: Free Listing */}
+              <div style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', backgroundColor: 'var(--bg-primary)' }}>
+                <div>
+                  <span style={{ fontSize: '10px', fontWeight: 'bold', color: 'var(--text-muted)', textTransform: 'uppercase' }}>FREE DIRECTORY</span>
+                  <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'bold', margin: '4px 0 8px 0' }}>Standard Listing</h3>
+                  <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 'bold', marginBottom: '12px' }}>$0</div>
+                  <ul style={{ fontSize: '11px', color: 'var(--text-secondary)', paddingLeft: '16px', margin: '0 0 16px 0', lineHeight: '1.6' }}>
+                    <li>Catalog index & search</li>
+                    <li>Community user reviews</li>
+                    <li>Standard verification queue</li>
+                  </ul>
+                </div>
+                <button onClick={() => setPhase('wizard')} className="btn btn-outline w-full" style={{ fontSize: '12px' }}>
+                  Submit Standard Free
+                </button>
+              </div>
+
+              {/* Option 2: Paid Popular Tools Spot ($39) */}
+              <div style={{ border: '2px solid #E2603A', borderRadius: 'var(--radius-lg)', padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', backgroundColor: 'var(--bg-card)', position: 'relative', boxShadow: '0 6px 20px rgba(226, 96, 58, 0.15)' }}>
+                <span style={{ position: 'absolute', top: '-11px', right: '16px', backgroundColor: '#E2603A', color: 'white', fontSize: '9px', fontWeight: 'bold', padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>
+                  ⚡ POPULAR PLACEMENT
+                </span>
+                <div>
+                  <span style={{ fontSize: '10px', fontWeight: 'bold', color: '#E2603A', textTransform: 'uppercase' }}>HOMEPAGE PROMOTION</span>
+                  <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'bold', margin: '4px 0 8px 0' }}>Popular Tools Spot</h3>
+                  <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 'bold', color: '#E2603A', marginBottom: '12px' }}>$39 <span style={{ fontSize: '11px', fontWeight: 'normal', color: 'var(--text-muted)' }}>/ 30 days</span></div>
+                  <ul style={{ fontSize: '11px', color: 'var(--text-secondary)', paddingLeft: '16px', margin: '0 0 16px 0', lineHeight: '1.6' }}>
+                    <li><strong>Guaranteed Popular Tools placement</strong></li>
+                    <li>Promoted badge & top 8 priority</li>
+                    <li>Express 24-hr editor verification</li>
+                  </ul>
+                </div>
+                <button onClick={() => setPhase('wizard')} className="btn btn-primary w-full" style={{ fontSize: '12px', padding: '10px' }}>
+                  Get Popular Placement ($39)
+                </button>
+              </div>
+
+              {/* Option 3: Featured Pack ($69) */}
+              <div style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', backgroundColor: 'var(--bg-primary)' }}>
+                <div>
+                  <span style={{ fontSize: '10px', fontWeight: 'bold', color: 'var(--color-gold)', textTransform: 'uppercase' }}>MAXIMUM VISIBILITY</span>
+                  <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'bold', margin: '4px 0 8px 0' }}>Featured Pack</h3>
+                  <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 'bold', marginBottom: '12px' }}>$69 <span style={{ fontSize: '11px', fontWeight: 'normal', color: 'var(--text-muted)' }}>/ 90 days</span></div>
+                  <ul style={{ fontSize: '11px', color: 'var(--text-secondary)', paddingLeft: '16px', margin: '0 0 16px 0', lineHeight: '1.6' }}>
+                    <li>Popular Tools + Featured Hero banner</li>
+                    <li>Category top placement for 90 days</li>
+                    <li>Priority search & analytics dashboard</li>
+                  </ul>
+                </div>
+                <button onClick={() => setPhase('wizard')} className="btn btn-outline w-full" style={{ fontSize: '12px' }}>
+                  Select Featured Pack
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

@@ -1087,29 +1087,74 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
       {/* Popular Tools Section Grid */}
       <section id="popular-tools" className="section" style={{ position: 'relative', zIndex: 1 }}>
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
             <div>
-              <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', marginBottom: '8px' }}>
-                Popular Tools
-              </h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', margin: 0 }}>
+                  Popular Tools
+                </h2>
+                <Link
+                  to="/advertise?plan=popular"
+                  className="badge"
+                  style={{
+                    backgroundColor: 'rgba(226, 96, 58, 0.1)',
+                    color: '#E2603A',
+                    border: '1px solid rgba(226, 96, 58, 0.3)',
+                    padding: '3px 10px',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: '11px',
+                    fontWeight: 'bold',
+                    textDecoration: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                  title="Feature your AI tool in Popular Tools"
+                >
+                  <span>⚡ Paid Popular Spot Available</span>
+                </Link>
+              </div>
               <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: 0 }}>
                 Browse the highest rated AI tools vetted by community builders and reviewers.
               </p>
             </div>
-            <Link to="/trending" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }}>
-              <span>View All Popular Tools</span>
-              <ArrowRight size={14} />
-            </Link>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+              <Link
+                to="/submit-tool?plan=popular"
+                className="btn btn-outline btn-sm"
+                style={{
+                  color: '#E2603A',
+                  borderColor: 'rgba(226, 96, 58, 0.3)',
+                  fontWeight: 'bold',
+                  borderRadius: 'var(--radius-full)',
+                  padding: '6px 14px'
+                }}
+              >
+                <span>+ Get Featured in Popular Tools ($39)</span>
+              </Link>
+              <Link to="/trending" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }}>
+                <span>View All ({tools.filter(t => t.status === 'approved').length})</span>
+                <ArrowRight size={14} />
+              </Link>
+            </div>
           </div>
 
-          <div className="grid grid-cols-4">
-            {tools
-              .filter(t => t.status === 'approved')
-              .sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount)
-              .slice(0, 8)
-              .map((tool) => (
+          <div className="grid grid-cols-4" style={{ gap: '20px' }}>
+            {(() => {
+              const approved = tools.filter(t => t.status === 'approved');
+              // Sort such that paid popular placement / sponsored tools appear first, then sorted by rating & review count
+              const sorted = [...approved].sort((a, b) => {
+                const aPromoted = a.isPopularPlacement || a.isSponsored || a.isFeatured ? 1 : 0;
+                const bPromoted = b.isPopularPlacement || b.isSponsored || b.isFeatured ? 1 : 0;
+                if (bPromoted !== aPromoted) return bPromoted - aPromoted;
+                return (b.rating * b.reviewCount) - (a.rating * a.reviewCount) || b.rating - a.rating;
+              });
+
+              return sorted.slice(0, 8).map((tool) => (
                 <ToolCard key={tool.id} tool={tool} onToast={onToast} />
-              ))}
+              ));
+            })()}
           </div>
         </div>
       </section>
