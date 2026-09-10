@@ -1065,7 +1065,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', position: 'relative', zIndex: 1 }}>
               <Link
-                to="/submit"
+                to="/submit-tool"
                 className="btn btn-primary"
                 style={{ padding: '12px 24px', borderRadius: 'var(--radius-lg)', fontWeight: 'bold' }}
               >

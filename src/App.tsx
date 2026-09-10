@@ -100,8 +100,8 @@ const AppContent: React.FC<{
             }
           />
           
-          {/* Redirect categories index to home (homepage lists all categories anyway) */}
-          <Route path="/categories" element={<Navigate to="/" replace />} />
+          {/* Redirect categories index to directory page where categories are filtered */}
+          <Route path="/categories" element={<Navigate to="/ai-tools" replace />} />
           <Route
             path="/categories/:slug"
             element={
