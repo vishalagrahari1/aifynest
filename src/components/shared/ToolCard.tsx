@@ -12,6 +12,7 @@ interface ToolCardProps {
   onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
   isCompareChecked?: boolean;
   onCompareToggle?: () => void;
+  isSquare?: boolean;
 }
 
 export const ToolCard: React.FC<ToolCardProps> = ({
@@ -19,6 +20,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({
   onToast,
   isCompareChecked = false,
   onCompareToggle,
+  isSquare = false,
 }) => {
   const { toggleFavoriteTool, collections, trackEvent } = useDatabase();
   const { user } = useAuth();
@@ -96,7 +98,11 @@ export const ToolCard: React.FC<ToolCardProps> = ({
       style={{
         display: 'flex',
         flexDirection: 'column',
+        justifyContent: 'space-between',
         height: '100%',
+        width: '100%',
+        aspectRatio: isSquare ? '1 / 1' : 'auto',
+        padding: isSquare ? '14px' : 'var(--space-6)',
         cursor: 'pointer',
         border: tool.isSponsored
           ? '2px solid var(--color-primary)'
@@ -104,6 +110,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({
           ? '1px solid var(--color-gold)'
           : '1px solid var(--border-color)',
         backgroundColor: tool.isSponsored ? 'var(--color-primary-light)' : 'var(--bg-card)',
+        boxSizing: 'border-box',
       }}
     >
       {/* Badges bar */}
@@ -245,13 +252,13 @@ export const ToolCard: React.FC<ToolCardProps> = ({
       {/* Tagline */}
       <p
         style={{
-          fontSize: 'var(--text-sm)',
+          fontSize: isSquare ? 'var(--text-xs)' : 'var(--text-sm)',
           color: 'var(--text-secondary)',
-          lineHeight: '1.4',
-          marginBottom: '16px',
+          lineHeight: '1.35',
+          marginBottom: isSquare ? '8px' : '16px',
           flexGrow: 1,
           display: '-webkit-box',
-          WebkitLineClamp: 3,
+          WebkitLineClamp: isSquare ? 2 : 3,
           WebkitBoxOrient: 'vertical',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -266,8 +273,8 @@ export const ToolCard: React.FC<ToolCardProps> = ({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: '16px',
-          paddingBottom: '12px',
+          marginBottom: isSquare ? '8px' : '16px',
+          paddingBottom: isSquare ? '6px' : '12px',
           borderBottom: '1px solid var(--border-color)',
         }}
       >

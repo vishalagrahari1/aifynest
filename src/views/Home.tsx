@@ -704,7 +704,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
 
                 return displayList.map((tool) => (
                   <div key={tool.id} style={{ display: 'flex' }}>
-                    <ToolCard tool={{ ...tool, isSponsored: true }} onToast={onToast} />
+                    <ToolCard tool={{ ...tool, isSponsored: true }} onToast={onToast} isSquare={true} />
                   </div>
                 ));
               })()}
