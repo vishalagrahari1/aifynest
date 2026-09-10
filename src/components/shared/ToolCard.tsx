@@ -104,12 +104,12 @@ export const ToolCard: React.FC<ToolCardProps> = ({
         aspectRatio: isSquare ? '1 / 1' : 'auto',
         padding: isSquare ? '14px' : 'var(--space-6)',
         cursor: 'pointer',
-        border: tool.isSponsored
-          ? '2px solid var(--color-primary)'
-          : tool.isFeatured
-          ? '1px solid var(--color-gold)'
+        border: tool.isFeatured
+          ? '1.5px solid #f59e0b'
+          : tool.isSponsored
+          ? '1.5px solid #E2603A'
           : '1px solid var(--border-color)',
-        backgroundColor: tool.isSponsored ? 'var(--color-primary-light)' : 'var(--bg-card)',
+        backgroundColor: 'var(--bg-card)',
         boxSizing: 'border-box',
       }}
     >

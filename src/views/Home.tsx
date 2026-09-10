@@ -627,8 +627,8 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
               </span>
             </div>
 
-            {/* 6 Columns x 2 Rows Grid = 12 Cards Total (standard tool card boxes) */}
-            <div className="grid grid-cols-6" style={{ gap: '16px' }}>
+            {/* 4 Columns x 2 Rows Grid = 8 Cards Total (matching exact Popular/Featured wireframe image) */}
+            <div className="grid grid-cols-4" style={{ gap: '20px' }}>
               {(() => {
                 const approvedTools = tools.filter(t => t.status === 'approved');
                 let filtered = [...approvedTools];
@@ -640,24 +640,24 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                 } else if (featuredTab === 'free') {
                   filtered = filtered.filter(t => t.pricing === 'free' || t.pricing === 'freemium');
                 } else {
-                  const sponsored = filtered.filter(t => t.isSponsored);
-                  const organic = filtered.filter(t => !t.isSponsored);
+                  const sponsored = filtered.filter(t => t.isSponsored || t.isFeatured);
+                  const organic = filtered.filter(t => !t.isSponsored && !t.isFeatured);
                   filtered = [...sponsored, ...organic];
                 }
 
-                const displayList = filtered.slice(0, 12);
+                const displayList = filtered.slice(0, 8);
                 
                 if (displayList.length === 0) {
                   return (
-                    <div style={{ gridColumn: 'span 6', textAlign: 'center', padding: '40px 0', color: 'var(--text-secondary)' }}>
+                    <div style={{ gridColumn: 'span 4', textAlign: 'center', padding: '40px 0', color: 'var(--text-secondary)' }}>
                       No tools found in this featured view.
                     </div>
                   );
                 }
 
-                return displayList.map((tool) => (
+                return displayList.map((tool, idx) => (
                   <div key={tool.id} style={{ display: 'flex' }}>
-                    <ToolCard tool={{ ...tool, isSponsored: true }} onToast={onToast} />
+                    <ToolCard tool={{ ...tool, isFeatured: idx < 2 || tool.isFeatured, isVerified: true }} onToast={onToast} />
                   </div>
                 ));
               })()}
