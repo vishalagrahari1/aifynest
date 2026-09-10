@@ -667,9 +667,9 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
       </section>
 
       {/* 3-Column Dashboard Grid Section (Trending AI Tools | Use Cases | Recently Added) */}
-      <section className="section" style={{ position: 'relative', zIndex: 1, padding: '28px 0' }}>
+      <section className="section" style={{ position: 'relative', zIndex: 1, padding: '24px 0 32px 0' }}>
         <div className="container">
-          <div className="grid grid-cols-3" style={{ gap: '24px', alignItems: 'stretch' }}>
+          <div className="grid grid-cols-1 lg:grid-cols-3" style={{ gap: '24px', alignItems: 'stretch' }}>
             
             {/* Column 1: 🔥 Trending AI Tools */}
             <div 
@@ -688,21 +688,21 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
             >
               <div>
                 {/* Header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '36px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '32px', marginBottom: '14px' }}>
                   <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{ fontSize: '20px' }}>🔥</span> Trending AI Tools
                   </h3>
                 </div>
 
                 {/* Timeframe Segment Tabs */}
-                <div style={{ display: 'flex', gap: '4px', backgroundColor: 'var(--bg-tertiary)', padding: '4px', borderRadius: 'var(--radius-full)', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', gap: '4px', backgroundColor: 'var(--bg-tertiary)', padding: '4px', borderRadius: 'var(--radius-full)', marginBottom: '14px' }}>
                   {(['today', 'week', 'month'] as const).map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setTrendingTab(tab)}
                       style={{
                         flex: 1,
-                        padding: '5px 8px',
+                        padding: '6px 8px',
                         fontSize: '11px',
                         fontWeight: trendingTab === tab ? 700 : 500,
                         borderRadius: 'var(--radius-full)',
@@ -720,8 +720,8 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                   ))}
                 </div>
 
-                {/* Numbered Ranked Items (01 - 05) */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {/* Numbered Ranked Items (01 - 05) with balanced padding */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {(() => {
                     const approved = tools.filter(t => t.status === 'approved');
                     let sorted = [...approved];
@@ -745,7 +745,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                           display: 'flex',
                           alignItems: 'center',
                           gap: '10px',
-                          padding: '8px 10px',
+                          padding: '10px 12px',
                           borderRadius: '14px',
                           border: '1px solid var(--border-color)',
                           backgroundColor: 'var(--bg-card)',
@@ -769,11 +769,11 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                         <img
                           src={tool.logoUrl}
                           alt={tool.name}
-                          style={{ width: '36px', height: '36px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)' }}
+                          style={{ width: '38px', height: '38px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)' }}
                           onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop'; }}
                         />
                         <div style={{ flexGrow: 1, overflow: 'hidden' }}>
-                          <div style={{ fontWeight: '700', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          <div style={{ fontWeight: '700', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {tool.name}
                           </div>
                           <div style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -794,11 +794,10 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                 </div>
               </div>
 
-              {/* Bottom Equalizer Link */}
-              <div style={{ marginTop: '16px', textAlign: 'right' }}>
+              {/* Bottom Link */}
+              <div style={{ marginTop: '16px', textAlign: 'center' }}>
                 <Link to="/trending" style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: '#E2603A', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                  <span>View All Trending</span>
-                  <ArrowRight size={12} />
+                  <span>View All Trending →</span>
                 </Link>
               </div>
             </div>
@@ -820,7 +819,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
             >
               <div>
                 {/* Header */}
-                <div style={{ minHeight: '36px', marginBottom: '16px' }}>
+                <div style={{ minHeight: '32px', marginBottom: '14px', textAlign: 'center' }}>
                   <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', margin: 0, marginBottom: '2px' }}>
                     What do you want to accomplish?
                   </h3>
@@ -851,7 +850,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        padding: '10px 8px',
+                        padding: '12px 8px',
                         borderRadius: '14px',
                         border: '1px solid var(--border-color)',
                         backgroundColor: 'var(--bg-card)',
@@ -883,11 +882,10 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                 </div>
               </div>
 
-              {/* Bottom Equalizer Link */}
-              <div style={{ marginTop: '16px', textAlign: 'right' }}>
+              {/* Bottom Link Centered */}
+              <div style={{ marginTop: '16px', textAlign: 'center' }}>
                 <Link to="/collections" style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: '#E2603A', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                  <span>View All Use Cases</span>
-                  <ArrowRight size={12} />
+                  <span>View All Use Cases →</span>
                 </Link>
               </div>
             </div>
@@ -908,15 +906,18 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
               }}
             >
               <div>
-                {/* Header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '36px', marginBottom: '16px' }}>
+                {/* Header with View All New Tools link matching reference image */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '32px', marginBottom: '14px' }}>
                   <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', margin: 0 }}>
                     Recently Added
                   </h3>
+                  <Link to="/ai-tools?q=new" style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: '#E2603A', textDecoration: 'none' }}>
+                    View All New Tools →
+                  </Link>
                 </div>
 
-                {/* Recent tools list - 5 items matching Col 1 */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {/* Recent tools list - 5 items balanced padding */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {(() => {
                     const recent = tools
                       .filter(t => t.status === 'approved')
@@ -933,7 +934,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                           display: 'flex',
                           alignItems: 'center',
                           gap: '10px',
-                          padding: '8px 10px',
+                          padding: '10px 12px',
                           borderRadius: '14px',
                           border: '1px solid var(--border-color)',
                           backgroundColor: 'var(--bg-card)',
@@ -955,14 +956,14 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                         <img
                           src={tool.logoUrl}
                           alt={tool.name}
-                          style={{ width: '36px', height: '36px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)' }}
+                          style={{ width: '38px', height: '38px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)' }}
                           onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop'; }}
                         />
                         <div style={{ flexGrow: 1, overflow: 'hidden' }}>
-                          <div style={{ fontWeight: '700', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '1px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          <div style={{ fontWeight: '700', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {tool.name}
                           </div>
-                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '2px' }}>
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '4px' }}>
                             {tool.tagline}
                           </div>
                           <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
@@ -983,11 +984,10 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                 </div>
               </div>
 
-              {/* Bottom Equalizer Link */}
-              <div style={{ marginTop: '16px', textAlign: 'right' }}>
+              {/* Bottom alignment spacer matching Column 1 and Column 2 */}
+              <div style={{ marginTop: '16px', textAlign: 'center' }}>
                 <Link to="/ai-tools?q=new" style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: '#E2603A', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                  <span>View All New Tools</span>
-                  <ArrowRight size={12} />
+                  <span>View All New Additions →</span>
                 </Link>
               </div>
             </div>
