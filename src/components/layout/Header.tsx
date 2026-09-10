@@ -809,45 +809,127 @@ export const Header: React.FC = () => {
             bottom: 0,
             backgroundColor: 'var(--bg-primary)',
             zIndex: 99,
-            padding: '24px',
+            padding: '20px 24px 32px 24px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '16px',
+            gap: '14px',
             overflowY: 'auto',
             borderTop: '1px solid var(--border-color)',
             animation: 'fade-in-overlay 150ms ease-out',
           }}
         >
-          {/* Navigation Links */}
-          <Link to="/ai-tools" style={mobileNavLinkStyle}>{t('allTools')}</Link>
-          <a href="/#popular-tools" style={mobileNavLinkStyle}>{t('popularTools')}</a>
-          <Link to="/trending" style={mobileNavLinkStyle}>{t('trending')}</Link>
-          <Link to="/new" style={mobileNavLinkStyle}>{t('newest')}</Link>
-          <Link to="/collections" style={mobileNavLinkStyle}>{t('collections')}</Link>
-          <Link to="/compare" style={mobileNavLinkStyle}>{t('compare')}</Link>
-          <Link to="/blog" style={mobileNavLinkStyle}>{t('blog')}</Link>
+          {/* Quick Utility Row: Theme, Language, Saved Favorites */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid var(--border-color)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className="header-icon-btn theme-btn"
+                title="Toggle light/dark theme"
+                style={{ ...iconBtnStyle, border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '6px 12px', display: 'flex', gap: '6px', alignItems: 'center' }}
+              >
+                {theme === 'dark' ? (
+                  <>
+                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <span style={{ fontSize: '12px' }}>Light</span>
+                  </>
+                ) : (
+                  <>
+                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    <span style={{ fontSize: '12px' }}>Dark</span>
+                  </>
+                )}
+              </button>
 
-          <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '8px 0' }} />
+              {/* Saved Favorites Link */}
+              <Link
+                to={user ? "/dashboard?tab=saved" : "/login"}
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  color: 'var(--text-primary)',
+                  textDecoration: 'none',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '6px 12px',
+                  backgroundColor: 'var(--bg-card)'
+                }}
+              >
+                <Bookmark size={16} />
+                <span>{t('savedTitle')}</span>
+                {user && savedToolsList.length > 0 && (
+                  <span className="badge badge-pricing" style={{ fontSize: '10px', padding: '1px 5px' }}>
+                    {savedToolsList.length}
+                  </span>
+                )}
+              </Link>
+            </div>
+
+            {/* Language Selector Indicator */}
+            <select
+              value={activeLanguage}
+              onChange={(e) => {
+                const lang = e.target.value;
+                setActiveLanguage(lang);
+                localStorage.setItem('app_lang', lang);
+              }}
+              style={{
+                fontSize: '12px',
+                padding: '6px 10px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--bg-card)',
+                color: 'var(--text-primary)',
+                cursor: 'pointer'
+              }}
+            >
+              {LANGUAGES.map((lang) => (
+                <option key={lang.code} value={lang.code}>
+                  {lang.flag} {lang.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Main Navigation Links */}
+          <Link to="/ai-tools" style={mobileNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>{t('allTools')}</Link>
+          <a href="/#popular-tools" style={mobileNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>{t('popularTools')}</a>
+          <Link to="/trending" style={mobileNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>{t('trending')}</Link>
+          <Link to="/new" style={mobileNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>{t('newest')}</Link>
+          <Link to="/collections" style={mobileNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>{t('collections')}</Link>
+          <Link to="/compare" style={mobileNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>{t('compare')}</Link>
+          <Link to="/blog" style={mobileNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>{t('blog')}</Link>
+          <Link to="/advertise" style={mobileNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>{t('sponsorship')}</Link>
+
+          <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '4px 0' }} />
 
           {/* Mobile Auth Actions */}
           {!user ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <Link to="/login" className="btn btn-outline w-full" style={{ padding: '12px', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <Link to="/login" className="btn btn-outline w-full" style={{ padding: '12px', justifyContent: 'center' }} onClick={() => setMobileMenuOpen(false)}>
                 <User size={16} />
                 <span>{t('login')}</span>
               </Link>
-              <Link to="/signup" className="btn btn-primary w-full" style={{ padding: '12px', justifyContent: 'center' }}>
+              <Link to="/signup" className="btn btn-primary w-full" style={{ padding: '12px', justifyContent: 'center' }} onClick={() => setMobileMenuOpen(false)}>
                 <span>{t('getStarted')}</span>
               </Link>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <Link to="/dashboard" style={mobileNavLinkStyle}>{t('dashboard')}</Link>
-              {isOwner() && <Link to="/dashboard?tab=listings" style={mobileNavLinkStyle}>{t('myTools')}</Link>}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <Link to="/dashboard" style={mobileNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>{t('dashboard')}</Link>
+              {isOwner() && <Link to="/dashboard?tab=listings" style={mobileNavLinkStyle} onClick={() => setMobileMenuOpen(false)}>{t('myTools')}</Link>}
+              {isAdmin() && <Link to="/admin" style={{ ...mobileNavLinkStyle, color: 'var(--color-gold)' }} onClick={() => setMobileMenuOpen(false)}>{t('adminConsole')}</Link>}
               <button
-                onClick={handleLogout}
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleLogout();
+                }}
                 className="btn btn-outline w-full"
-                style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)', padding: '10px', justifyContent: 'center' }}
+                style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)', padding: '10px', justifyContent: 'center', marginTop: '4px' }}
               >
                 <LogOut size={16} />
                 <span>{t('logout')}</span>
@@ -855,20 +937,21 @@ export const Header: React.FC = () => {
             </div>
           )}
 
-          {/* Submit Tool - Visually distinct full-width CTA at the bottom of drawer */}
+          {/* Submit Tool CTA Button */}
           <Link
             to="/submit-tool"
             className="btn w-full"
+            onClick={() => setMobileMenuOpen(false)}
             style={{
               marginTop: 'auto',
               padding: '14px',
               justifyContent: 'center',
-              background: 'var(--gradient-brand)',
+              background: 'linear-gradient(135deg, #E2603A 0%, #ee6f47 100%)',
               color: 'white',
               border: 'none',
               borderRadius: 'var(--radius-md)',
               fontWeight: 'var(--font-bold)',
-              boxShadow: 'var(--shadow-md)',
+              boxShadow: '0 4px 14px rgba(226, 96, 58, 0.35)',
               textAlign: 'center',
             }}
           >
