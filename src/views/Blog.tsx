@@ -6,7 +6,43 @@ import { SEOHead } from '../components/shared/SEOHead';
 import { ArrowRight } from '../components/shared/Icons';
 
 export const Blog: React.FC = () => {
-  const { blogPosts } = useDatabase();
+  const { blogPosts: defaultPosts } = useDatabase();
+  const [posts, setPosts] = React.useState<any[]>(defaultPosts);
+
+  React.useEffect(() => {
+    async function fetchPayloadPosts() {
+      const cmsUrls = [
+        'https://cms.aifynest.com/api/posts?where[status][equals]=published',
+        'http://localhost:3000/api/posts?where[status][equals]=published'
+      ];
+
+      for (const url of cmsUrls) {
+        try {
+          const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+          if (res.ok) {
+            const data = await res.json();
+            if (data && Array.isArray(data.docs) && data.docs.length > 0) {
+              const mapped = data.docs.map((doc: any) => ({
+                slug: doc.slug,
+                title: doc.title,
+                category: typeof doc.category === 'string' ? doc.category : (doc.category?.name || 'Guides'),
+                excerpt: doc.excerpt,
+                author: doc.author || 'AIFynest Team',
+                date: doc.publishedAt ? new Date(doc.publishedAt).toISOString().split('T')[0] : 'Recently',
+                readTime: doc.readTime || '5 min read',
+                image: doc.featuredImage?.url || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=500&fit=crop',
+              }));
+              setPosts(mapped);
+              break;
+            }
+          }
+        } catch (e) {
+          // Try next endpoint fallback
+        }
+      }
+    }
+    fetchPayloadPosts();
+  }, []);
 
   return (
     <div className="container section">
@@ -27,9 +63,9 @@ export const Blog: React.FC = () => {
         </div>
 
         {/* Blog listings */}
-        {blogPosts.length > 0 ? (
+        {posts.length > 0 ? (
           <div className="grid grid-cols-2" style={{ gap: '32px' }}>
-            {blogPosts.map((post) => (
+            {posts.map((post) => (
               <div
                 key={post.slug}
                 className="card"
