@@ -5,9 +5,8 @@ import { useDatabase } from '../context/DatabaseContext';
 import { supabase } from '../utils/supabase';
 
 import { ToolCard } from '../components/shared/ToolCard';
-import { CategoryCard } from '../components/shared/CategoryCard';
 import { SEOHead } from '../components/shared/SEOHead';
-import { Search, Sparkles, ArrowRight, Award, DollarSign, MousePointer } from '../components/shared/Icons';
+import { Search, Sparkles, ArrowRight, Award, DollarSign, MousePointer, CategoryIcon } from '../components/shared/Icons';
 
 interface HomeProps {
   onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
@@ -427,77 +426,126 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
         </div>
       </section>
 
-      {/* Featured Sponsored Tools Carousel */}
-      <section className="section" style={{ backgroundColor: 'var(--bg-secondary)', borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)', position: 'relative', zIndex: 1, padding: '40px 0' }}>
+      {/* Category Row Section (Middle) */}
+      <section id="categories" className="section" style={{ position: 'relative', zIndex: 1, padding: '32px 0 24px 0', borderBottom: '1px solid var(--border-color)' }}>
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px' }}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                <span className="badge badge-sponsored" style={{ margin: 0, textTransform: 'uppercase', fontSize: '9px', letterSpacing: '0.05em' }}>Ad Campaign</span>
-                <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', margin: 0 }}>
-                  Sponsored Featured Tools
-                </h2>
-              </div>
-              <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: 0 }}>
-                Handpicked innovations running sponsored campaigns.
-              </p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '18px' }}>📂</span>
+              <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', margin: 0, letterSpacing: '-0.01em' }}>
+                Category
+              </h2>
             </div>
-            <Link to="/advertise" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }}>
-              <span>Advertise Here</span>
-              <ArrowRight size={14} />
+            <Link to="/categories" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: 'var(--text-xs)', fontWeight: 'var(--font-semibold)', color: 'var(--color-primary)' }}>
+              <span>Browse All Categories</span>
+              <ArrowRight size={13} />
             </Link>
           </div>
 
-          {/* Sliding Carousel wrapper */}
+          {/* Horizontal scrollable row of Category Boxes/Pills */}
           <div 
-            ref={sponsoredContainerRef}
-            onMouseEnter={() => { isHoveredRef.current = true; }}
-            onMouseLeave={() => { isHoveredRef.current = false; }}
             style={{ 
               display: 'flex', 
-              gap: '24px', 
+              gap: '12px', 
               overflowX: 'auto', 
-              scrollBehavior: 'smooth', 
-              padding: '8px 4px',
+              paddingBottom: '8px',
               WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'thin'
             }}
-            className="sponsored-scroll-container"
+            className="category-scroll-bar"
           >
-            {tools
-              .filter(t => t.isSponsored && t.status === 'approved')
-              .concat(tools.filter(t => !t.isSponsored && t.status === 'approved'))
-              .slice(0, 8)
-              .map((tool) => (
-                <div key={tool.id} style={{ flex: '0 0 calc(25% - 18px)', minWidth: '280px' }} className="sponsored-carousel-card">
-                  <ToolCard tool={{ ...tool, isSponsored: true }} onToast={onToast} />
-                </div>
-              ))}
+            {categories.map((cat) => {
+              const count = getToolCount(cat.slug);
+              return (
+                <Link
+                  key={cat.slug}
+                  to={`/categories/${cat.slug}`}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '10px 18px',
+                    borderRadius: 'var(--radius-lg)',
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'var(--bg-card)',
+                    color: 'var(--text-primary)',
+                    textDecoration: 'none',
+                    fontWeight: 'var(--font-medium)',
+                    fontSize: 'var(--text-xs)',
+                    whiteSpace: 'nowrap',
+                    boxShadow: 'var(--shadow-sm)',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                    flexShrink: 0
+                  }}
+                  className="category-pill-box"
+                >
+                  <span style={{ display: 'inline-flex', alignItems: 'center', color: 'var(--color-primary)' }}>
+                    <CategoryIcon name={cat.name} size={16} />
+                  </span>
+                  <span style={{ fontWeight: 'bold' }}>{cat.name}</span>
+                  <span 
+                    style={{ 
+                      fontSize: '10px', 
+                      backgroundColor: 'var(--bg-tertiary)', 
+                      color: 'var(--text-muted)', 
+                      padding: '2px 7px', 
+                      borderRadius: 'var(--radius-full)',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {count}
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* Popular Categories Grid */}
-      <section id="categories" className="section" style={{ position: 'relative', zIndex: 1 }}>
+      {/* Sponsored Section Container (Bottom - 6 Columns x 2 Rows = 12 Cards) */}
+      <section className="section" style={{ position: 'relative', zIndex: 1, padding: '40px 0' }}>
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px' }}>
-            <div>
-              <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', marginBottom: '8px' }}>
-                Browse by Category
-              </h2>
-              <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: 0 }}>
-                Explore specialized AI tools mapped across industrial use cases.
-              </p>
+          {/* Outer Sponsored Container Box matching Wireframe */}
+          <div 
+            className="card glass" 
+            style={{ 
+              padding: '32px 28px', 
+              borderRadius: 'var(--radius-xl)', 
+              border: '2px solid var(--border-color)',
+              boxShadow: 'var(--shadow-lg)',
+              backgroundColor: 'var(--bg-secondary)',
+              position: 'relative'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span className="badge badge-sponsored" style={{ margin: 0, textTransform: 'uppercase', fontSize: '10px', letterSpacing: '0.08em', padding: '4px 10px' }}>
+                  Sponsored
+                </span>
+                <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', margin: 0 }}>
+                  Featured Promotions
+                </h2>
+              </div>
+              <Link to="/advertise" className="btn btn-outline btn-sm" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 'bold' }}>
+                <span>Promote Your Tool</span>
+                <ArrowRight size={13} />
+              </Link>
             </div>
-            <Link to="/categories" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }}>
-              <span>All Categories</span>
-              <ArrowRight size={14} />
-            </Link>
-          </div>
 
-          <div className="grid grid-cols-4">
-            {categories.slice(0, 8).map((cat) => (
-              <CategoryCard key={cat.slug} category={cat} toolCount={getToolCount(cat.slug)} />
-            ))}
+            {/* 6 Columns x 2 Rows Grid = 12 Cards Total */}
+            <div className="grid grid-cols-6" style={{ gap: '16px' }}>
+              {(() => {
+                const sponsoredList = tools.filter(t => t.isSponsored && t.status === 'approved');
+                const organicList = tools.filter(t => !t.isSponsored && t.status === 'approved');
+                const displayList = [...sponsoredList, ...organicList].slice(0, 12);
+                
+                return displayList.map((tool) => (
+                  <div key={tool.id} style={{ display: 'flex' }}>
+                    <ToolCard tool={{ ...tool, isSponsored: true }} onToast={onToast} />
+                  </div>
+                ));
+              })()}
+            </div>
           </div>
         </div>
       </section>
