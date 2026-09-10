@@ -6,7 +6,7 @@ import { supabase } from '../utils/supabase';
 
 import { ToolCard } from '../components/shared/ToolCard';
 import { SEOHead } from '../components/shared/SEOHead';
-import { Search, Sparkles, ArrowRight, Award, DollarSign, MousePointer, CategoryIcon, ChevronLeft, ChevronRight } from '../components/shared/Icons';
+import { Search, Sparkles, ArrowRight, CategoryIcon, ChevronLeft, ChevronRight } from '../components/shared/Icons';
 
 interface HomeProps {
   onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
@@ -23,6 +23,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
   // FAQ Accordion toggles
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [featuredTab, setFeaturedTab] = useState<'all' | 'top' | 'new' | 'free'>('all');
+  const [trendingTab, setTrendingTab] = useState<'today' | 'week' | 'month'>('week');
 
   const sponsoredContainerRef = useRef<HTMLDivElement>(null);
   const isHoveredRef = useRef(false);
@@ -665,6 +666,357 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
         </div>
       </section>
 
+      {/* 3-Column Dashboard Grid Section (Trending AI Tools | Use Cases | Recently Added) */}
+      <section className="section" style={{ position: 'relative', zIndex: 1, padding: '24px 0' }}>
+        <div className="container">
+          <div className="grid grid-cols-3" style={{ gap: '24px', alignItems: 'stretch' }}>
+            
+            {/* Column 1: 🔥 Trending AI Tools */}
+            <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>🔥</span> Trending AI Tools
+                </h3>
+              </div>
+
+              {/* Timeframe Tabs */}
+              <div style={{ display: 'flex', gap: '4px', backgroundColor: 'var(--bg-tertiary)', padding: '3px', borderRadius: 'var(--radius-full)', marginBottom: '20px' }}>
+                <button
+                  onClick={() => setTrendingTab('today')}
+                  style={{
+                    flex: 1,
+                    padding: '4px 10px',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    borderRadius: 'var(--radius-full)',
+                    border: 'none',
+                    backgroundColor: trendingTab === 'today' ? 'var(--bg-card)' : 'transparent',
+                    color: trendingTab === 'today' ? 'var(--color-primary)' : 'var(--text-muted)',
+                    boxShadow: trendingTab === 'today' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  Today
+                </button>
+                <button
+                  onClick={() => setTrendingTab('week')}
+                  style={{
+                    flex: 1,
+                    padding: '4px 10px',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    borderRadius: 'var(--radius-full)',
+                    border: 'none',
+                    backgroundColor: trendingTab === 'week' ? 'var(--bg-card)' : 'transparent',
+                    color: trendingTab === 'week' ? 'var(--color-primary)' : 'var(--text-muted)',
+                    boxShadow: trendingTab === 'week' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  This Week
+                </button>
+                <button
+                  onClick={() => setTrendingTab('month')}
+                  style={{
+                    flex: 1,
+                    padding: '4px 10px',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    borderRadius: 'var(--radius-full)',
+                    border: 'none',
+                    backgroundColor: trendingTab === 'month' ? 'var(--bg-card)' : 'transparent',
+                    color: trendingTab === 'month' ? 'var(--color-primary)' : 'var(--text-muted)',
+                    boxShadow: trendingTab === 'month' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  This Month
+                </button>
+              </div>
+
+              {/* Numbered Ranked Items (01 - 05) */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', flexGrow: 1 }}>
+                {(() => {
+                  const approved = tools.filter(t => t.status === 'approved');
+                  let sorted = [...approved];
+
+                  if (trendingTab === 'today') {
+                    sorted.sort((a, b) => b.reviewCount - a.reviewCount);
+                  } else if (trendingTab === 'week') {
+                    sorted.sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount);
+                  } else {
+                    sorted.sort((a, b) => (b.rating * b.reviewCount) - (a.rating * a.reviewCount));
+                  }
+
+                  const top5 = sorted.slice(0, 5);
+                  const rankChanges = ['+2', '+1', '+3', '+1', '+2'];
+
+                  return top5.map((tool, idx) => (
+                    <div
+                      key={tool.id}
+                      onClick={() => navigate(`/tools/${tool.slug}`)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '8px 10px',
+                        borderRadius: 'var(--radius-md)',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s ease',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-tertiary)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                    >
+                      <span style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold', color: 'var(--text-muted)', width: '20px', flexShrink: 0 }}>
+                        0{idx + 1}
+                      </span>
+                      <img
+                        src={tool.logoUrl}
+                        alt={tool.name}
+                        style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)' }}
+                        onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop'; }}
+                      />
+                      <div style={{ flexGrow: 1, overflow: 'hidden' }}>
+                        <div style={{ fontWeight: 'bold', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {tool.name}
+                        </div>
+                        <div style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {tool.tagline}
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                        <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-primary)' }}>
+                          ★ {tool.rating > 0 ? tool.rating : '4.8'}
+                        </span>
+                        <span style={{ fontSize: '10px', fontWeight: 'bold', color: 'var(--color-success)', backgroundColor: 'var(--color-success-light)', padding: '2px 6px', borderRadius: 'var(--radius-full)' }}>
+                          {rankChanges[idx]}
+                        </span>
+                      </div>
+                    </div>
+                  ));
+                })()}
+              </div>
+            </div>
+
+            {/* Column 2: What do you want to accomplish? */}
+            <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <div style={{ marginBottom: '16px' }}>
+                <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', margin: 0, marginBottom: '4px' }}>
+                  What do you want to accomplish?
+                </h3>
+                <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', margin: 0 }}>
+                  Choose a use case and find the perfect AI tools.
+                </p>
+              </div>
+
+              {/* Grid of 10 Use Case Tiles */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', flexGrow: 1 }}>
+                {[
+                  { icon: '✍️', label: 'Write an article', q: 'article' },
+                  { icon: '🎨', label: 'Create a logo', q: 'logo' },
+                  { icon: '🖼️', label: 'Generate an image', q: 'image' },
+                  { icon: '🎥', label: 'Make a video', q: 'video' },
+                  { icon: '🌐', label: 'Build a website', q: 'website' },
+                  { icon: '💻', label: 'Write code', q: 'code' },
+                  { icon: '🔍', label: 'Improve SEO', q: 'seo' },
+                  { icon: '📱', label: 'Social media posts', q: 'social' },
+                  { icon: '📊', label: 'Create presentations', q: 'presentations' },
+                  { icon: '🎙️', label: 'Generate voice', q: 'voice' },
+                ].map((useCase) => (
+                  <div
+                    key={useCase.label}
+                    onClick={() => navigate(`/ai-tools?q=${encodeURIComponent(useCase.q)}`)}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '12px 8px',
+                      borderRadius: 'var(--radius-md)',
+                      border: '1px solid var(--border-color)',
+                      backgroundColor: 'var(--bg-primary)',
+                      cursor: 'pointer',
+                      textAlign: 'center',
+                      gap: '4px',
+                      transition: 'all 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--color-primary)';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = 'var(--border-color)';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                  >
+                    <span style={{ fontSize: '18px' }}>{useCase.icon}</span>
+                    <span style={{ fontSize: '11px', fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
+                      {useCase.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ marginTop: '16px', textAlign: 'right' }}>
+                <Link to="/collections" style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold', color: 'var(--color-primary)', textDecoration: 'none' }}>
+                  View All Use Cases →
+                </Link>
+              </div>
+            </div>
+
+            {/* Column 3: Recently Added */}
+            <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', margin: 0 }}>
+                  Recently Added
+                </h3>
+                <Link to="/ai-tools?q=new" style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold', color: 'var(--color-primary)', textDecoration: 'none' }}>
+                  View All New Tools →
+                </Link>
+              </div>
+
+              {/* Recent tools list */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flexGrow: 1 }}>
+                {(() => {
+                  const recent = tools
+                    .filter(t => t.status === 'approved')
+                    .sort((a, b) => new Date(b.approvedAt || b.lastUpdated || 0).getTime() - new Date(a.approvedAt || a.lastUpdated || 0).getTime())
+                    .slice(0, 4);
+
+                  const timesAgo = ['2 days ago', '3 days ago', '3 days ago', '4 days ago'];
+
+                  return recent.map((tool, idx) => (
+                    <div
+                      key={tool.id}
+                      onClick={() => navigate(`/tools/${tool.slug}`)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '10px',
+                        borderRadius: 'var(--radius-md)',
+                        border: '1px solid var(--border-color)',
+                        backgroundColor: 'var(--bg-primary)',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = 'var(--color-primary)';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = 'var(--border-color)';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}
+                    >
+                      <img
+                        src={tool.logoUrl}
+                        alt={tool.name}
+                        style={{ width: '40px', height: '40px', borderRadius: 'var(--radius-md)', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)' }}
+                        onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop'; }}
+                      />
+                      <div style={{ flexGrow: 1, overflow: 'hidden' }}>
+                        <div style={{ fontWeight: 'bold', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '2px' }}>
+                          {tool.name}
+                        </div>
+                        <div style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '4px' }}>
+                          {tool.tagline}
+                        </div>
+                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                          <span className="badge badge-platform" style={{ fontSize: '9px', padding: '1px 5px' }}>
+                            {tool.subCategory || 'AI'}
+                          </span>
+                          <span className="badge badge-pricing" style={{ fontSize: '9px', padding: '1px 5px' }}>
+                            {tool.pricing}
+                          </span>
+                        </div>
+                      </div>
+                      <span style={{ fontSize: '10px', color: 'var(--text-muted)', flexShrink: 0, alignSelf: 'flex-start' }}>
+                        {timesAgo[idx] || 'recently'}
+                      </span>
+                    </div>
+                  ));
+                })()}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* Banner to Add Tools ("Built an AI Tool? Get Discovered.") */}
+      <section className="section" style={{ position: 'relative', zIndex: 1, padding: '24px 0 36px 0' }}>
+        <div className="container">
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #0b0f19 0%, #151e30 100%)',
+              borderRadius: 'var(--radius-xl)',
+              padding: '32px 40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '24px',
+              border: '1px solid rgba(226, 96, 58, 0.3)',
+              boxShadow: '0 12px 36px rgba(0, 0, 0, 0.25)',
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
+            {/* Ambient Background Glow */}
+            <div style={{ position: 'absolute', top: 0, right: 0, width: '300px', height: '100%', background: 'radial-gradient(circle at 100% 50%, rgba(226, 96, 58, 0.15), transparent 70%)', pointerEvents: 'none' }}></div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', position: 'relative', zIndex: 1, maxWidth: '600px' }}>
+              <div
+                style={{
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(226, 96, 58, 0.15)',
+                  border: '1px solid rgba(226, 96, 58, 0.4)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '28px',
+                  flexShrink: 0,
+                }}
+              >
+                🚀
+              </div>
+              <div>
+                <h3 style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: '#ffffff', margin: 0, marginBottom: '6px' }}>
+                  Built an AI Tool? Get Discovered.
+                </h3>
+                <p style={{ fontSize: 'var(--text-sm)', color: '#94a3b8', margin: 0, lineHeight: '1.4' }}>
+                  List your product in front of thousands of creators, developers, and founders actively searching for AI solutions.
+                </p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', position: 'relative', zIndex: 1 }}>
+              <Link
+                to="/submit"
+                className="btn btn-primary"
+                style={{ padding: '12px 24px', borderRadius: 'var(--radius-lg)', fontWeight: 'bold' }}
+              >
+                <span>Submit Your Tool</span>
+                <ArrowRight size={14} />
+              </Link>
+              <Link
+                to="/advertise"
+                className="btn btn-outline"
+                style={{ color: '#ffffff', borderColor: 'rgba(255, 255, 255, 0.2)', padding: '12px 20px', borderRadius: 'var(--radius-lg)' }}
+              >
+                View Listing Plans
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Popular Tools Section Grid */}
       <section id="popular-tools" className="section" style={{ position: 'relative', zIndex: 1 }}>
         <div className="container">
@@ -759,55 +1111,6 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
             </div>
           </div>
 
-        </div>
-      </section>
-
-      {/* Key Platform Features / Benefits Deck */}
-      <section className="section" style={{ backgroundColor: 'var(--bg-secondary)', borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)', position: 'relative', zIndex: 1 }}>
-        <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'bold', marginBottom: '12px' }}>
-              The Ultimate Hub for AI Finders
-            </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', maxWidth: '500px', margin: '0 auto' }}>
-              Designed to help builders list innovations and let users search, compare, and bookmark tools seamlessly.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-3">
-            {/* Benefit 1 */}
-            <div className="card" style={{ padding: '30px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-              <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <MousePointer size={28} />
-              </div>
-              <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'bold', margin: 0 }}>One-Click Access</h3>
-              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', lineHeight: '1.6', margin: 0 }}>
-                Instantly redirect to official AI tools dashboards. Our links are vetted continuously to prevent broken pathways.
-              </p>
-            </div>
-
-            {/* Benefit 2 */}
-            <div className="card" style={{ padding: '30px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-              <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Award size={28} />
-              </div>
-              <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'bold', margin: 0 }}>Trusted Vetted Reviews</h3>
-              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', lineHeight: '1.6', margin: 0 }}>
-                Every single rating, review commentary, and pros/cons report is manually validated by directory admins to rule out spam.
-              </p>
-            </div>
-
-            {/* Benefit 3 */}
-            <div className="card" style={{ padding: '30px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-              <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <DollarSign size={28} />
-              </div>
-              <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'bold', margin: 0 }}>Tailored Tool Finder</h3>
-              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', lineHeight: '1.6', margin: 0 }}>
-                Easily filter systems by Gold Vetted tags, Pricing plans tiers, or direct compatibility platforms with zero delay.
-              </p>
-            </div>
-          </div>
         </div>
       </section>
 
