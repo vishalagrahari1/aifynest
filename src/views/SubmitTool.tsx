@@ -157,6 +157,57 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
     <div className="container section" style={{ maxWidth: '800px' }}>
       <SEOHead title="Submit Your AI Tool — AIFynest" description="Submit your AI tool on AIFynest to reach thousands of active developers, startups, and founders." />
 
+      <style>{`
+        @media (max-width: 768px) {
+          .benefits-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .submission-tiers-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .submission-tiers-box {
+            padding: 20px 14px !important;
+          }
+          .submit-wizard-card {
+            padding: 20px 14px !important;
+          }
+          .form-two-col-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .pricing-builder-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .socials-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .wizard-progress-bar {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 10px;
+          }
+          .wizard-progress-bar > div {
+            width: 100% !important;
+          }
+          .wizard-actions-bar {
+            flex-direction: column-reverse;
+            gap: 12px;
+          }
+          .wizard-actions-bar > button,
+          .wizard-actions-bar > div {
+            width: 100%;
+            justify-content: center;
+          }
+          .wizard-actions-bar > div {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+          }
+          .wizard-actions-bar > div > button {
+            width: 100%;
+          }
+        }
+      `}</style>
+
       {/* PHASE 1: LANDING HERO */}
       {phase === 'landing' && (
         <div>
@@ -178,7 +229,7 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
           </div>
 
           {/* Benefits Grid */}
-          <div id="benefits" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '40px' }}>
+          <div id="benefits" className="benefits-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '40px' }}>
             <div style={benefitCardStyle}>
               <div style={iconCircleStyle}>🚀</div>
               <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 'bold', margin: '8px 0' }}>Get Discovered</h3>
@@ -203,7 +254,7 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
           </div>
 
           {/* Submission Tiers Grid including Paid Popular Placement */}
-          <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-xl)', padding: '32px 24px', marginBottom: '40px' }}>
+          <div className="submission-tiers-box" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-xl)', padding: '32px 24px', marginBottom: '40px' }}>
             <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold', textAlign: 'center', margin: '0 0 8px 0' }}>
               Choose Your Listing & Placement Tier
             </h2>
@@ -211,7 +262,7 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
               Select standard indexing or get instant priority placement in the Popular Tools section.
             </p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+            <div className="submission-tiers-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
               {/* Option 1: Free Listing */}
               <div style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', backgroundColor: 'var(--bg-primary)' }}>
                 <div>
@@ -272,9 +323,9 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
 
       {/* PHASE 2: MULTI-STEP WIZARD */}
       {phase === 'wizard' && (
-        <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '40px' }}>
+        <div className="submit-wizard-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '40px' }}>
           {/* Progress Indicator */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+          <div className="wizard-progress-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
             <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 'bold' }}>
               Step {wizardStep} of 7: {
                 wizardStep === 1 ? 'Basic Info' :
@@ -356,7 +407,7 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
           {wizardStep === 2 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               <h2 style={wizardHeaderStyle}>Categories & Deployment Channels</h2>
-              <div style={gridStyle}>
+              <div className="form-two-col-grid" style={gridStyle}>
                 <div className="form-group">
                   <label className="form-label">Primary Category *</label>
                   <select
@@ -499,7 +550,7 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
               {/* Build pricing plans */}
               <div style={{ border: '1px solid var(--border-color)', padding: '16px', borderRadius: 'var(--radius-md)' }}>
                 <h4 style={{ margin: '0 0 12px 0', fontSize: 'var(--text-xs)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Create Pricing Tiers</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '10px', alignItems: 'flex-end', marginBottom: '14px' }}>
+                <div className="pricing-builder-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '10px', alignItems: 'flex-end', marginBottom: '14px' }}>
                   <div className="form-group" style={{ margin: 0 }}>
                     <label className="form-label" style={{ fontSize: '10px' }}>Plan Name</label>
                     <input
@@ -703,7 +754,7 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
           )}
 
           {/* Wizard Action Controls */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '30px', paddingTop: '20px', borderTop: '1px solid var(--border-color)' }}>
+          <div className="wizard-actions-bar" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '30px', paddingTop: '20px', borderTop: '1px solid var(--border-color)' }}>
             {wizardStep > 1 ? (
               <button onClick={() => setWizardStep(wizardStep - 1)} className="btn btn-outline">
                 Back Step
@@ -748,7 +799,7 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
 
       {/* PHASE 3: SUBMISSION CONFIRMATION */}
       {phase === 'confirmation' && (
-        <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '40px', textAlign: 'center' }}>
+        <div className="submit-wizard-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '40px', textAlign: 'center' }}>
           <div style={{ fontSize: '48px', marginBottom: '16px' }}>🎉</div>
           <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', margin: '0 0 10px 0' }}>
             Your AI tool has been submitted!
