@@ -617,63 +617,79 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
         </div>
       </section>
 
-      {/* Featured / Sponsored Section Container (6 Columns x 2 Rows = 12 Cards Grid) */}
-      <section className="section" style={{ position: 'relative', zIndex: 1, padding: '36px 0' }}>
+      {/* Featured / Sponsored Section Container */}
+      <section className="section" style={{ position: 'relative', zIndex: 1 }}>
         <div className="container">
-          <div className="featured-container-card">
-            {/* Header with Title, Badge, Tabs, and Action Button */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '28px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span className="featured-spotlight-badge">
-                    <Sparkles size={12} /> FEATURED SPOTLIGHT
+          {/* Outer Card Container matching site section boxes */}
+          <div 
+            className="card" 
+            style={{ 
+              padding: '32px 28px', 
+              borderRadius: 'var(--radius-xl)', 
+              border: '1px solid var(--border-color)',
+              boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.04)',
+              backgroundColor: 'var(--bg-secondary)',
+              position: 'relative'
+            }}
+          >
+            {/* Section Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '24px' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                  <span className="badge badge-sponsored">
+                    <Sparkles size={11} /> Featured
                   </span>
-                  <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', margin: 0, letterSpacing: '-0.02em' }}>
-                    Promoted & Top AI Tools
+                  <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', margin: 0 }}>
+                    Featured Promotions
                   </h2>
                 </div>
-                <Link to="/advertise" className="btn btn-outline btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontWeight: '700', borderRadius: 'var(--radius-full)', padding: '8px 18px' }}>
-                  <Sparkles size={14} style={{ color: 'var(--color-primary)' }} />
-                  <span>Promote Your Tool</span>
-                  <ArrowRight size={14} />
-                </Link>
+                <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: 0 }}>
+                  Handpicked & promoted AI solutions curated by our community and partners.
+                </p>
               </div>
-
-              {/* Filter Tabs */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                  <button
-                    onClick={() => setFeaturedTab('all')}
-                    className={`featured-tab-btn ${featuredTab === 'all' ? 'featured-tab-btn-active' : ''}`}
-                  >
-                    All Featured
-                  </button>
-                  <button
-                    onClick={() => setFeaturedTab('top')}
-                    className={`featured-tab-btn ${featuredTab === 'top' ? 'featured-tab-btn-active' : ''}`}
-                  >
-                    🔥 Top Rated
-                  </button>
-                  <button
-                    onClick={() => setFeaturedTab('new')}
-                    className={`featured-tab-btn ${featuredTab === 'new' ? 'featured-tab-btn-active' : ''}`}
-                  >
-                    ⚡ New Additions
-                  </button>
-                  <button
-                    onClick={() => setFeaturedTab('free')}
-                    className={`featured-tab-btn ${featuredTab === 'free' ? 'featured-tab-btn-active' : ''}`}
-                  >
-                    💎 Free & Freemium
-                  </button>
-                </div>
-                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', fontWeight: 500 }}>
-                  Showing 12 Spotlight Tools
-                </span>
+              
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                <Link to="/advertise" className="btn btn-outline btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontWeight: 'bold' }}>
+                  <span>Promote Your Tool</span>
+                  <ArrowRight size={13} />
+                </Link>
               </div>
             </div>
 
-            {/* 6 Columns x 2 Rows Grid = 12 Cards Total */}
+            {/* Filter Tabs Bar */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)', padding: '14px 0', marginBottom: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => setFeaturedTab('all')}
+                  className={`featured-tab-btn ${featuredTab === 'all' ? 'featured-tab-btn-active' : ''}`}
+                >
+                  All Featured
+                </button>
+                <button
+                  onClick={() => setFeaturedTab('top')}
+                  className={`featured-tab-btn ${featuredTab === 'top' ? 'featured-tab-btn-active' : ''}`}
+                >
+                  🔥 Top Rated
+                </button>
+                <button
+                  onClick={() => setFeaturedTab('new')}
+                  className={`featured-tab-btn ${featuredTab === 'new' ? 'featured-tab-btn-active' : ''}`}
+                >
+                  ⚡ New Additions
+                </button>
+                <button
+                  onClick={() => setFeaturedTab('free')}
+                  className={`featured-tab-btn ${featuredTab === 'free' ? 'featured-tab-btn-active' : ''}`}
+                >
+                  💎 Free & Freemium
+                </button>
+              </div>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', fontWeight: 500 }}>
+                Showing 12 Featured Tools
+              </span>
+            </div>
+
+            {/* 6 Columns x 2 Rows Grid = 12 Cards Total (standard tool card boxes) */}
             <div className="grid grid-cols-6" style={{ gap: '16px' }}>
               {(() => {
                 const approvedTools = tools.filter(t => t.status === 'approved');
@@ -686,7 +702,6 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                 } else if (featuredTab === 'free') {
                   filtered = filtered.filter(t => t.pricing === 'free' || t.pricing === 'freemium');
                 } else {
-                  // 'all': prioritize sponsored, then organic
                   const sponsored = filtered.filter(t => t.isSponsored);
                   const organic = filtered.filter(t => !t.isSponsored);
                   filtered = [...sponsored, ...organic];
@@ -704,7 +719,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
 
                 return displayList.map((tool) => (
                   <div key={tool.id} style={{ display: 'flex' }}>
-                    <ToolCard tool={{ ...tool, isSponsored: true }} onToast={onToast} isSquare={true} />
+                    <ToolCard tool={{ ...tool, isSponsored: true }} onToast={onToast} />
                   </div>
                 ));
               })()}
