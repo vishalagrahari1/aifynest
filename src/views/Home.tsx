@@ -667,78 +667,58 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
       </section>
 
       {/* 3-Column Dashboard Grid Section (Trending AI Tools | Use Cases | Recently Added) */}
-      <section className="section" style={{ position: 'relative', zIndex: 1, padding: '24px 0' }}>
+      <section className="section" style={{ position: 'relative', zIndex: 1, padding: '28px 0' }}>
         <div className="container">
           <div className="grid grid-cols-3" style={{ gap: '24px', alignItems: 'stretch' }}>
             
             {/* Column 1: 🔥 Trending AI Tools */}
-            <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', height: '100%' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <div 
+              className="card" 
+              style={{ 
+                padding: '28px 22px', 
+                borderRadius: '24px', 
+                border: '1px solid var(--border-color)',
+                boxShadow: '0 8px 30px -4px rgba(0, 0, 0, 0.04)',
+                backgroundColor: 'var(--bg-secondary)',
+                display: 'flex', 
+                flexDirection: 'column', 
+                height: '100%' 
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
                 <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>🔥</span> Trending AI Tools
+                  <span style={{ fontSize: '20px' }}>🔥</span> Trending AI Tools
                 </h3>
               </div>
 
-              {/* Timeframe Tabs */}
-              <div style={{ display: 'flex', gap: '4px', backgroundColor: 'var(--bg-tertiary)', padding: '3px', borderRadius: 'var(--radius-full)', marginBottom: '20px' }}>
-                <button
-                  onClick={() => setTrendingTab('today')}
-                  style={{
-                    flex: 1,
-                    padding: '4px 10px',
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    borderRadius: 'var(--radius-full)',
-                    border: 'none',
-                    backgroundColor: trendingTab === 'today' ? 'var(--bg-card)' : 'transparent',
-                    color: trendingTab === 'today' ? 'var(--color-primary)' : 'var(--text-muted)',
-                    boxShadow: trendingTab === 'today' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  Today
-                </button>
-                <button
-                  onClick={() => setTrendingTab('week')}
-                  style={{
-                    flex: 1,
-                    padding: '4px 10px',
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    borderRadius: 'var(--radius-full)',
-                    border: 'none',
-                    backgroundColor: trendingTab === 'week' ? 'var(--bg-card)' : 'transparent',
-                    color: trendingTab === 'week' ? 'var(--color-primary)' : 'var(--text-muted)',
-                    boxShadow: trendingTab === 'week' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  This Week
-                </button>
-                <button
-                  onClick={() => setTrendingTab('month')}
-                  style={{
-                    flex: 1,
-                    padding: '4px 10px',
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    borderRadius: 'var(--radius-full)',
-                    border: 'none',
-                    backgroundColor: trendingTab === 'month' ? 'var(--bg-card)' : 'transparent',
-                    color: trendingTab === 'month' ? 'var(--color-primary)' : 'var(--text-muted)',
-                    boxShadow: trendingTab === 'month' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  This Month
-                </button>
+              {/* Timeframe Segment Tabs */}
+              <div style={{ display: 'flex', gap: '4px', backgroundColor: 'var(--bg-tertiary)', padding: '4px', borderRadius: 'var(--radius-full)', marginBottom: '22px' }}>
+                {(['today', 'week', 'month'] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setTrendingTab(tab)}
+                    style={{
+                      flex: 1,
+                      padding: '6px 10px',
+                      fontSize: '11px',
+                      fontWeight: trendingTab === tab ? 700 : 500,
+                      borderRadius: 'var(--radius-full)',
+                      border: trendingTab === tab ? '1px solid rgba(226, 96, 58, 0.25)' : '1px solid transparent',
+                      backgroundColor: trendingTab === tab ? 'var(--bg-card)' : 'transparent',
+                      color: trendingTab === tab ? '#E2603A' : 'var(--text-muted)',
+                      boxShadow: trendingTab === tab ? '0 2px 8px rgba(226, 96, 58, 0.12)' : 'none',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      textTransform: 'capitalize'
+                    }}
+                  >
+                    {tab === 'today' ? 'Today' : tab === 'week' ? 'This Week' : 'This Month'}
+                  </button>
+                ))}
               </div>
 
               {/* Numbered Ranked Items (01 - 05) */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', flexGrow: 1 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flexGrow: 1 }}>
                 {(() => {
                   const approved = tools.filter(t => t.status === 'approved');
                   let sorted = [...approved];
@@ -762,36 +742,45 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '12px',
-                        padding: '8px 10px',
-                        borderRadius: 'var(--radius-md)',
+                        padding: '10px 12px',
+                        borderRadius: '16px',
+                        border: '1px solid transparent',
                         cursor: 'pointer',
-                        transition: 'background 0.2s ease',
+                        transition: 'all 0.2s ease',
                       }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-tertiary)')}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--bg-card)';
+                        e.currentTarget.style.borderColor = 'rgba(226, 96, 58, 0.2)';
+                        e.currentTarget.style.boxShadow = '0 4px 14px rgba(0, 0, 0, 0.04)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                        e.currentTarget.style.borderColor = 'transparent';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
                     >
-                      <span style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold', color: 'var(--text-muted)', width: '20px', flexShrink: 0 }}>
+                      <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)', width: '22px', flexShrink: 0 }}>
                         0{idx + 1}
                       </span>
                       <img
                         src={tool.logoUrl}
                         alt={tool.name}
-                        style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)' }}
+                        style={{ width: '38px', height: '38px', borderRadius: '10px', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)' }}
                         onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop'; }}
                       />
                       <div style={{ flexGrow: 1, overflow: 'hidden' }}>
-                        <div style={{ fontWeight: 'bold', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <div style={{ fontWeight: '700', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           {tool.name}
                         </div>
-                        <div style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           {tool.tagline}
                         </div>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                        <span style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-primary)' }}>
+                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--text-primary)' }}>
                           ★ {tool.rating > 0 ? tool.rating : '4.8'}
                         </span>
-                        <span style={{ fontSize: '10px', fontWeight: 'bold', color: 'var(--color-success)', backgroundColor: 'var(--color-success-light)', padding: '2px 6px', borderRadius: 'var(--radius-full)' }}>
+                        <span style={{ fontSize: '10px', fontWeight: '700', color: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', padding: '2px 8px', borderRadius: '50px' }}>
                           {rankChanges[idx]}
                         </span>
                       </div>
@@ -802,8 +791,20 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
             </div>
 
             {/* Column 2: What do you want to accomplish? */}
-            <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', height: '100%' }}>
-              <div style={{ marginBottom: '16px' }}>
+            <div 
+              className="card" 
+              style={{ 
+                padding: '28px 22px', 
+                borderRadius: '24px', 
+                border: '1px solid var(--border-color)',
+                boxShadow: '0 8px 30px -4px rgba(0, 0, 0, 0.04)',
+                backgroundColor: 'var(--bg-secondary)',
+                display: 'flex', 
+                flexDirection: 'column', 
+                height: '100%' 
+              }}
+            >
+              <div style={{ marginBottom: '20px' }}>
                 <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', margin: 0, marginBottom: '4px' }}>
                   What do you want to accomplish?
                 </h3>
@@ -813,7 +814,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
               </div>
 
               {/* Grid of 10 Use Case Tiles */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', flexGrow: 1 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', flexGrow: 1 }}>
                 {[
                   { icon: '✍️', label: 'Write an article', q: 'article' },
                   { icon: '🎨', label: 'Create a logo', q: 'logo' },
@@ -834,52 +835,71 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                       flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      padding: '12px 8px',
-                      borderRadius: 'var(--radius-md)',
+                      padding: '14px 10px',
+                      borderRadius: '16px',
                       border: '1px solid var(--border-color)',
-                      backgroundColor: 'var(--bg-primary)',
+                      backgroundColor: 'var(--bg-card)',
                       cursor: 'pointer',
                       textAlign: 'center',
-                      gap: '4px',
-                      transition: 'all 0.2s ease',
+                      gap: '8px',
+                      transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.02)'
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--color-primary)';
-                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.borderColor = '#E2603A';
+                      e.currentTarget.style.transform = 'translateY(-3px)';
+                      e.currentTarget.style.boxShadow = '0 8px 20px rgba(226, 96, 58, 0.12)';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.borderColor = 'var(--border-color)';
                       e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.02)';
                     }}
                   >
-                    <span style={{ fontSize: '18px' }}>{useCase.icon}</span>
-                    <span style={{ fontSize: '11px', fontWeight: 'var(--font-medium)', color: 'var(--text-primary)' }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'rgba(226, 96, 58, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
+                      {useCase.icon}
+                    </div>
+                    <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', lineHeight: '1.2' }}>
                       {useCase.label}
                     </span>
                   </div>
                 ))}
               </div>
 
-              <div style={{ marginTop: '16px', textAlign: 'right' }}>
-                <Link to="/collections" style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold', color: 'var(--color-primary)', textDecoration: 'none' }}>
-                  View All Use Cases →
+              <div style={{ marginTop: '20px', textAlign: 'right' }}>
+                <Link to="/collections" style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: '#E2603A', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <span>View All Use Cases</span>
+                  <ArrowRight size={12} />
                 </Link>
               </div>
             </div>
 
             {/* Column 3: Recently Added */}
-            <div className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <div 
+              className="card" 
+              style={{ 
+                padding: '28px 22px', 
+                borderRadius: '24px', 
+                border: '1px solid var(--border-color)',
+                boxShadow: '0 8px 30px -4px rgba(0, 0, 0, 0.04)',
+                backgroundColor: 'var(--bg-secondary)',
+                display: 'flex', 
+                flexDirection: 'column', 
+                height: '100%' 
+              }}
+            >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', margin: 0 }}>
                   Recently Added
                 </h3>
-                <Link to="/ai-tools?q=new" style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold', color: 'var(--color-primary)', textDecoration: 'none' }}>
-                  View All New Tools →
+                <Link to="/ai-tools?q=new" style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: '#E2603A', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <span>View All New Tools</span>
+                  <ArrowRight size={12} />
                 </Link>
               </div>
 
               {/* Recent tools list */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flexGrow: 1 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', flexGrow: 1 }}>
                 {(() => {
                   const recent = tools
                     .filter(t => t.status === 'approved')
@@ -896,45 +916,48 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '12px',
-                        padding: '10px',
-                        borderRadius: 'var(--radius-md)',
+                        padding: '12px 14px',
+                        borderRadius: '16px',
                         border: '1px solid var(--border-color)',
-                        backgroundColor: 'var(--bg-primary)',
+                        backgroundColor: 'var(--bg-card)',
                         cursor: 'pointer',
-                        transition: 'all 0.2s ease',
+                        transition: 'all 0.25s ease',
+                        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.02)'
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = 'var(--color-primary)';
+                        e.currentTarget.style.borderColor = '#E2603A';
                         e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 6px 18px rgba(226, 96, 58, 0.1)';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.borderColor = 'var(--border-color)';
                         e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.02)';
                       }}
                     >
                       <img
                         src={tool.logoUrl}
                         alt={tool.name}
-                        style={{ width: '40px', height: '40px', borderRadius: 'var(--radius-md)', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)' }}
+                        style={{ width: '42px', height: '42px', borderRadius: '12px', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)' }}
                         onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop'; }}
                       />
                       <div style={{ flexGrow: 1, overflow: 'hidden' }}>
-                        <div style={{ fontWeight: 'bold', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '2px' }}>
+                        <div style={{ fontWeight: '700', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '2px' }}>
                           {tool.name}
                         </div>
-                        <div style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '4px' }}>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '6px' }}>
                           {tool.tagline}
                         </div>
                         <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                          <span className="badge badge-platform" style={{ fontSize: '9px', padding: '1px 5px' }}>
+                          <span className="badge badge-platform" style={{ fontSize: '10px', padding: '2px 6px', borderRadius: 'var(--radius-full)' }}>
                             {tool.subCategory || 'AI'}
                           </span>
-                          <span className="badge badge-pricing" style={{ fontSize: '9px', padding: '1px 5px' }}>
+                          <span className="badge badge-pricing" style={{ fontSize: '10px', padding: '2px 6px', borderRadius: 'var(--radius-full)' }}>
                             {tool.pricing}
                           </span>
                         </div>
                       </div>
-                      <span style={{ fontSize: '10px', color: 'var(--text-muted)', flexShrink: 0, alignSelf: 'flex-start' }}>
+                      <span style={{ fontSize: '11px', color: 'var(--text-muted)', flexShrink: 0, alignSelf: 'flex-start', fontWeight: 500 }}>
                         {timesAgo[idx] || 'recently'}
                       </span>
                     </div>
