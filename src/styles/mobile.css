@@ -246,6 +246,16 @@
     gap: 20px !important;
   }
 
+  .dimensions-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .review-inputs-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
   /* Sticky floating action CTA on tool detail view */
   .mobile-sticky-cta-bar {
     position: fixed !important;

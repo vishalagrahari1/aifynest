@@ -309,9 +309,6 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
       {/* Header Info Banner above the fold */}
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 320px',
-          gap: '32px',
           backgroundColor: 'var(--bg-card)',
           border: '1px solid var(--border-color)',
           borderRadius: 'var(--radius-lg)',
@@ -447,7 +444,7 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
       </div>
 
       {/* Main Body */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '32px' }} className="tool-body-grid">
+      <div className="tool-body-grid">
         {/* Left Column Content */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
           {activeTab === 'overview' && (

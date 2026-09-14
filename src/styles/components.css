@@ -557,6 +557,19 @@
   gap: 6px;
 }
 
+/* --- TOOL DETAIL PAGE LAYOUT GRID --- */
+.tool-header-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 32px;
+}
+
+.tool-body-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 32px;
+}
+
 /* --- MOBILE & TOUCH RESPONSIVE OVERRIDES --- */
 @media (max-width: 640px) {
   .container {
