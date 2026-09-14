@@ -1098,6 +1098,19 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
         </form>
       </Modal>
 
+      {/* Sticky Mobile Bottom CTA Bar */}
+      <div className="mobile-sticky-cta-bar" style={{ display: 'none' }}>
+        <button onClick={handleVisitToolClick} className="btn btn-primary" style={{ flex: 1, minHeight: '44px' }}>
+          <span>Visit Tool ↗</span>
+        </button>
+        <button onClick={handleFavoriteClick} className={`btn btn-outline ${isFavorited ? 'btn-save-active' : ''}`} style={{ minHeight: '44px', width: '48px', padding: 0 }}>
+          <Heart size={18} fill={isFavorited ? 'var(--color-danger)' : 'none'} />
+        </button>
+        <button onClick={handleShareClick} className="btn btn-outline" style={{ minHeight: '44px', width: '48px', padding: 0 }}>
+          <Share2 size={18} />
+        </button>
+      </div>
+
       {/* Style overrides for details and summaries */}
       <style>{`
         @media (max-width: 768px) {
@@ -1106,6 +1119,9 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
           }
           .pros-cons-grid, .review-inputs-grid {
             grid-template-columns: 1fr !important;
+          }
+          .mobile-sticky-cta-bar {
+            display: flex !important;
           }
         }
       `}</style>

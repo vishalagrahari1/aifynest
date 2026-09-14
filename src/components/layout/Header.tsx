@@ -792,7 +792,7 @@ export const Header: React.FC = () => {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="btn-icon mobile-menu-btn"
-            style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer' }}
+            style={{ cursor: 'pointer' }}
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>

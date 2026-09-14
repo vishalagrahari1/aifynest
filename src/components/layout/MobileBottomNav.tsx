@@ -28,22 +28,31 @@ const CategoryGridIcon: React.FC<{ size?: number }> = ({ size = 20 }) => (
 export const MobileBottomNav: React.FC = () => {
   const location = useLocation();
   const activePath = location.pathname;
+  const searchString = location.search;
 
   const navItems = [
     { label: 'Home', path: '/', icon: <HomeIcon size={20} /> },
-    { label: 'Browse', path: '/ai-tools', icon: <Search size={20} /> },
+    { label: 'Explore', path: '/ai-tools', icon: <Search size={20} /> },
     { label: 'Trending', path: '/trending', icon: <FlameIcon size={20} /> },
-    { label: 'Categories', path: '/categories', icon: <CategoryGridIcon size={20} /> },
-    { label: 'Saved', path: '/collections', icon: <Heart size={20} /> },
+    { label: 'Collections', path: '/collections', icon: <CategoryGridIcon size={20} /> },
+    { label: 'Saved', path: '/dashboard?tab=saved', icon: <Heart size={20} /> },
   ];
 
   return (
     <nav className="mobile-bottom-nav">
       {navItems.map((item) => {
-        const isActive = activePath === item.path || (item.path !== '/' && activePath.startsWith(item.path));
+        let isActive = false;
+        if (item.path === '/') {
+          isActive = activePath === '/';
+        } else if (item.path.includes('?tab=')) {
+          isActive = activePath === '/dashboard' && searchString.includes('tab=saved');
+        } else {
+          isActive = activePath.startsWith(item.path);
+        }
+
         return (
           <Link
-            key={item.path}
+            key={item.label}
             to={item.path}
             className={`mobile-nav-item ${isActive ? 'mobile-nav-item-active' : ''}`}
           >
