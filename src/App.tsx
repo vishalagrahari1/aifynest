@@ -42,6 +42,7 @@ const ManageTool = React.lazy(() => import('./views/dashboard/ManageTool').then(
 
 // Import CSS Design system
 import './styles/main.css';
+import './styles/mobile.css';
 
 const AppContent: React.FC<{
   showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
