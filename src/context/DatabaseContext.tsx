@@ -270,6 +270,12 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       let compiledTools: Tool[] = [];
       if (toolsData && toolsData.length > 0) {
         compiledTools = toolsData.map(t => mapToolRow(t));
+        const existingIds = new Set(compiledTools.map(t => t.id));
+        const existingSlugs = new Set(compiledTools.map(t => t.slug));
+        const missingInitial = initialTools.filter(t => !existingIds.has(t.id) && !existingSlugs.has(t.slug));
+        if (missingInitial.length > 0) {
+          compiledTools = [...compiledTools, ...missingInitial];
+        }
       } else {
         compiledTools = [...initialTools];
       }
