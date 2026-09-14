@@ -326,7 +326,7 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
               e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop';
             }}
           />
-          <div style={{ flex: 1, minWidth: '240px' }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap' }}>
               <h1 style={{ fontSize: 'var(--text-3xl)', fontWeight: 'var(--font-bold)', margin: 0 }}>{tool.name}</h1>
               {tool.isSponsored && <span className="badge badge-sponsored">Sponsored</span>}
@@ -374,13 +374,13 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
             AIFynest may earn a commission when you purchase through certain links.
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginTop: '4px' }}>
-            <button onClick={handleFavoriteClick} className={`btn btn-outline ${isFavorited ? 'btn-save-active' : ''}`} title="Save tool">
+            <button onClick={handleFavoriteClick} className={`btn btn-outline btn-sm ${isFavorited ? 'btn-save-active' : ''}`} title="Save tool">
               <Heart size={16} fill={isFavorited ? 'var(--color-danger)' : 'none'} />
             </button>
-            <button onClick={() => onCompareToggle(tool.id)} className="btn btn-outline" title="Compare tool">
+            <button onClick={() => onCompareToggle(tool.id)} className="btn btn-outline btn-sm" title="Compare tool">
               {compareList.includes(tool.id) ? <Check size={16} /> : <Plus size={16} />}
             </button>
-            <button onClick={handleShareClick} className="btn btn-outline" title="Share listing">
+            <button onClick={handleShareClick} className="btn btn-outline btn-sm" title="Share listing">
               <Share2 size={16} />
             </button>
           </div>
@@ -421,7 +421,7 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
       )}
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '20px', borderBottom: '1px solid var(--border-color)', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', gap: '20px', borderBottom: '1px solid var(--border-color)', marginBottom: '24px', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }} className="no-scrollbar">
         {['overview', 'pricing', 'reviews'].map((tab) => (
           <button
             key={tab}
@@ -454,7 +454,7 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
                 <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', marginBottom: '12px' }}>
                   What is {tool.name}?
                 </h2>
-                <p style={{ lineHeight: '1.6', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', whiteSpace: 'pre-line' }}>
+                <p style={{ lineHeight: '1.6', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', whiteSpace: 'pre-line', overflowWrap: 'break-word', wordBreak: 'break-word', maxWidth: '100%' }}>
                   {tool.description}
                 </p>
               </div>
@@ -1058,7 +1058,7 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
 
       {/* REPORT MODAL */}
       <Modal isOpen={isReportModalOpen} title={`Report Listing – ${tool.name}`} onClose={() => setIsReportModalOpen(false)}>
-        <form onSubmit={handleReportSubmit} style={{ padding: '12px', minWidth: '400px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <form onSubmit={handleReportSubmit} style={{ padding: '12px', width: '100%', maxWidth: '100%', display: 'flex', flexDirection: 'column', gap: '14px', boxSizing: 'border-box' }}>
           <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', margin: 0 }}>
             Is there something wrong with this tool page? Let us know so our moderation team can review it.
           </p>
@@ -1096,14 +1096,14 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
       </Modal>
 
       {/* Sticky Mobile Bottom CTA Bar */}
-      <div className="mobile-sticky-cta-bar" style={{ display: 'none' }}>
-        <button onClick={handleVisitToolClick} className="btn btn-primary" style={{ flex: 1, minHeight: '44px' }}>
+      <div className="mobile-sticky-cta-bar">
+        <button onClick={handleVisitToolClick} className="btn-visit-main">
           <span>Visit Tool ↗</span>
         </button>
-        <button onClick={handleFavoriteClick} className={`btn btn-outline ${isFavorited ? 'btn-save-active' : ''}`} style={{ minHeight: '44px', width: '48px', padding: 0 }}>
+        <button onClick={handleFavoriteClick} className={`btn-icon-action ${isFavorited ? 'btn-save-active' : ''}`} title="Save to Favorites">
           <Heart size={18} fill={isFavorited ? 'var(--color-danger)' : 'none'} />
         </button>
-        <button onClick={handleShareClick} className="btn btn-outline" style={{ minHeight: '44px', width: '48px', padding: 0 }}>
+        <button onClick={handleShareClick} className="btn-icon-action" title="Share listing">
           <Share2 size={18} />
         </button>
       </div>

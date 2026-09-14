@@ -121,11 +121,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/perplexity</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://aifynest.com/tools/zoice</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -137,11 +132,6 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/mem</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/tools/pi</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -177,11 +167,6 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/magnifi</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/tools/dreamstudio</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -391,6 +376,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://aifynest.com/tools/dreamstudio</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://aifynest.com/tools/framer-ai</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -407,6 +397,11 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/avoma</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://aifynest.com/tools/pi</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -497,6 +492,11 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/runway-act-one</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://aifynest.com/tools/perplexity</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -831,6 +831,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://aifynest.com/tools/ideogram</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://aifynest.com/tools/taplio</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -842,11 +847,6 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/sudowrite</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/tools/ideogram</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
