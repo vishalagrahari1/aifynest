@@ -570,6 +570,12 @@
   gap: 32px;
 }
 
+.tool-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
 /* --- MOBILE & TOUCH RESPONSIVE OVERRIDES --- */
 @media (max-width: 640px) {
   .container {

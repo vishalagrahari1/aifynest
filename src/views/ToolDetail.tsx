@@ -566,7 +566,7 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
                 Pricing Plans
               </h2>
               {tool.pricingPlans.length > 0 ? (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+                <div className="tool-cards-grid">
                   {tool.pricingPlans.map((plan, idx) => (
                     <div
                       key={idx}
@@ -783,7 +783,7 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
                 <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', marginBottom: '16px' }}>
                   Similar AI Tools
                 </h2>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+                <div className="tool-cards-grid">
                   {similarTools.map((relTool) => (
                     <div
                       key={relTool.id}
@@ -822,7 +822,7 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
                 <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', marginBottom: '16px' }}>
                   Alternatives
                 </h2>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+                <div className="tool-cards-grid">
                   {alternatives.map((relTool) => (
                     <div
                       key={relTool.id}
@@ -861,7 +861,7 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
                 <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', marginBottom: '16px' }}>
                   More tools in this category
                 </h2>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+                <div className="tool-cards-grid">
                   {moreInCategory.map((relTool) => (
                     <div
                       key={relTool.id}
