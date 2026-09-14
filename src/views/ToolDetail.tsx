@@ -43,7 +43,7 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
   const [featuresVal, setFeaturesVal] = useState(5);
   const [performance, setPerformance] = useState(5);
 
-  const tool = tools.find((t) => t.slug === slug);
+  const tool = tools.find((t) => t.slug === slug || t.id === slug || (slug && (slug.startsWith(t.slug) || t.slug.startsWith(slug))));
 
   // Track page view event
   useEffect(() => {
