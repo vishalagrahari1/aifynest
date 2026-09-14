@@ -116,12 +116,12 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/perplexity</loc>
+    <loc>https://aifynest.com/tools/zoice</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/zoice</loc>
+    <loc>https://aifynest.com/tools/perplexity</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -141,12 +141,12 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/deepseek</loc>
+    <loc>https://aifynest.com/tools/pi</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/pi</loc>
+    <loc>https://aifynest.com/tools/deepseek</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -177,6 +177,11 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/cursor-2</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://aifynest.com/tools/elevenlabs</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -317,11 +322,6 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/poe</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/tools/elevenlabs</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>

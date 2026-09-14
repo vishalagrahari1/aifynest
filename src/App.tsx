@@ -52,6 +52,11 @@ const AppContent: React.FC<{
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Automatically scroll to top of page on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   useEffect(() => {
     if (loading) return; // Wait until initial session fetch completes to avoid premature redirects
 

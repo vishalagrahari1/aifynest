@@ -45,8 +45,9 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
 
   const tool = tools.find((t) => t.slug === slug || t.id === slug || (slug && (slug.startsWith(t.slug) || t.slug.startsWith(slug))));
 
-  // Track page view event
+  // Track page view event & scroll to top
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (tool) {
       const viewedKey = `viewed_${tool.id}`;
       if (!(window as any)[viewedKey]) {
