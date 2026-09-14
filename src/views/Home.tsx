@@ -347,43 +347,44 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
           </p>
 
           {/* Interactive Search Bar wrapper */}
-          <div ref={suggestionsRef} style={{ position: 'relative', maxWidth: '640px', margin: '0 auto' }}>
-            <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '8px' }}>
-              <div style={{ position: 'relative', flex: 1 }}>
-                <Search
-                  size={18}
+          <div ref={suggestionsRef} style={{ position: 'relative', maxWidth: '720px', margin: '0 auto' }}>
+            <form onSubmit={handleSearchSubmit} className="hero-search-box">
+              <Search
+                size={20}
+                style={{
+                  color: 'var(--text-muted)',
+                  flexShrink: 0,
+                  marginLeft: '4px',
+                }}
+              />
+              <input
+                type="text"
+                placeholder={`Search ${tools ? tools.filter(t => t.status === 'approved').length : 0}+ AI tools, categories, or tags...`}
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onFocus={() => setShowSuggestions(suggestions.length > 0)}
+                className="hero-search-input"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
                   style={{
-                    position: 'absolute',
-                    left: '16px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
                     color: 'var(--text-muted)',
+                    fontSize: '14px',
+                    padding: '4px 8px',
+                    cursor: 'pointer',
+                    marginRight: '4px',
                   }}
-                />
-                <input
-                  type="text"
-                  placeholder={`Search ${tools ? tools.filter(t => t.status === 'approved').length : 0}+ AI tools, categories, or tags...`}
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  onFocus={() => setShowSuggestions(suggestions.length > 0)}
-                  style={{
-                    padding: '14px 16px 14px 44px',
-                    fontSize: 'var(--text-base)',
-                    borderRadius: 'var(--radius-lg)',
-                    border: '1px solid var(--border-color)',
-                    backgroundColor: 'var(--bg-secondary)',
-                    color: 'var(--text-primary)',
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02)',
-                    width: '100%',
-                    outline: 'none',
-                    transition: 'all var(--transition-normal)',
-                    boxSizing: 'border-box',
-                  }}
-                  className="search-input-glow"
-                />
-              </div>
-              <button type="submit" className="btn btn-primary" style={{ borderRadius: 'var(--radius-lg)', padding: '12px 24px', fontWeight: 'bold' }}>
-                Search
+                  title="Clear search query"
+                >
+                  ✕
+                </button>
+              )}
+              <button type="submit" className="hero-search-btn">
+                <span>Search</span>
               </button>
             </form>
 
