@@ -130,7 +130,17 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const existingIds = new Set(parsed.map((t: Tool) => t.id));
+          const existingSlugs = new Set(parsed.map((t: Tool) => t.slug));
+          const missingInitial = initialTools.filter(t => !existingIds.has(t.id) && !existingSlugs.has(t.slug));
+          if (missingInitial.length > 0) {
+            const merged = [...parsed, ...missingInitial];
+            localStorage.setItem('ai_tools', JSON.stringify(merged));
+            return merged;
+          }
+          return parsed;
+        }
       } catch (e) {}
     }
     return initialTools;
