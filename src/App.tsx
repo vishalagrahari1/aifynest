@@ -4,6 +4,7 @@ import { DatabaseProvider } from './context/DatabaseContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
+import { MobileBottomNav } from './components/layout/MobileBottomNav';
 import { Toast } from './components/shared/Toast';
 
 // Views imports
@@ -223,6 +224,7 @@ const AppContent: React.FC<{
     </main>
 
       <Footer />
+      <MobileBottomNav />
     </div>
   );
 };
