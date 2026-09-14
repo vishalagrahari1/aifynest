@@ -617,7 +617,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
         <div className="container">
           {/* Outer Card Container matching site section boxes */}
           <div 
-            className="card" 
+            className="card featured-container-box" 
             style={{ 
               padding: '32px 28px', 
               borderRadius: 'var(--radius-xl)', 
@@ -652,8 +652,8 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
             </div>
 
             {/* Filter Tabs Bar */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)', padding: '14px 0', marginBottom: '24px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <div className="featured-tab-bar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)', padding: '14px 0', marginBottom: '24px' }}>
+              <div className="featured-tabs-row" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <button
                   onClick={() => setFeaturedTab('all')}
                   className={`featured-tab-btn ${featuredTab === 'all' ? 'featured-tab-btn-active' : ''}`}
@@ -679,8 +679,8 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                   💎 Free & Freemium
                 </button>
               </div>
-              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', fontWeight: 500 }}>
-                Showing 12 Featured Tools
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', fontWeight: 500 }} className="featured-count-text">
+                Showing 8 Featured Tools
               </span>
             </div>
 
