@@ -34,12 +34,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('id', authUser.id)
         .single();
       
+      const isMasterAdmin = authUser.email?.toLowerCase() === 'aifynestofficial@gmail.com';
       if (profile && !error) {
         setUser({
           id: profile.id,
           name: profile.name,
           email: profile.email,
-          role: profile.role,
+          role: isMasterAdmin ? 'admin' : profile.role,
           interests: profile.interests || [],
           emailConfirmedAt: authUser.email_confirmed_at || null,
         });
@@ -49,7 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           id: authUser.id,
           name: authUser.user_metadata?.name || 'User',
           email: authUser.email || '',
-          role: authUser.user_metadata?.role || 'user',
+          role: isMasterAdmin ? 'admin' : (authUser.user_metadata?.role || 'user'),
           interests: [],
           emailConfirmedAt: authUser.email_confirmed_at || null,
         });
@@ -98,7 +99,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const data = localStorage.getItem('ai_users');
     if (data) {
       const parsed = JSON.parse(data) as User[];
-      const hasNewAdmin = parsed.some((u) => u.email === 'mevishal1130@gmail.com');
+      const hasNewAdmin = parsed.some((u) => u.email === 'aifynestofficial@gmail.com' && u.password === 'AIFynest_Official@3098');
       if (hasNewAdmin) {
         return parsed;
       }
@@ -108,6 +109,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string; isUnverified?: boolean }> => {
+    const users = getUsersFromStorage();
+    const localMatched = users.find((u) => u.email.toLowerCase() === email.toLowerCase().trim() && u.password === password);
+
     if (useSupabase) {
       try {
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -116,6 +120,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
         if (error) {
           console.error('Supabase Login Error:', error.message);
+          if (localMatched) {
+            const sessionUser: User = { 
+              id: localMatched.id, 
+              name: localMatched.name, 
+              email: localMatched.email, 
+              role: localMatched.role, 
+              interests: localMatched.interests || [],
+              emailConfirmedAt: localMatched.emailConfirmedAt || new Date().toISOString()
+            };
+            setUser(sessionUser);
+            localStorage.setItem('ai_user_session', JSON.stringify(sessionUser));
+            return { success: true };
+          }
           const isUnverified = error.message.toLowerCase().includes('confirm') || 
                               error.message.toLowerCase().includes('verified') || 
                               error.message.toLowerCase().includes('verification') ||
@@ -129,7 +146,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               id: data.user.id,
               name: data.user.user_metadata?.name || 'User',
               email: data.user.email || '',
-              role: data.user.user_metadata?.role || 'user',
+              role: data.user.email?.toLowerCase() === 'aifynestofficial@gmail.com' ? 'admin' : (data.user.user_metadata?.role || 'user'),
               interests: [],
               emailConfirmedAt: null,
             });
@@ -140,7 +157,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         return { success: false, error: 'Failed to sign in. Please try again.' };
       } catch (err: any) {
-        console.error(err);
+        if (localMatched) {
+          const sessionUser: User = { 
+            id: localMatched.id, 
+            name: localMatched.name, 
+            email: localMatched.email, 
+            role: localMatched.role, 
+            interests: localMatched.interests || [],
+            emailConfirmedAt: localMatched.emailConfirmedAt || new Date().toISOString()
+          };
+          setUser(sessionUser);
+          localStorage.setItem('ai_user_session', JSON.stringify(sessionUser));
+          return { success: true };
+        }
         return { success: false, error: err.message || 'An unexpected error occurred.' };
       }
     } else {
@@ -261,8 +290,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const isAdmin = () => user?.role === 'admin';
-  const isOwner = () => user?.role === 'owner' || user?.role === 'admin';
+  const isAdmin = () => user?.role === 'admin' && user?.email.toLowerCase() === 'aifynestofficial@gmail.com';
+  const isOwner = () => user?.role === 'owner' || (user?.role === 'admin' && user?.email.toLowerCase() === 'aifynestofficial@gmail.com');
   const isAuthenticated = () => user !== null;
 
   return (

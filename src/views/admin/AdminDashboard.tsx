@@ -132,16 +132,16 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
     return <Navigate to="/login" replace />;
   }
 
-  if (user.role !== 'admin') {
+  if (user.role !== 'admin' || user.email.toLowerCase() !== 'aifynestofficial@gmail.com') {
     return (
       <div className="container section text-center" style={{ maxWidth: '480px' }}>
         <Shield size={48} style={{ color: 'var(--color-danger)', margin: '0 auto 16px auto' }} />
-        <h2>Access Denied</h2>
+        <h2>Access Restricted</h2>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
-          You do not have administrative permissions required to access the moderator console.
+          You do not have administrative permissions required to access the moderator console. Only authorized administrators (aifynestofficial@gmail.com) can log in to the admin panel.
         </p>
-        <Link to="/" className="btn btn-primary">
-          Back to Homepage
+        <Link to="/login" className="btn btn-primary">
+          Log In as Admin
         </Link>
       </div>
     );
@@ -982,7 +982,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                 <span>Admin Console</span>
               </h1>
               <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', margin: '4px 0 0 0' }}>
-                System Administration panel for mevishal1130@gmail.com
+                System Administration panel for aifynestofficial@gmail.com
               </p>
             </div>
             {unreadNotifs.length > 0 && (

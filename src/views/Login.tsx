@@ -40,7 +40,11 @@ export const Login: React.FC<LoginProps> = ({ onToast }) => {
 
     if (res.success) {
       onToast('Logged in successfully! Welcome back to AIFynest.', 'success');
-      navigate('/dashboard');
+      if (email.toLowerCase().trim() === 'aifynestofficial@gmail.com') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     } else {
       if (res.isUnverified) {
         setIsUnverified(true);
@@ -109,8 +113,7 @@ export const Login: React.FC<LoginProps> = ({ onToast }) => {
     setShowGoogleModal(false);
     onToast('Running simulated Google sign-in...', 'info');
     setIsLoading(true);
-    // Google logins falls back to seed admin account to demonstrate full dashboard permission levels
-    const res = await login('mevishal1130@gmail.com', 'password123');
+    const res = await login('john@gmail.com', 'password123');
     setIsLoading(false);
     if (res.success) {
       onToast('Logged in successfully via simulated Google sign-in!', 'success');
@@ -125,10 +128,9 @@ export const Login: React.FC<LoginProps> = ({ onToast }) => {
     onToast('A simulated password reset email has been sent to ' + (email || 'your email address') + '.', 'info');
   };
 
-  const handleQuickLogin = async (role: 'admin' | 'owner' | 'user') => {
+  const handleQuickLogin = async (role: 'owner' | 'user') => {
     let testEmail = 'john@gmail.com';
-    if (role === 'admin') testEmail = 'mevishal1130@gmail.com';
-    else if (role === 'owner') testEmail = 'owner@synthesia.io';
+    if (role === 'owner') testEmail = 'owner@synthesia.io';
 
     setIsLoading(true);
     const res = await login(testEmail, 'password123');
@@ -267,15 +269,12 @@ export const Login: React.FC<LoginProps> = ({ onToast }) => {
           <span style={{ fontSize: '11px', color: 'var(--text-muted)', textAlign: 'center' }}>
             Quick fill testing credentials:
           </span>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '6px' }}>
-            <button onClick={() => handleQuickLogin('admin')} className="btn btn-outline btn-sm" style={{ padding: '6px 4px', fontSize: '10px' }}>
-              Admin
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+            <button onClick={() => handleQuickLogin('owner')} className="btn btn-outline btn-sm" style={{ padding: '8px 4px', fontSize: '11px' }}>
+              Tool Owner
             </button>
-            <button onClick={() => handleQuickLogin('owner')} className="btn btn-outline btn-sm" style={{ padding: '6px 4px', fontSize: '10px' }}>
-              Owner
-            </button>
-            <button onClick={() => handleQuickLogin('user')} className="btn btn-outline btn-sm" style={{ padding: '6px 4px', fontSize: '10px' }}>
-              User
+            <button onClick={() => handleQuickLogin('user')} className="btn btn-outline btn-sm" style={{ padding: '8px 4px', fontSize: '11px' }}>
+              Regular User
             </button>
           </div>
         </div>
