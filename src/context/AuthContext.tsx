@@ -9,6 +9,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string; isUnverified?: boolean }>;
   signup: (name: string, email: string, password: string, role: 'user' | 'owner') => Promise<{ success: boolean; error?: string }>;
+  confirmEmail: (email: string) => void;
   logout: () => void;
   isAdmin: () => boolean;
   isOwner: () => boolean;
@@ -139,13 +140,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (error) {
           console.error('Supabase Login Error:', error.message);
           if (localMatched) {
+            if (!localMatched.emailConfirmedAt) {
+              return { success: false, error: 'Email not verified. Please enter the verification code sent to your email to activate your account.', isUnverified: true };
+            }
             const sessionUser: User = { 
               id: localMatched.id, 
               name: localMatched.name, 
               email: localMatched.email, 
               role: localMatched.role, 
               interests: localMatched.interests || [],
-              emailConfirmedAt: localMatched.emailConfirmedAt || new Date().toISOString()
+              emailConfirmedAt: localMatched.emailConfirmedAt
             };
             setUser(sessionUser);
             localStorage.setItem('ai_user_session', JSON.stringify(sessionUser));
@@ -176,13 +180,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: false, error: 'Failed to sign in. Please try again.' };
       } catch (err: any) {
         if (localMatched) {
+          if (!localMatched.emailConfirmedAt) {
+            return { success: false, error: 'Email not verified. Please enter the verification code sent to your email to activate your account.', isUnverified: true };
+          }
           const sessionUser: User = { 
             id: localMatched.id, 
             name: localMatched.name, 
             email: localMatched.email, 
             role: localMatched.role, 
             interests: localMatched.interests || [],
-            emailConfirmedAt: localMatched.emailConfirmedAt || new Date().toISOString()
+            emailConfirmedAt: localMatched.emailConfirmedAt
           };
           setUser(sessionUser);
           localStorage.setItem('ai_user_session', JSON.stringify(sessionUser));
@@ -191,23 +198,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: false, error: err.message || 'An unexpected error occurred.' };
       }
     } else {
-      const users = getUsersFromStorage();
-      const matched = users.find((u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
-      
-      if (matched) {
+      if (localMatched) {
+        if (!localMatched.emailConfirmedAt) {
+          return { success: false, error: 'Email not verified. Please enter the verification code sent to your email to activate your account.', isUnverified: true };
+        }
         const sessionUser: User = { 
-          id: matched.id, 
-          name: matched.name, 
-          email: matched.email, 
-          role: matched.role, 
-          interests: matched.interests || [],
-          emailConfirmedAt: matched.emailConfirmedAt || new Date().toISOString()
+          id: localMatched.id, 
+          name: localMatched.name, 
+          email: localMatched.email, 
+          role: localMatched.role, 
+          interests: localMatched.interests || [],
+          emailConfirmedAt: localMatched.emailConfirmedAt
         };
         setUser(sessionUser);
         localStorage.setItem('ai_user_session', JSON.stringify(sessionUser));
         return { success: true };
       }
       return { success: false, error: 'Invalid email address or password credentials.' };
+    }
+  };
+
+  const confirmEmail = (emailToConfirm: string) => {
+    const users = getUsersFromStorage();
+    const nowStr = new Date().toISOString();
+    const updated = users.map((u) => {
+      if (u.email.toLowerCase() === emailToConfirm.toLowerCase().trim()) {
+        return { ...u, emailConfirmedAt: nowStr };
+      }
+      return u;
+    });
+    localStorage.setItem('ai_users', JSON.stringify(updated));
+
+    const confirmedUser = updated.find((u) => u.email.toLowerCase() === emailToConfirm.toLowerCase().trim());
+    if (confirmedUser) {
+      const sessionUser: User = {
+        id: confirmedUser.id,
+        name: confirmedUser.name,
+        email: confirmedUser.email,
+        role: confirmedUser.role,
+        interests: confirmedUser.interests || [],
+        emailConfirmedAt: nowStr,
+      };
+      setUser(sessionUser);
+      localStorage.setItem('ai_user_session', JSON.stringify(sessionUser));
     }
   };
 
@@ -256,15 +289,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role,
         password,
         interests: [],
-        emailConfirmedAt: new Date().toISOString(),
+        emailConfirmedAt: null, // Must verify email via 6-digit verification code before login!
       };
 
       const updated = [...users, newUser];
       localStorage.setItem('ai_users', JSON.stringify(updated));
-
-      const sessionUser: User = { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role, interests: [], emailConfirmedAt: newUser.emailConfirmedAt };
-      setUser(sessionUser);
-      localStorage.setItem('ai_user_session', JSON.stringify(sessionUser));
       return { success: true };
     }
   };
@@ -319,6 +348,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         login,
         signup,
+        confirmEmail,
         logout,
         isAdmin,
         isOwner,
