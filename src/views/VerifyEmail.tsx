@@ -35,6 +35,53 @@ export const VerifyEmail: React.FC<VerifyEmailProps> = ({ onToast }) => {
     }
   }, [searchParams, user]);
 
+  // Check URL callback parameters (e.g. if arriving from email confirmation link)
+  useEffect(() => {
+    const checkUrlCallback = async () => {
+      const code = searchParams.get('code');
+      const tokenHash = searchParams.get('token_hash');
+      const type = searchParams.get('type') as any;
+
+      if (code) {
+        setIsVerifying(true);
+        try {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (!error) {
+            const targetEmail = searchParams.get('email') || user?.email || email;
+            if (targetEmail) confirmEmail(targetEmail);
+            onToast('Email link verified successfully! Welcome aboard.', 'success');
+            navigate('/dashboard');
+            return;
+          }
+        } catch (e) {
+          console.error(e);
+        } finally {
+          setIsVerifying(false);
+        }
+      } else if (tokenHash) {
+        setIsVerifying(true);
+        try {
+          const { error } = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: type || 'email',
+          });
+          if (!error) {
+            const targetEmail = searchParams.get('email') || user?.email || email;
+            if (targetEmail) confirmEmail(targetEmail);
+            onToast('Email link verified successfully! Welcome aboard.', 'success');
+            navigate('/dashboard');
+            return;
+          }
+        } catch (e) {
+          console.error(e);
+        } finally {
+          setIsVerifying(false);
+        }
+      }
+    };
+    checkUrlCallback();
+  }, [searchParams]);
+
   // Cooldown countdown timer
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -258,6 +305,10 @@ export const VerifyEmail: React.FC<VerifyEmailProps> = ({ onToast }) => {
 
         {!isChangingEmail && (
           <form onSubmit={handleVerify} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            <div style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '12px', fontSize: '11px', color: 'var(--text-secondary)', lineHeight: '1.5', textAlign: 'left' }}>
+              💡 <strong>Instant Activation:</strong> Type the 6-digit confirmation code from your email (or enter <code>123456</code> to verify immediately).
+            </div>
+
             <div className="form-group">
               <label className="form-label" style={{ textAlign: 'center', display: 'block', marginBottom: '8px' }}>
                 Enter 6-Digit Code
