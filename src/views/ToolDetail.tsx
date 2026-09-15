@@ -5,8 +5,9 @@ import { useDatabase } from '../context/DatabaseContext';
 import { useAuth } from '../context/AuthContext';
 import { StarRating } from '../components/shared/StarRating';
 import { SEOHead } from '../components/shared/SEOHead';
-import { Heart, Share2, Plus, Check, Award } from '../components/shared/Icons';
+import { Heart, Share2, Award } from '../components/shared/Icons';
 import { Modal } from '../components/shared/Modal';
+import { ToolDetailActions } from '../components/shared/ToolDetailActions';
 
 interface ToolDetailProps {
   onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
@@ -373,24 +374,14 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
           <div style={{ fontSize: '10px', color: 'var(--text-muted)', textAlign: 'center', lineHeight: '1.3' }}>
             AIFynest may earn a commission when you purchase through certain links.
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginTop: '4px' }}>
-            <button onClick={handleFavoriteClick} className={`btn btn-outline btn-sm ${isFavorited ? 'btn-save-active' : ''}`} title="Save tool">
-              <Heart size={16} fill={isFavorited ? 'var(--color-danger)' : 'none'} />
-            </button>
-            <button onClick={() => onCompareToggle(tool.id)} className="btn btn-outline btn-sm" title="Compare tool">
-              {compareList.includes(tool.id) ? <Check size={16} /> : <Plus size={16} />}
-            </button>
-            <button onClick={handleShareClick} className="btn btn-outline btn-sm" title="Share listing">
-              <Share2 size={16} />
-            </button>
-          </div>
-          <button 
-            onClick={() => setIsReportModalOpen(true)} 
-            className="btn btn-outline btn-xs w-full"
-            style={{ marginTop: '8px', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
-          >
-            <span>🚩 Report / Flag Listing</span>
-          </button>
+          <ToolDetailActions
+            isFavorited={isFavorited}
+            isInCompare={compareList.includes(tool.id)}
+            onFavoriteClick={handleFavoriteClick}
+            onCompareClick={() => onCompareToggle(tool.id)}
+            onShareClick={handleShareClick}
+            onReportClick={() => setIsReportModalOpen(true)}
+          />
         </div>
       </div>
 

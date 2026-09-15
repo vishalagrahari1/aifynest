@@ -246,6 +246,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://aifynest.com/tools/udio</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://aifynest.com/tools/predis-ai</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -262,11 +267,6 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/mubert</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/tools/udio</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>

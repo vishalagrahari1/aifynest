@@ -224,12 +224,32 @@
   .socials-grid,
   .pros-cons-grid,
   .tool-cards-grid,
-  div[style*="gridTemplateColumns"],
-  div[style*="grid-template-columns"] {
+  .featured-card-grid {
     grid-template-columns: 1fr !important;
     gap: 16px !important;
     width: 100% !important;
     max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .tool-action-buttons-row {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .tool-action-button-item {
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    width: auto !important;
+    min-height: 44px !important;
+    padding: 0 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     box-sizing: border-box !important;
   }
 
