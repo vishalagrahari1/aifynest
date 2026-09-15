@@ -275,7 +275,8 @@ const optionsContainerStyle: React.CSSProperties = {
 const radioLabelStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  gap: '8px',
+  gap: '10px',
+  minHeight: '38px',
   fontSize: 'var(--text-xs)',
   color: 'var(--text-secondary)',
   cursor: 'pointer',
@@ -284,7 +285,8 @@ const radioLabelStyle: React.CSSProperties = {
 const checkboxLabelStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  gap: '8px',
+  gap: '10px',
+  minHeight: '38px',
   fontSize: 'var(--text-xs)',
   color: 'var(--text-secondary)',
   cursor: 'pointer',

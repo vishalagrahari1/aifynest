@@ -1,7 +1,7 @@
 /* src/components/layout/Header.tsx */
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, User, LogOut, Layout } from '../shared/Icons';
+import { Menu, X, User, LogOut, Layout, Search } from '../shared/Icons';
 import { useAuth } from '../../context/AuthContext';
 import { useDatabase } from '../../context/DatabaseContext';
 
@@ -274,10 +274,28 @@ export const Header: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Close mobile drawer on navigation
+  // Close mobile drawer on navigation & lock background scroll + Escape key listener
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location]);
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          setMobileMenuOpen(false);
+        }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = '';
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [mobileMenuOpen]);
 
   const toggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
@@ -788,14 +806,25 @@ export const Header: React.FC = () => {
           </Link>
         </div>
 
-          {/* Tablet/Mobile Hamburger Trigger */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="btn-icon mobile-menu-btn"
-            style={{ cursor: 'pointer' }}
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          {/* Tablet/Mobile Actions & Hamburger Trigger */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Link
+              to="/ai-tools"
+              className="btn-icon mobile-search-quick-btn"
+              title="Search Tools"
+              style={{ display: 'none' }}
+            >
+              <Search size={20} />
+            </Link>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="btn-icon mobile-menu-btn"
+              style={{ cursor: 'pointer' }}
+              aria-label="Toggle Navigation Menu"
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
 
       {/* Floating Compact Mobile Menu Card */}
