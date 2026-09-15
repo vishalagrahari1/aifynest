@@ -1603,15 +1603,15 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {[
-              { id: 'plan_starter', name: 'Starter', duration: '30 Days', price: '$25' },
-              { id: 'plan_growth', name: 'Growth', duration: '90 Days', price: '$49' },
-              { id: 'plan_longterm', name: 'Long-Term', duration: '180 Days', price: '$79' },
-              { id: 'plan_annual', name: 'Annual', duration: '365 Days', price: '$99 (BEST VALUE)' },
+              { id: 'plan_starter', name: 'Popular Tools Spot', duration: '30 Days', price: '$39' },
+              { id: 'plan_growth', name: 'Growth Featured Pack', duration: '90 Days', price: '$69' },
+              { id: 'plan_featured_article', name: 'Featured + Article Package', duration: 'Lifetime Article', price: '$129 (BEST VALUE)' },
+              { id: 'plan_annual', name: 'Annual Pass', duration: '365 Days', price: '$199' },
             ].map((p) => (
               <div key={p.id} style={{ padding: '12px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <strong style={{ fontSize: 'var(--text-xs)', display: 'block' }}>{p.name} ({p.duration})</strong>
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Fixed period promotion</span>
+                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Featured section placement + Published Blog Article</span>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <span style={{ fontWeight: 'bold', fontSize: 'var(--text-sm)' }}>{p.price}</span>

@@ -27,9 +27,9 @@ export const Pricing: React.FC = () => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '24px',
-            maxWidth: '960px',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '20px',
+            maxWidth: '1200px',
             margin: '0 auto',
             width: '100%',
           }}
@@ -56,25 +56,7 @@ export const Pricing: React.FC = () => {
           </div>
 
           {/* Premium Plan */}
-          <div style={{ ...planCardStyle, border: '2px solid var(--color-primary)', boxShadow: 'var(--shadow-xl)', position: 'relative' }}>
-            <div
-              style={{
-                position: 'absolute',
-                top: '-12px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                backgroundColor: 'var(--color-primary)',
-                color: 'white',
-                padding: '2px 12px',
-                borderRadius: 'var(--radius-full)',
-                fontSize: '9px',
-                fontWeight: 'bold',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-              }}
-            >
-              Most Popular
-            </div>
+          <div style={planCardStyle}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <h3 style={planTitleStyle}>Verified Premium</h3>
               <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Optimize conversion and edit custom content.</p>
@@ -87,10 +69,9 @@ export const Pricing: React.FC = () => {
               <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Verified Blue Check Badge</span></li>
               <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Add Pricing Plans & Screenshots</span></li>
               <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Claim Owner Dashboard Analytics</span></li>
-              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Expedited 6-Hour Review Safety</span></li>
-              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Respond to Customer Reviews</span></li>
+              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Expedited Review Safety</span></li>
             </ul>
-            <Link to="/submit-tool" className="btn btn-primary" style={{ marginTop: 'auto' }}>
+            <Link to="/submit-tool" className="btn btn-outline" style={{ marginTop: 'auto' }}>
               List Premium
             </Link>
           </div>
@@ -108,19 +89,64 @@ export const Pricing: React.FC = () => {
             <ul style={featuresListStyle}>
               <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>All Verified Premium Features</span></li>
               <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Featured Listing in Target Category</span></li>
-              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Sponsored Banners in Search Results</span></li>
-              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>$100 Ad Campaigns Seed Credits</span></li>
-              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Enterprise API Analytics Feeds</span></li>
+              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Sponsored Search Banners</span></li>
+              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Analytics Feeds</span></li>
             </ul>
             <Link to="/advertise" className="btn btn-outline" style={{ marginTop: 'auto' }}>
               Learn Sponsoring
+            </Link>
+          </div>
+
+          {/* Featured + Article Plan ($129) */}
+          <div style={{ ...planCardStyle, border: '2px solid var(--color-primary)', boxShadow: 'var(--shadow-xl)', position: 'relative' }}>
+            <div
+              style={{
+                position: 'absolute',
+                top: '-12px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                backgroundColor: 'var(--color-primary)',
+                color: 'white',
+                padding: '2px 12px',
+                borderRadius: 'var(--radius-full)',
+                fontSize: '9px',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              🔥 Featured + Article
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <h3 style={planTitleStyle}>Featured & Article</h3>
+              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Featured placement + published blog article review.</p>
+              <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 'bold', color: 'var(--color-primary)', margin: '16px 0' }}>
+                $129
+                <span style={{ fontSize: 'var(--text-xs)', fontWeight: 'normal', color: 'var(--text-muted)' }}> / package</span>
+              </div>
+            </div>
+            <ul style={featuresListStyle}>
+              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span><strong>Featured Section Placement</strong></span></li>
+              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span><strong>Dedicated Article Published on Site</strong></span></li>
+              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Verified Blue Checkmark Badge</span></li>
+              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Express 24-hr Verification Queue</span></li>
+              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Full Analytics & Review Dashboard</span></li>
+            </ul>
+            <Link to="/submit-tool" className="btn btn-primary" style={{ marginTop: 'auto' }}>
+              Get Featured & Article
             </Link>
           </div>
         </div>
       </div>
 
       <style>{`
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
+          .pricing-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+        @media (max-width: 600px) {
           .pricing-grid {
             grid-template-columns: 1fr !important;
           }

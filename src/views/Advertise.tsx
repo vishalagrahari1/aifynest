@@ -10,26 +10,17 @@ export const Advertise: React.FC = () => {
 
   const plans = [
     {
-      id: 'plan_popular',
+      id: 'plan_starter',
       name: 'Popular Tools Spot',
       duration: '30 Days',
       price: '$39',
       description: 'Guaranteed high-visibility placement in the Popular Tools grid on the Homepage.',
-      badge: '🔥 POPULAR CHOICE',
+      badge: null,
       features: ['Top 8 Popular Tools grid placement', 'Promoted badge tag', 'Direct outbound traffic booster'],
     },
     {
-      id: 'plan_starter',
-      name: 'Starter Featured',
-      duration: '30 Days',
-      price: '$25',
-      description: 'Give your AI tool featured promotion visibility across category banners.',
-      badge: null,
-      features: ['Featured Promotions carousel', 'Verified badge tag', 'Category page priority'],
-    },
-    {
       id: 'plan_growth',
-      name: 'Growth Pack',
+      name: 'Growth Featured Pack',
       duration: '90 Days',
       price: '$69',
       description: 'Promote your tool across Popular Tools and Featured section for 3 months.',
@@ -37,12 +28,21 @@ export const Advertise: React.FC = () => {
       features: ['Popular Tools + Featured combo', '90 Days active placement', 'Priority search placement'],
     },
     {
+      id: 'plan_featured_article',
+      name: 'Featured + Article Package',
+      duration: 'Lifetime Article',
+      price: '$129',
+      description: 'Get your AI tool listed in the Featured section and get a dedicated editorial article published on the site.',
+      badge: '🔥 BEST VALUE',
+      features: ['Featured Section placement on Homepage', 'Dedicated Editorial Article published on /blog', 'Verified Blue Checkmark badge', 'Express 24-hr editor verification', 'Priority search & analytics dashboard'],
+    },
+    {
       id: 'plan_annual',
       name: 'Annual Pass',
       duration: '365 Days',
-      price: '$129',
+      price: '$199',
       description: 'Keep your AI tool continuously promoted in Popular & Featured sections all year.',
-      badge: 'BEST VALUE',
+      badge: 'ENTERPRISE',
       features: ['365 Days uninterrupted promo', 'All placement zones included', 'Dedicated support & analytics'],
     },
   ];
