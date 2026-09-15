@@ -280,18 +280,21 @@
   }
 
   /* --- 9. TOOL DETAIL PAGE MOBILE STYLING --- */
-  .tool-header-grid {
-    grid-template-columns: 1fr !important;
-    padding: 18px 16px !important;
-    border-radius: 22px !important;
-    gap: 16px !important;
-    background: var(--bg-card) !important;
-    border: 1px solid var(--border-color) !important;
-  }
-
+  .tool-header-grid,
   .tool-body-grid {
     grid-template-columns: 1fr !important;
-    gap: 20px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .tool-header-grid > *,
+  .tool-body-grid > * {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .dimensions-grid {

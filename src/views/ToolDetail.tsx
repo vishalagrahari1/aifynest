@@ -444,9 +444,9 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
       </div>
 
       {/* Main Body */}
-      <div className="tool-body-grid">
+      <div className="tool-body-grid" style={{ minWidth: 0, width: '100%' }}>
         {/* Left Column Content */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', minWidth: 0, width: '100%' }}>
           {activeTab === 'overview' && (
             <>
               {/* Detailed description */}
@@ -898,7 +898,7 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
         </div>
 
         {/* Right Column Specs Sidebar */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', minWidth: 0, width: '100%' }}>
           {/* Claim Banner if unclaimed */}
           {tool.claimStatus === 'unclaimed' && (
             <div
