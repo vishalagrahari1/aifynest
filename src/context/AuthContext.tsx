@@ -67,7 +67,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (session && session.user) {
           fetchProfileAndSet(session.user).then(() => setLoading(false));
         } else {
-          setUser(null);
+          const localSess = localStorage.getItem('ai_user_session');
+          if (localSess) {
+            try {
+              setUser(JSON.parse(localSess) as User);
+            } catch (e) {
+              setUser(null);
+            }
+          } else {
+            setUser(null);
+          }
           setLoading(false);
         }
       });
@@ -77,7 +86,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (session && session.user) {
           fetchProfileAndSet(session.user).then(() => setLoading(false));
         } else {
-          setUser(null);
+          const localSess = localStorage.getItem('ai_user_session');
+          if (localSess) {
+            try {
+              setUser(JSON.parse(localSess) as User);
+            } catch (e) {
+              setUser(null);
+            }
+          } else {
+            setUser(null);
+          }
           setLoading(false);
         }
       });

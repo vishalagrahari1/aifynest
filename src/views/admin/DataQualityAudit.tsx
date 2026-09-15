@@ -405,7 +405,7 @@ export const DataQualityAudit: React.FC<DataQualityAuditProps> = ({ onToast }) =
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       
       {/* 1. Dashboard Quality Metrics Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }} className="stats-box-grid admin-stats-grid">
         <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '16px', boxShadow: 'var(--shadow-sm)' }}>
           <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 'bold' }}>TOTAL ACTIVE LISTINGS</div>
           <div style={{ fontSize: '24px', fontWeight: 'bold', marginTop: '6px' }}>{stats.total}</div>
@@ -432,7 +432,7 @@ export const DataQualityAudit: React.FC<DataQualityAuditProps> = ({ onToast }) =
       </div>
 
       {/* 2. Filter Navigation Tab Row */}
-      <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
+      <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }} className="data-quality-subtabs">
         {[
           { id: 'all', name: 'All Problems' },
           { id: 'duplicates_name', name: `Duplicate Names (${duplicateNameGroups.length})` },

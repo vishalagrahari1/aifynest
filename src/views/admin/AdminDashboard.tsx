@@ -906,10 +906,10 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
     <div className="container section">
       <SEOHead title="Admin Console — AIFynest" description="Manage submissions, listing claims, customer reviews, and sponsored affiliate networks." />
 
-      <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: '32px' }} className="dashboard-grid">
+      <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: '32px' }} className="dashboard-grid admin-dashboard-grid">
         {/* Navigation Sidebar */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <div style={{ fontSize: '10px', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '8px', paddingLeft: '8px', letterSpacing: '0.05em' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }} className="admin-sidebar">
+          <div style={{ fontSize: '10px', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '8px', paddingLeft: '8px', letterSpacing: '0.05em' }} className="admin-sidebar-deck-label">
             ADMIN CONTROL DECK
           </div>
           {[
@@ -936,6 +936,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                 setReviewingTool(null);
                 setActiveTab(tab.id as any);
               }}
+              className={`admin-sidebar-tab-btn ${activeTab === tab.id ? 'admin-sidebar-tab-active' : ''}`}
               style={{
                 width: '100%',
                 textAlign: 'left',
@@ -996,6 +997,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
           {/* SPLIT SCREEN PREVIEW OVERLAY */}
           {reviewingTool && (
             <div
+              className="admin-review-overlay"
               style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
@@ -1285,6 +1287,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
 
               {/* Bottom Control Bar */}
               <div
+                className="admin-review-bottom-bar"
                 style={{
                   gridColumn: 'span 2',
                   display: 'flex',
