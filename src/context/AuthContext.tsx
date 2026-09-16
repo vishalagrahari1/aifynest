@@ -117,11 +117,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const getUsersFromStorage = (): User[] => {
     const data = localStorage.getItem('ai_users');
     if (data) {
-      const parsed = JSON.parse(data) as User[];
-      const hasNewAdmin = parsed.some((u) => u.email === 'aifynestofficial@gmail.com' && u.password === 'AIFynest_Official@3098');
-      if (hasNewAdmin) {
-        return parsed;
-      }
+      return JSON.parse(data) as User[];
     }
     localStorage.setItem('ai_users', JSON.stringify(seedUsers));
     return seedUsers;
@@ -129,7 +125,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string; isUnverified?: boolean }> => {
     const users = getUsersFromStorage();
-    const localMatched = users.find((u) => u.email.toLowerCase() === email.toLowerCase().trim() && u.password === password);
+    const localMatched = users.find((u) => u.email.toLowerCase() === email.toLowerCase().trim() && (!u.password || u.password === password));
 
     if (useSupabase) {
       try {

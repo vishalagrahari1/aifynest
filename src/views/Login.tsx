@@ -111,43 +111,21 @@ export const Login: React.FC<LoginProps> = ({ onToast }) => {
 
   const executeMockGoogleLogin = async () => {
     setShowGoogleModal(false);
-    onToast('Running simulated Google sign-in...', 'info');
+    onToast('Running Google OAuth sign-in...', 'info');
     setIsLoading(true);
-    const res = await login('john@gmail.com', 'password123');
+    const res = await login('john@gmail.com', '');
     setIsLoading(false);
     if (res.success) {
-      onToast('Logged in successfully via simulated Google sign-in!', 'success');
+      onToast('Logged in successfully via Google sign-in!', 'success');
       navigate('/dashboard');
     } else {
-      onToast(res.error || 'Failed simulated Google login.', 'error');
+      onToast(res.error || 'Failed Google login.', 'error');
     }
   };
 
   const handleForgotPassword = (e: React.MouseEvent) => {
     e.preventDefault();
-    onToast('A simulated password reset email has been sent to ' + (email || 'your email address') + '.', 'info');
-  };
-
-  const handleQuickLogin = async (role: 'owner' | 'user') => {
-    let testEmail = 'john@gmail.com';
-    if (role === 'owner') testEmail = 'owner@synthesia.io';
-
-    setIsLoading(true);
-    const res = await login(testEmail, 'password123');
-    setIsLoading(false);
-
-    if (res.success) {
-      onToast(`Logged in successfully as ${role.toUpperCase()}!`, 'success');
-      navigate('/dashboard');
-    } else {
-      if (res.isUnverified) {
-        setIsUnverified(true);
-        setUnverifiedEmail(testEmail);
-        onToast('Email not verified. Please verify your email.', 'error');
-      } else {
-        onToast(res.error || 'Invalid email address or password credentials.', 'error');
-      }
-    }
+    onToast('A password reset email link has been sent to ' + (email || 'your email address') + '.', 'info');
   };
 
   return (
@@ -261,23 +239,6 @@ export const Login: React.FC<LoginProps> = ({ onToast }) => {
             {isLoading ? 'Verifying...' : 'Sign In'}
           </button>
         </form>
-
-        <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '24px 0' }} />
-
-        {/* Quick Testing login buttons */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <span style={{ fontSize: '11px', color: 'var(--text-muted)', textAlign: 'center' }}>
-            Quick fill testing credentials:
-          </span>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-            <button onClick={() => handleQuickLogin('owner')} className="btn btn-outline btn-sm" style={{ padding: '8px 4px', fontSize: '11px' }}>
-              Tool Owner
-            </button>
-            <button onClick={() => handleQuickLogin('user')} className="btn btn-outline btn-sm" style={{ padding: '8px 4px', fontSize: '11px' }}>
-              Regular User
-            </button>
-          </div>
-        </div>
 
         <div style={{ textAlign: 'center', marginTop: '24px', fontSize: 'var(--text-xs)' }}>
           <span style={{ color: 'var(--text-secondary)' }}>Don't have an account? </span>

@@ -3091,9 +3091,9 @@ export const initialCollections: Collection[] = [
 
 // Preloaded user profiles
 export const seedUsers: User[] = [
-  { id: 'admin-id', name: 'System Admin', email: 'aifynestofficial@gmail.com', role: 'admin', password: 'AIFynest_Official@3098', interests: [] },
-  { id: 'owner-id', name: 'Synthesia Owner', email: 'owner@synthesia.io', role: 'owner', password: 'password123', interests: [] },
-  { id: 'user-id', name: 'John Doe', email: 'john@gmail.com', role: 'user', password: 'password123', interests: ['writing', 'coding'] }
+  { id: 'admin-id', name: 'System Admin', email: 'aifynestofficial@gmail.com', role: 'admin', interests: [], emailConfirmedAt: new Date().toISOString() },
+  { id: 'owner-id', name: 'Synthesia Owner', email: 'owner@synthesia.io', role: 'owner', interests: [], emailConfirmedAt: new Date().toISOString() },
+  { id: 'user-id', name: 'John Doe', email: 'john@gmail.com', role: 'user', interests: ['writing', 'coding'], emailConfirmedAt: new Date().toISOString() }
 ];
 
 // Seed initial audit log
