@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDatabase } from '../context/DatabaseContext';
 import { supabase } from '../utils/supabase';
+import { getToolLogoUrl, handleLogoError } from '../utils/toolHelpers';
 
 import { ToolCard } from '../components/shared/ToolCard';
 import { SEOHead } from '../components/shared/SEOHead';
@@ -835,10 +836,10 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                             0{idx + 1}
                           </span>
                           <img
-                            src={tool.logoUrl}
+                            src={getToolLogoUrl(tool)}
                             alt={tool.name}
                             style={{ width: '40px', height: '40px', borderRadius: '12px', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
-                            onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop'; }}
+                            onError={(e) => handleLogoError(e, tool.name)}
                           />
                           <div style={{ flexGrow: 1, minWidth: 0 }}>
                             <div style={{ fontWeight: '700', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -1014,10 +1015,10 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                         }}
                       >
                         <img
-                          src={tool.logoUrl}
+                          src={getToolLogoUrl(tool)}
                           alt={tool.name}
                           style={{ width: '40px', height: '40px', borderRadius: '12px', objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border-color)', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
-                          onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop'; }}
+                          onError={(e) => handleLogoError(e, tool.name)}
                         />
                         <div style={{ flexGrow: 1, minWidth: 0 }}>
                           <div style={{ fontWeight: '700', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>

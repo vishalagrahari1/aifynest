@@ -4,6 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useDatabase } from '../context/DatabaseContext';
 import { SEOHead } from '../components/shared/SEOHead';
 import { ArrowLeft } from '../components/shared/Icons';
+import { getToolLogoUrl, handleLogoError } from '../utils/toolHelpers';
 
 export const BlogDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -103,7 +104,7 @@ export const BlogDetail: React.FC = () => {
                 {recommendedTools.map((t) => (
                   <div key={t.id} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                      <img src={t.logoUrl} alt={t.name} style={{ width: '24px', height: '24px', borderRadius: 'var(--radius-xs)', objectFit: 'cover' }} />
+                      <img src={getToolLogoUrl(t)} alt={t.name} style={{ width: '24px', height: '24px', borderRadius: 'var(--radius-xs)', objectFit: 'cover' }} onError={(e) => handleLogoError(e, t.name)} />
                       <Link to={`/tools/${t.slug}`} style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold' }}>
                         {t.name}
                       </Link>

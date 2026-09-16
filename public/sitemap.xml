@@ -151,6 +151,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://aifynest.com/tools/elevenlabs</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://aifynest.com/tools/notebooklm</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -161,12 +166,12 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/elevenlabs</loc>
+    <loc>https://aifynest.com/tools/magnifi</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/magnifi</loc>
+    <loc>https://aifynest.com/tools/playht</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -177,11 +182,6 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/canva-ai</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/tools/playht</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -251,6 +251,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://aifynest.com/tools/mubert</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://aifynest.com/tools/predis-ai</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -262,11 +267,6 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/elicit</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/tools/mubert</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>

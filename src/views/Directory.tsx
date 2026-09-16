@@ -7,6 +7,7 @@ import { ToolCard } from '../components/shared/ToolCard';
 import { SEOHead } from '../components/shared/SEOHead';
 import { X, Search } from '../components/shared/Icons';
 import { supabase } from '../utils/supabase';
+import { mapToolRow } from '../utils/toolHelpers';
 
 interface DirectoryProps {
   onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
@@ -274,7 +275,7 @@ export const Directory: React.FC<DirectoryProps> = ({
         if (error) throw error;
 
         if (active) {
-          setPaginatedTools(data || []);
+          setPaginatedTools((data || []).map(mapToolRow));
           setTotalItems(count || 0);
         }
       } catch (err: any) {
@@ -325,7 +326,7 @@ export const Directory: React.FC<DirectoryProps> = ({
 
             const { data: fbData, count: fbCount } = await fbQuery;
             if (active) {
-              setPaginatedTools(fbData || []);
+              setPaginatedTools((fbData || []).map(mapToolRow));
               setTotalItems(fbCount || 0);
             }
           } catch (_) {}

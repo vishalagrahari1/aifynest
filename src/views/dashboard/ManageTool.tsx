@@ -5,6 +5,7 @@ import { useDatabase } from '../../context/DatabaseContext';
 import { useAuth } from '../../context/AuthContext';
 import { SEOHead } from '../../components/shared/SEOHead';
 import { Shield } from '../../components/shared/Icons';
+import { getToolLogoUrl, handleLogoError } from '../../utils/toolHelpers';
 
 export const ManageTool: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -201,7 +202,7 @@ export const ManageTool: React.FC = () => {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <img src={logoUrl} alt={name} style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--border-color)' }} />
+          <img src={getToolLogoUrl({ logoUrl, name })} alt={name} style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--border-color)' }} onError={(e) => handleLogoError(e, name)} />
           <div>
             <h1 style={{ margin: 0, fontSize: 'var(--text-xl)', fontWeight: 'bold' }}>Edit {name}</h1>
             <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>

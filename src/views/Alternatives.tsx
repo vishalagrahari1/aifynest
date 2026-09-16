@@ -4,6 +4,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useDatabase } from '../context/DatabaseContext';
 import { SEOHead } from '../components/shared/SEOHead';
 import { Shield, MessageSquare } from '../components/shared/Icons';
+import { getToolLogoUrl, handleLogoError } from '../utils/toolHelpers';
 
 export const Alternatives: React.FC = () => {
   const { tools, categories, trackEvent } = useDatabase();
@@ -60,9 +61,10 @@ export const Alternatives: React.FC = () => {
         {/* Header Hero */}
         <div style={{ display: 'flex', gap: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
           <img
-            src={currentTool.logoUrl}
+            src={getToolLogoUrl(currentTool)}
             alt={currentTool.name}
             style={{ width: '64px', height: '64px', borderRadius: '12px', border: '1px solid var(--border-color)', objectFit: 'cover' }}
+            onError={(e) => handleLogoError(e, currentTool.name)}
           />
           <div>
             <h1 style={{ margin: 0, fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)' }}>
@@ -119,9 +121,10 @@ export const Alternatives: React.FC = () => {
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
                     <span style={{ fontSize: 'var(--text-md)', fontWeight: 'bold', color: 'var(--color-primary)' }}>#{idx + 1}</span>
                     <img
-                      src={alt.logoUrl}
+                      src={getToolLogoUrl(alt)}
                       alt={alt.name}
                       style={{ width: '48px', height: '48px', borderRadius: '8px', border: '1px solid var(--border-color)', objectFit: 'cover' }}
+                      onError={(e) => handleLogoError(e, alt.name)}
                     />
                   </div>
 

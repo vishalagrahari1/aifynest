@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Tool } from '../../utils/seedData';
+import { getToolLogoUrl, handleLogoError } from '../../utils/toolHelpers';
 import { StarRating } from './StarRating';
 import { Heart, Globe, Plus, Check } from './Icons';
 import { useDatabase } from '../../context/DatabaseContext';
@@ -206,19 +207,17 @@ export const ToolCard: React.FC<ToolCardProps> = ({
       {/* Tool Header info */}
       <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', marginBottom: '12px' }}>
         <img
-          src={tool.logoUrl}
-          alt={`${tool.name} logo`}
+          src={getToolLogoUrl(tool)}
+          alt={`${tool.name || 'Tool'} logo`}
           style={{
             width: '48px',
             height: '48px',
             borderRadius: 'var(--radius-md)',
             objectFit: 'cover',
             border: '1px solid var(--border-color)',
+            flexShrink: 0,
           }}
-          onError={(e) => {
-            // Fallback placeholder image
-            e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop';
-          }}
+          onError={(e) => handleLogoError(e, tool.name)}
         />
         <div style={{ overflow: 'hidden' }}>
           <h3
@@ -234,7 +233,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({
             {tool.name}
           </h3>
           <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
-            {tool.subCategory}
+            {tool.subCategory || (tool as any).sub_category}
           </span>
         </div>
       </div>

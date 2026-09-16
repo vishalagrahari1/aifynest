@@ -16,6 +16,7 @@ import {
   Lock
 } from '../../components/shared/Icons';
 import { paymentProvider } from '../../services/payments/paymentProvider';
+import { getToolLogoUrl, handleLogoError } from '../../utils/toolHelpers';
 
 interface OwnerDashboardProps {
   onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
@@ -567,7 +568,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }} className="grid-cols-2">
                   {favoritedTools.map((tool) => (
                     <div key={tool.id} style={{ display: 'flex', gap: '12px', padding: '16px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)' }}>
-                      <img src={tool.logoUrl} alt="logo" style={{ width: '40px', height: '40px', borderRadius: '4px', objectFit: 'cover' }} />
+                      <img src={getToolLogoUrl(tool)} alt="logo" style={{ width: '40px', height: '40px', borderRadius: '4px', objectFit: 'cover' }} onError={(e) => handleLogoError(e, tool.name)} />
                       <div style={{ flex: 1 }}>
                         <h4 style={{ margin: '0 0 4px 0', fontSize: 'var(--text-sm)' }}>
                           <Link to={`/tools/${tool.slug}`} style={{ color: 'var(--text-primary)', fontWeight: 'bold', textDecoration: 'none' }}>
@@ -774,7 +775,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
                             }}
                           >
                             <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                              <img src={tool.logoUrl} alt={tool.name} style={{ width: '32px', height: '32px', borderRadius: '4px', objectFit: 'cover' }} />
+                              <img src={getToolLogoUrl(tool)} alt={tool.name} style={{ width: '32px', height: '32px', borderRadius: '4px', objectFit: 'cover' }} onError={(e) => handleLogoError(e, tool.name)} />
                               <div>
                                 <h4 style={{ margin: 0, fontSize: 'var(--text-sm)', fontWeight: 'bold' }}>{tool.name}</h4>
                                 <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{tool.subCategory}</span>
@@ -895,7 +896,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
                           return (
                             <tr key={tool.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                               <td style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <img src={tool.logoUrl} alt={tool.name} style={{ width: '28px', height: '28px', borderRadius: '4px', objectFit: 'cover' }} />
+                                <img src={getToolLogoUrl(tool)} alt={tool.name} style={{ width: '28px', height: '28px', borderRadius: '4px', objectFit: 'cover' }} onError={(e) => handleLogoError(e, tool.name)} />
                                 <span style={{ fontWeight: 'bold' }}>{tool.name}</span>
                               </td>
                               <td style={{ padding: '12px 16px', textTransform: 'capitalize' }}>
@@ -1125,7 +1126,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
                         {ownerToolsBreakdown.map(({ tool, stats }) => (
                           <tr key={tool.id}>
                             <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <img src={tool.logoUrl} alt={tool.name} style={{ width: '24px', height: '24px', borderRadius: '4px', objectFit: 'cover' }} />
+                              <img src={getToolLogoUrl(tool)} alt={tool.name} style={{ width: '24px', height: '24px', borderRadius: '4px', objectFit: 'cover' }} onError={(e) => handleLogoError(e, tool.name)} />
                               <strong>{tool.name}</strong>
                             </td>
                             <td style={{ textAlign: 'center' }}>{stats.views}</td>
@@ -1232,7 +1233,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
                       return (
                         <div key={tool.id} style={{ padding: '20px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
                           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                            <img src={tool.logoUrl} alt={tool.name} style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover' }} />
+                            <img src={getToolLogoUrl(tool)} alt={tool.name} style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover' }} onError={(e) => handleLogoError(e, tool.name)} />
                             <div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 <h4 style={{ margin: 0, fontSize: 'var(--text-sm)', fontWeight: 'bold' }}>{tool.name}</h4>
@@ -1584,7 +1585,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
         <div style={{ padding: '16px', maxWidth: '480px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {selectedSponsorshipTool && (
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center', backgroundColor: 'var(--bg-tertiary)', padding: '12px', borderRadius: 'var(--radius-md)' }}>
-              <img src={selectedSponsorshipTool.logoUrl} alt={selectedSponsorshipTool.name} style={{ width: '36px', height: '36px', borderRadius: '4px', objectFit: 'cover' }} />
+              <img src={getToolLogoUrl(selectedSponsorshipTool)} alt={selectedSponsorshipTool.name} style={{ width: '36px', height: '36px', borderRadius: '4px', objectFit: 'cover' }} onError={(e) => handleLogoError(e, selectedSponsorshipTool.name)} />
               <div>
                 <strong style={{ fontSize: 'var(--text-sm)', display: 'block' }}>{selectedSponsorshipTool.name}</strong>
                 <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{selectedSponsorshipTool.tagline}</span>

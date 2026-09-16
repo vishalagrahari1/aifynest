@@ -7,6 +7,7 @@ import { SEOHead } from '../../components/shared/SEOHead';
 import { Modal } from '../../components/shared/Modal';
 import { StarRating } from '../../components/shared/StarRating';
 import { DataQualityAudit } from './DataQualityAudit';
+import { getToolLogoUrl, handleLogoError } from '../../utils/toolHelpers';
 import {
   Shield,
   Layout,
@@ -1371,7 +1372,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                         {pendingReviewList.slice(0, 5).map((tool) => (
                           <tr key={tool.id}>
                             <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <img src={tool.logoUrl} alt={tool.name} style={{ width: '24px', height: '24px', borderRadius: '4px', objectFit: 'cover' }} />
+                              <img src={getToolLogoUrl(tool)} alt={tool.name} style={{ width: '24px', height: '24px', borderRadius: '4px', objectFit: 'cover' }} onError={(e) => handleLogoError(e, tool.name)} />
                               <span style={{ fontWeight: 'bold' }}>{tool.name}</span>
                             </td>
                             <td>
@@ -1482,7 +1483,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                       {filteredSubmissions.map((tool) => (
                         <tr key={tool.id}>
                           <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <img src={tool.logoUrl} alt={tool.name} style={{ width: '28px', height: '28px', borderRadius: '4px', objectFit: 'cover' }} />
+                            <img src={getToolLogoUrl(tool)} alt={tool.name} style={{ width: '28px', height: '28px', borderRadius: '4px', objectFit: 'cover' }} onError={(e) => handleLogoError(e, tool.name)} />
                             <div>
                               <span style={{ fontWeight: 'bold', display: 'block' }}>{tool.name}</span>
                               <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>{tool.pricing.toUpperCase()}</span>
@@ -1703,7 +1704,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                           />
                         </td>
                         <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <img src={tool.logoUrl} alt={tool.name} style={{ width: '28px', height: '28px', borderRadius: '4px', objectFit: 'cover' }} />
+                          <img src={getToolLogoUrl(tool)} alt={tool.name} style={{ width: '28px', height: '28px', borderRadius: '4px', objectFit: 'cover' }} onError={(e) => handleLogoError(e, tool.name)} />
                           <span style={{ fontWeight: 'bold' }}>{tool.name}</span>
                         </td>
                         <td>/tools/{tool.slug}</td>
@@ -2265,7 +2266,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                       {filteredPendingList.map((tool) => (
                         <tr key={tool.id}>
                           <td style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>
-                            <img src={tool.logoUrl} alt={tool.name} style={{ width: '24px', height: '24px', borderRadius: '4px', objectFit: 'cover' }} />
+                            <img src={getToolLogoUrl(tool)} alt={tool.name} style={{ width: '24px', height: '24px', borderRadius: '4px', objectFit: 'cover' }} onError={(e) => handleLogoError(e, tool.name)} />
                             <span>{tool.name}</span>
                           </td>
                           <td>{tool.ownerId ? `Owner: ${tool.ownerId}` : 'Unclaimed'}</td>
@@ -2326,7 +2327,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                         return (
                           <tr key={tool.id}>
                             <td style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>
-                              <img src={tool.logoUrl} alt={tool.name} style={{ width: '24px', height: '24px', borderRadius: '4px', objectFit: 'cover' }} />
+                              <img src={getToolLogoUrl(tool)} alt={tool.name} style={{ width: '24px', height: '24px', borderRadius: '4px', objectFit: 'cover' }} onError={(e) => handleLogoError(e, tool.name)} />
                               <span>{tool.name}</span>
                             </td>
                             <td>
@@ -2602,7 +2603,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                         <tr key={item.tool.id}>
                           <td style={{ fontWeight: 'bold', color: 'var(--color-primary)' }}>#{idx + 1}</td>
                           <td style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <img src={item.tool.logoUrl} alt="logo" style={{ width: '20px', height: '20px', borderRadius: '3px', objectFit: 'cover' }} />
+                            <img src={getToolLogoUrl(item.tool)} alt="logo" style={{ width: '20px', height: '20px', borderRadius: '3px', objectFit: 'cover' }} onError={(e) => handleLogoError(e, item.tool.name)} />
                             <strong>{item.tool.name}</strong>
                           </td>
                           <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{item.views}</td>

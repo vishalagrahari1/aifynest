@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDatabase } from '../context/DatabaseContext';
 import { useAuth } from '../context/AuthContext';
 import { SEOHead } from '../components/shared/SEOHead';
+import { getToolLogoUrl, handleLogoError } from '../utils/toolHelpers';
 
 interface SubmitToolProps {
   onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
@@ -755,7 +756,7 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
                 {/* Visual Tool Card Mockup */}
                 <div style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '20px', backgroundColor: 'var(--bg-card)' }}>
                   <div style={{ display: 'flex', gap: '14px', alignItems: 'center', marginBottom: '12px' }}>
-                    <img src={logoUrl || 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop'} alt={name} style={{ width: '40px', height: '40px', borderRadius: 'var(--radius-sm)', objectFit: 'cover' }} />
+                    <img src={getToolLogoUrl({ logoUrl, name })} alt={name} style={{ width: '40px', height: '40px', borderRadius: 'var(--radius-sm)', objectFit: 'cover' }} onError={(e) => handleLogoError(e, name || 'Tool')} />
                     <div>
                       <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>{name || 'My AI Tool'}</h4>
                       <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{subCategory || 'Select Subcategory'}</span>

@@ -8,6 +8,7 @@ import { SEOHead } from '../components/shared/SEOHead';
 import { Heart, Share2, Award } from '../components/shared/Icons';
 import { Modal } from '../components/shared/Modal';
 import { ToolDetailActions } from '../components/shared/ToolDetailActions';
+import { getToolLogoUrl, handleLogoError } from '../utils/toolHelpers';
 
 interface ToolDetailProps {
   onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
@@ -320,12 +321,10 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
       >
         <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
           <img
-            src={tool.logoUrl}
+            src={getToolLogoUrl(tool)}
             alt={tool.name}
             style={{ width: '80px', height: '80px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)', objectFit: 'cover' }}
-            onError={(e) => {
-              e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop';
-            }}
+            onError={(e) => handleLogoError(e, tool.name)}
           />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap' }}>
@@ -789,7 +788,7 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
                       }}
                     >
                       <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                        <img src={relTool.logoUrl} alt={relTool.name} style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', objectFit: 'cover' }} />
+                        <img src={getToolLogoUrl(relTool)} alt={relTool.name} style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', objectFit: 'cover' }} onError={(e) => handleLogoError(e, relTool.name)} />
                         <div style={{ fontWeight: 'bold', fontSize: 'var(--text-sm)' }}>{relTool.name}</div>
                       </div>
                       <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: 0 }}>
@@ -828,7 +827,7 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
                       }}
                     >
                       <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                        <img src={relTool.logoUrl} alt={relTool.name} style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', objectFit: 'cover' }} />
+                        <img src={getToolLogoUrl(relTool)} alt={relTool.name} style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', objectFit: 'cover' }} onError={(e) => handleLogoError(e, relTool.name)} />
                         <div style={{ fontWeight: 'bold', fontSize: 'var(--text-sm)' }}>{relTool.name}</div>
                       </div>
                       <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: 0 }}>
@@ -867,7 +866,7 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
                       }}
                     >
                       <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                        <img src={relTool.logoUrl} alt={relTool.name} style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', objectFit: 'cover' }} />
+                        <img src={getToolLogoUrl(relTool)} alt={relTool.name} style={{ width: '32px', height: '32px', borderRadius: 'var(--radius-sm)', objectFit: 'cover' }} onError={(e) => handleLogoError(e, relTool.name)} />
                         <div style={{ fontWeight: 'bold', fontSize: 'var(--text-sm)' }}>{relTool.name}</div>
                       </div>
                       <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: 0 }}>

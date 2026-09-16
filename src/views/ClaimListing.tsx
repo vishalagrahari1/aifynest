@@ -5,6 +5,7 @@ import { useDatabase } from '../context/DatabaseContext';
 import { useAuth } from '../context/AuthContext';
 import { SEOHead } from '../components/shared/SEOHead';
 import { Award, ShieldAlert } from '../components/shared/Icons';
+import { getToolLogoUrl, handleLogoError } from '../utils/toolHelpers';
 
 interface ClaimListingProps {
   onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
@@ -133,9 +134,10 @@ export const ClaimListing: React.FC<ClaimListingProps> = ({ onToast }) => {
                   }}
                 >
                   <img
-                    src={targetTool.logoUrl}
+                    src={getToolLogoUrl(targetTool)}
                     alt={targetTool.name}
                     style={{ width: '28px', height: '28px', borderRadius: 'var(--radius-xs)', objectFit: 'cover' }}
+                    onError={(e) => handleLogoError(e, targetTool.name)}
                   />
                   <span style={{ fontSize: 'var(--text-sm)', fontWeight: 'bold' }}>{targetTool.name}</span>
                 </div>

@@ -4,6 +4,7 @@ import type { Tool } from '../../utils/seedData';
 import { StarRating } from '../shared/StarRating';
 import { Globe, Trash, Check, X, Award, Zap } from '../shared/Icons';
 import { Link } from 'react-router-dom';
+import { getToolLogoUrl, handleLogoError } from '../../utils/toolHelpers';
 
 
 interface ComparisonTableProps {
@@ -190,7 +191,7 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({ tools, onRemov
                       </button>
 
                       <img
-                        src={tool.logoUrl}
+                        src={getToolLogoUrl(tool)}
                         alt={tool.name}
                         style={{ 
                           width: '64px', 
@@ -201,9 +202,7 @@ export const ComparisonTable: React.FC<ComparisonTableProps> = ({ tools, onRemov
                           boxShadow: 'var(--shadow-md)',
                           backgroundColor: 'var(--bg-secondary)'
                         }}
-                        onError={(e) => {
-                          e.currentTarget.src = 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop';
-                        }}
+                        onError={(e) => handleLogoError(e, tool.name)}
                       />
 
                       <div>
