@@ -5,6 +5,7 @@ import { useDatabase } from '../context/DatabaseContext';
 import { SEOHead } from '../components/shared/SEOHead';
 import { ArrowLeft } from '../components/shared/Icons';
 import { getToolLogoUrl, handleLogoError } from '../utils/toolHelpers';
+import { MarkdownRenderer } from '../components/shared/MarkdownRenderer';
 
 export const BlogDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -69,18 +70,8 @@ export const BlogDetail: React.FC = () => {
             style={{ width: '100%', height: '320px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', marginBottom: '32px' }}
           />
 
-          <article
-            style={{
-              fontSize: 'var(--text-sm)',
-              color: 'var(--text-primary)',
-              lineHeight: '1.7',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '20px',
-              whiteSpace: 'pre-line',
-            }}
-          >
-            {post.content}
+          <article style={{ marginTop: '24px' }}>
+            <MarkdownRenderer content={post.content} />
           </article>
         </div>
 

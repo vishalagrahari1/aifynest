@@ -192,7 +192,25 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const [analyticsEvents, setAnalyticsEvents] = useState<AnalyticsEvent[]>([]);
   const [claims, setClaims] = useState<any[]>([]);
-  const [blogPosts, setBlogPosts] = useState<BlogPost[]>(() => initialBlogPosts);
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>(() => {
+    const cached = localStorage.getItem('ai_blog_posts');
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const existingSlugs = new Set(parsed.map((b: BlogPost) => b.slug));
+          const missingInitial = initialBlogPosts.filter(b => !existingSlugs.has(b.slug));
+          if (missingInitial.length > 0) {
+            const merged = [...missingInitial, ...parsed];
+            localStorage.setItem('ai_blog_posts', JSON.stringify(merged));
+            return merged;
+          }
+          return parsed;
+        }
+      } catch (e) {}
+    }
+    return initialBlogPosts;
+  });
   const [collections, setCollections] = useState<Collection[]>(() => initialCollections);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(() => initialAuditLogs);
   const [affiliateLinks, setAffiliateLinks] = useState<AffiliateLink[]>(() => initialAffiliateLinks);
@@ -544,6 +562,27 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         return seed;
       };
 
+      const loadOrSeedBlogPosts = (): BlogPost[] => {
+        const cached = localStorage.getItem('ai_blog_posts');
+        if (cached) {
+          try {
+            const parsed = JSON.parse(cached);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              const existingSlugs = new Set(parsed.map((b: BlogPost) => b.slug));
+              const missingInitial = initialBlogPosts.filter(b => !existingSlugs.has(b.slug));
+              if (missingInitial.length > 0) {
+                const merged = [...missingInitial, ...parsed];
+                localStorage.setItem('ai_blog_posts', JSON.stringify(merged));
+                return merged;
+              }
+              return parsed;
+            }
+          } catch (e) {}
+        }
+        localStorage.setItem('ai_blog_posts', JSON.stringify(initialBlogPosts));
+        return initialBlogPosts;
+      };
+
       setTools(loadOrSeed('ai_tools', initialTools));
       setCategories(loadOrSeed('ai_categories', initialCategories));
       setReviews(loadOrSeed('ai_reviews', initialReviews));
@@ -551,7 +590,7 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setPayments(loadOrSeed('ai_payments', initialPayments));
       setAnalyticsEvents(loadOrSeed('ai_analytics_events', []));
       setClaims(loadOrSeed('ai_claims', []));
-      setBlogPosts(loadOrSeed('ai_blog_posts', initialBlogPosts));
+      setBlogPosts(loadOrSeedBlogPosts());
       setCollections(loadOrSeed('ai_collections', initialCollections));
       setAuditLogs(loadOrSeed('ai_audit_logs', initialAuditLogs));
       setAffiliateLinks(loadOrSeed('ai_affiliates', initialAffiliateLinks));

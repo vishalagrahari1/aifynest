@@ -29,6 +29,9 @@ function writeSitemap(categories, tools) {
   const staticUrls = [
     '',
     '/ai-tools',
+    '/blog',
+    '/blog/best-image-generation-tools',
+    '/best-image-generation-tools',
     '/about',
     '/contact',
     '/terms',

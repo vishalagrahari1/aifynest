@@ -199,6 +199,7 @@ const AppContent: React.FC<{
           <Route path="/advertise" element={<Advertise />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogDetail />} />
+          <Route path="/best-image-generation-tools" element={<Navigate to="/blog/best-image-generation-tools" replace />} />
 
           {/* Policy & Legal routes */}
           <Route path="/about" element={<About />} />
