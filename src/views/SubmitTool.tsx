@@ -1,3 +1,4 @@
+/* src/views/SubmitTool.tsx */
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useDatabase } from '../context/DatabaseContext';
@@ -9,6 +10,48 @@ interface SubmitToolProps {
   onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
 }
 
+export interface ListingPlanTier {
+  id: string;
+  name: string;
+  price: number;
+  badge?: string;
+  description: string;
+}
+
+const LISTING_TIERS: ListingPlanTier[] = [
+  {
+    id: 'free',
+    name: 'Standard Free Listing',
+    price: 0,
+    description: 'Catalog index, community reviews, standard verification queue.',
+  },
+  {
+    id: 'premium',
+    name: 'Verified Premium',
+    price: 29,
+    description: 'Verified Blue Check mark, add pricing plans & screenshots, dashboard access.',
+  },
+  {
+    id: 'popular',
+    name: 'Popular Tools Spot',
+    price: 39,
+    description: 'Guaranteed placement in the Homepage Popular Tools section for 30 days.',
+  },
+  {
+    id: 'featured',
+    name: 'Growth Featured Pack',
+    price: 69,
+    description: 'Popular Tools + Featured Hero section combo for 90 days.',
+  },
+  {
+    id: 'featured_article',
+    name: 'Featured & Article Package',
+    price: 129,
+    badge: '🔥 BEST VALUE',
+    description: 'Featured section placement + dedicated editorial review article published on the site.',
+  },
+];
+
 export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
   const { categories, addTool } = useDatabase();
   const { user } = useAuth();
@@ -17,6 +60,7 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submissionId, setSubmissionId] = useState('');
+  const [paymentTxId, setPaymentTxId] = useState('');
   const [isCashfreeOpen, setIsCashfreeOpen] = useState(false);
 
   // Form state
@@ -27,25 +71,72 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
   const [pricing, setPricing] = useState('');
   const [email, setEmail] = useState(user?.email || '');
   const [additionalNotes, setAdditionalNotes] = useState('');
-  const [selectedPackage, setSelectedPackage] = useState<string>('');
-  const [packageAmount, setPackageAmount] = useState<number>(0);
+  const [selectedTierId, setSelectedTierId] = useState<string>('free');
 
   useEffect(() => {
     if (planParam === 'popular' || planParam === 'plan_starter') {
-      setSelectedPackage('Popular Tools Spot');
-      setPackageAmount(39);
+      setSelectedTierId('popular');
     } else if (planParam === 'featured' || planParam === 'plan_growth') {
-      setSelectedPackage('Growth Featured Pack');
-      setPackageAmount(69);
+      setSelectedTierId('featured');
     } else if (planParam === 'featured_article' || planParam === 'plan_featured_article') {
-      setSelectedPackage('Featured & Article Package');
-      setPackageAmount(129);
+      setSelectedTierId('featured_article');
     } else if (planParam === 'premium') {
-      setSelectedPackage('Verified Premium Plan');
-      setPackageAmount(29);
+      setSelectedTierId('premium');
     }
   }, [planParam]);
+
+  const activeTier = LISTING_TIERS.find((t) => t.id === selectedTierId) || LISTING_TIERS[0];
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const executeToolSubmission = (cashfreeTxId?: string) => {
+    setIsSubmitting(true);
+    const activeCategory = categories.find((c) => c.slug === categorySlug);
+    const generatedId = 'sub_' + Math.random().toString(36).substring(2, 9);
+    setSubmissionId(generatedId);
+    if (cashfreeTxId) setPaymentTxId(cashfreeTxId);
+
+    const isPaid = activeTier.price > 0 && !!cashfreeTxId;
+
+    const toolPayload = {
+      name: name.trim(),
+      slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      tagline: description.length > 120 ? description.substring(0, 117) + '...' : description.trim(),
+      description: description.trim(),
+      categorySlug,
+      subCategory: activeCategory?.subcategories[0] || '',
+      pricing: pricing as any,
+      pricingUrl: websiteUrl.trim(),
+      platforms: ['Web'] as any[],
+      pricingPlans: [],
+      features: [],
+      useCases: [],
+      pros: [],
+      cons: [],
+      logoUrl: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop',
+      screenshotUrls: ['https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=500&fit=crop'],
+      websiteUrl: websiteUrl.trim(),
+      ownerId: user?.id || 'guest',
+      tags: [categorySlug],
+      isVerified: isPaid,
+      isFeatured: isPaid && activeTier.price >= 69,
+      isSponsored: isPaid && (activeTier.price === 39 || activeTier.price === 69),
+      adminNotes: isPaid
+        ? `[VERIFIED CASHFREE PAYMENT - Tx: ${cashfreeTxId}]\nSelected Tier: ${activeTier.name} ($${activeTier.price})\nContact Email: ${email.trim()}\nNotes: ${additionalNotes.trim()}`
+        : activeTier.price > 0
+        ? `[SELECTED PLAN: ${activeTier.name} ($${activeTier.price})]\nContact Email: ${email.trim()}\nNotes: ${additionalNotes.trim()}`
+        : additionalNotes ? `Contact Email: ${email.trim()}\nNotes: ${additionalNotes.trim()}` : `Contact Email: ${email.trim()}`,
+      status: 'pending' as const,
+    };
+
+    addTool(toolPayload);
+    setIsSubmitting(false);
+    setIsSubmitted(true);
+    if (isPaid) {
+      onToast(`Payment of $${activeTier.price} verified! Your AI tool has been submitted.`, 'success');
+    } else {
+      onToast('Your AI tool has been submitted successfully for review!', 'success');
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,42 +166,13 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
       return;
     }
 
-    setIsSubmitting(true);
-
-    const activeCategory = categories.find((c) => c.slug === categorySlug);
-    const generatedId = 'sub_' + Math.random().toString(36).substring(2, 9);
-    setSubmissionId(generatedId);
-
-    const toolPayload = {
-      name: name.trim(),
-      slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-      tagline: description.length > 120 ? description.substring(0, 117) + '...' : description.trim(),
-      description: description.trim(),
-      categorySlug,
-      subCategory: activeCategory?.subcategories[0] || '',
-      pricing: pricing as any,
-      pricingUrl: websiteUrl.trim(),
-      platforms: ['Web'] as any[],
-      pricingPlans: [],
-      features: [],
-      useCases: [],
-      pros: [],
-      cons: [],
-      logoUrl: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop',
-      screenshotUrls: ['https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=500&fit=crop'],
-      websiteUrl: websiteUrl.trim(),
-      ownerId: user?.id || 'guest',
-      tags: [categorySlug],
-      adminNotes: selectedPackage
-        ? `[Selected Package: ${selectedPackage}]\nContact Email: ${email.trim()}\nNotes: ${additionalNotes.trim()}`
-        : additionalNotes ? `Contact Email: ${email.trim()}\nNotes: ${additionalNotes.trim()}` : `Contact Email: ${email.trim()}`,
-      status: 'pending' as const,
-    };
-
-    addTool(toolPayload);
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    onToast('Your AI tool has been submitted successfully for review!', 'success');
+    // If paid tier is selected, OPEN CASHFREE PAYMENT MODAL FIRST!
+    if (activeTier.price > 0) {
+      setIsCashfreeOpen(true);
+    } else {
+      // Free plan: execute submission directly
+      executeToolSubmission();
+    }
   };
 
   const handleReset = () => {
@@ -121,11 +183,13 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
     setPricing('');
     setEmail(user?.email || '');
     setAdditionalNotes('');
+    setSelectedTierId('free');
     setIsSubmitted(false);
+    setPaymentTxId('');
   };
 
   return (
-    <div className="container section" style={{ maxWidth: '680px', padding: '40px 20px' }}>
+    <div className="container section" style={{ maxWidth: '720px', padding: '40px 20px' }}>
       <SEOHead
         title="Submit an AI Tool — AIFynest"
         description="Know a great AI tool that should be listed? Submit it here and we'll review it within 48 hours."
@@ -145,10 +209,10 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
         >
           <div style={{ fontSize: '54px', marginBottom: '16px' }}>🎉</div>
           <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', margin: '0 0 12px 0', fontFamily: 'var(--font-display)' }}>
-            Your AI Tool Has Been Submitted!
+            {paymentTxId ? 'Tool & Payment Submitted Successfully!' : 'Your AI Tool Has Been Submitted!'}
           </h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-base)', maxWidth: '480px', margin: '0 auto 24px auto', lineHeight: '1.6' }}>
-            Thank you for submitting <strong>{name}</strong>. Our editorial team will review your tool and list it within <strong>48 hours</strong>.
+          <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-base)', maxWidth: '500px', margin: '0 auto 24px auto', lineHeight: '1.6' }}>
+            Thank you for submitting <strong>{name}</strong>. Our editorial team will review your tool and process your listing within <strong>{activeTier.price > 0 ? '24 hours' : '48 hours'}</strong>.
           </p>
 
           <div
@@ -156,8 +220,8 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
               backgroundColor: 'var(--bg-primary)',
               border: '1px solid var(--border-color)',
               borderRadius: 'var(--radius-lg)',
-              padding: '16px 20px',
-              maxWidth: '380px',
+              padding: '20px 24px',
+              maxWidth: '420px',
               margin: '0 auto 32px auto',
               textAlign: 'left',
               fontSize: 'var(--text-xs)',
@@ -167,54 +231,36 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
               <span style={{ color: 'var(--text-muted)' }}>Submission Reference:</span>
               <span style={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--color-primary)' }}>{submissionId}</span>
             </div>
-            {selectedPackage && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <span style={{ color: 'var(--text-muted)' }}>Selected Plan:</span>
+              <span style={{ fontWeight: 'bold', color: 'var(--color-primary)' }}>{activeTier.name} (${activeTier.price})</span>
+            </div>
+            {paymentTxId && (
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Selected Plan:</span>
-                <span style={{ fontWeight: 'bold', color: 'var(--color-primary)' }}>{selectedPackage}</span>
+                <span style={{ color: 'var(--text-muted)' }}>Cashfree Payment ID:</span>
+                <span style={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--color-success)' }}>{paymentTxId}</span>
               </div>
             )}
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
               <span style={{ color: 'var(--text-muted)' }}>Status:</span>
-              <span style={{ fontWeight: 'bold', color: 'var(--color-gold)' }}>Pending Review</span>
+              <span style={{ fontWeight: 'bold', color: paymentTxId ? 'var(--color-success)' : 'var(--color-gold)' }}>
+                {paymentTxId ? 'Payment Verified (Priority Queue)' : 'Pending Review'}
+              </span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--text-muted)' }}>Confirmation Sent To:</span>
+              <span style={{ color: 'var(--text-muted)' }}>Confirmation Email:</span>
               <span style={{ fontWeight: 'bold' }}>{email}</span>
             </div>
           </div>
 
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            {packageAmount > 0 && (
-              <button
-                onClick={() => setIsCashfreeOpen(true)}
-                className="btn btn-primary"
-                style={{ backgroundColor: 'var(--color-primary)', fontWeight: 'bold' }}
-              >
-                💳 Pay ${packageAmount} with Cashfree (UPI / Card)
-              </button>
-            )}
             <button onClick={handleReset} className="btn btn-outline">
               Submit Another Tool
             </button>
-            <Link to="/pricing" className="btn btn-outline">
-              Explore Paid Plans
+            <Link to="/ai-tools" className="btn btn-primary">
+              Browse Directory
             </Link>
           </div>
-
-          {/* Cashfree Modal for Submission Payment */}
-          {packageAmount > 0 && (
-            <CashfreeModal
-              isOpen={isCashfreeOpen}
-              onClose={() => setIsCashfreeOpen(false)}
-              planName={selectedPackage || 'AI Tool Listing Plan'}
-              amount={packageAmount}
-              userEmail={email}
-              toolName={name}
-              onPaymentSuccess={(payId) => {
-                console.log('Cashfree payment completed for submission:', payId);
-              }}
-            />
-          )}
         </div>
       ) : (
         <div>
@@ -236,65 +282,77 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
             </p>
           </div>
 
-          {/* Selected Plan Banner if passed from pricing */}
-          {selectedPackage && (
-            <div
-              style={{
-                backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                border: '1px solid var(--color-primary)',
-                borderRadius: 'var(--radius-lg)',
-                padding: '14px 20px',
-                marginBottom: '20px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-primary)' }}>
-                <strong>Requested Plan:</strong> {selectedPackage}
-              </span>
-              <span style={{ fontSize: '11px', color: 'var(--color-primary)', fontWeight: 'bold', textTransform: 'uppercase' }}>
-                Selected
-              </span>
-            </div>
-          )}
+          {/* Listing Plan Tiers Selection Box */}
+          <div style={{ marginBottom: '28px' }}>
+            <label className="form-label" style={{ fontWeight: 'bold', marginBottom: '10px', display: 'block', fontSize: 'var(--text-sm)' }}>
+              Select Your Listing & Promotion Plan <span style={{ color: 'var(--color-danger)' }}>*</span>
+            </label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {LISTING_TIERS.map((tier) => {
+                const isSelected = selectedTierId === tier.id;
+                return (
+                  <div
+                    key={tier.id}
+                    onClick={() => setSelectedTierId(tier.id)}
+                    style={{
+                      border: isSelected ? '2px solid var(--color-primary)' : '1px solid var(--border-color)',
+                      backgroundColor: isSelected ? 'rgba(99, 102, 241, 0.05)' : 'var(--bg-card)',
+                      borderRadius: 'var(--radius-lg)',
+                      padding: '16px 20px',
+                      cursor: 'pointer',
+                      transition: 'all 150ms ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '16px',
+                      position: 'relative',
+                    }}
+                  >
+                    {tier.badge && (
+                      <span
+                        style={{
+                          position: 'absolute',
+                          top: '-10px',
+                          right: '16px',
+                          backgroundColor: '#E2603A',
+                          color: '#fff',
+                          fontSize: '9px',
+                          fontWeight: 'bold',
+                          padding: '2px 8px',
+                          borderRadius: 'var(--radius-full)',
+                        }}
+                      >
+                        {tier.badge}
+                      </span>
+                    )}
 
-          {/* Visibility Banner Box */}
-          <div
-            style={{
-              backgroundColor: 'var(--bg-card)',
-              border: '1px solid var(--border-color)',
-              borderRadius: 'var(--radius-xl)',
-              padding: '24px 28px',
-              marginBottom: '32px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '20px',
-              background: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(99, 102, 241, 0.05) 100%)',
-              boxShadow: 'var(--shadow-sm)',
-            }}
-          >
-            <div>
-              <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', margin: '0 0 6px 0', color: 'var(--text-primary)' }}>
-                Want more visibility?
-              </h3>
-              <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.5' }}>
-                Get featured placement, a dedicated review, and reach thousands more users with our pricing plans starting at $99.
-              </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <input
+                        type="radio"
+                        name="listingTier"
+                        checked={isSelected}
+                        onChange={() => setSelectedTierId(tier.id)}
+                        style={{ accentColor: 'var(--color-primary)', width: '16px', height: '16px', cursor: 'pointer' }}
+                      />
+                      <div>
+                        <div style={{ fontSize: 'var(--text-sm)', fontWeight: 'bold', color: 'var(--text-primary)' }}>
+                          {tier.name}
+                        </div>
+                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                          {tier.description}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                      <span style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', color: isSelected ? 'var(--color-primary)' : 'var(--text-primary)' }}>
+                        {tier.price === 0 ? 'FREE' : `$${tier.price}`}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            <Link
-              to="/pricing"
-              className="btn btn-primary"
-              style={{
-                whiteSpace: 'nowrap',
-                padding: '10px 20px',
-                fontWeight: 'var(--font-semibold)',
-                flexShrink: 0,
-              }}
-            >
-              See Plans
-            </Link>
           </div>
 
           {/* Form Card */}
@@ -311,6 +369,13 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
               boxShadow: 'var(--shadow-sm)',
             }}
           >
+            <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '12px', marginBottom: '4px' }}>
+              <h3 style={{ margin: 0, fontSize: 'var(--text-base)', fontWeight: 'bold' }}>Tool Details</h3>
+              <p style={{ margin: '4px 0 0 0', fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
+                Fill out the information for your AI product listing.
+              </p>
+            </div>
+
             {/* Tool Name */}
             <div className="form-group">
               <label className="form-label" style={{ fontWeight: 'var(--font-semibold)', marginBottom: '6px' }}>
@@ -432,7 +497,7 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
               />
             </div>
 
-            {/* Submit Button */}
+            {/* Dynamic Action Button */}
             <button
               type="submit"
               disabled={isSubmitting}
@@ -443,11 +508,32 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
                 padding: '14px',
                 fontSize: 'var(--text-base)',
                 fontWeight: 'var(--font-bold)',
+                backgroundColor: activeTier.price > 0 ? 'var(--color-primary)' : undefined,
               }}
             >
-              {isSubmitting ? 'Submitting...' : 'Submit Tool'}
+              {isSubmitting
+                ? 'Processing...'
+                : activeTier.price > 0
+                ? `Proceed to Pay $${activeTier.price} with Cashfree`
+                : 'Submit Tool for Free'}
             </button>
           </form>
+
+          {/* Cashfree Modal Popup */}
+          {activeTier.price > 0 && (
+            <CashfreeModal
+              isOpen={isCashfreeOpen}
+              onClose={() => setIsCashfreeOpen(false)}
+              planName={activeTier.name}
+              amount={activeTier.price}
+              userEmail={email}
+              toolName={name || 'AI Tool Listing'}
+              onPaymentSuccess={(payId) => {
+                setIsCashfreeOpen(false);
+                executeToolSubmission(payId);
+              }}
+            />
+          )}
         </div>
       )}
     </div>
