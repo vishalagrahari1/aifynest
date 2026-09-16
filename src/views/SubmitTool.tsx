@@ -1,6 +1,5 @@
-/* src/views/SubmitTool.tsx */
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useDatabase } from '../context/DatabaseContext';
 import { useAuth } from '../context/AuthContext';
 import { SEOHead } from '../components/shared/SEOHead';
@@ -12,6 +11,8 @@ interface SubmitToolProps {
 export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
   const { categories, addTool } = useDatabase();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const planParam = searchParams.get('plan');
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submissionId, setSubmissionId] = useState('');
@@ -24,6 +25,19 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
   const [pricing, setPricing] = useState('');
   const [email, setEmail] = useState(user?.email || '');
   const [additionalNotes, setAdditionalNotes] = useState('');
+  const [selectedPackage, setSelectedPackage] = useState<string>('');
+
+  useEffect(() => {
+    if (planParam === 'popular' || planParam === 'plan_starter') {
+      setSelectedPackage('Popular Tools Spot ($39)');
+    } else if (planParam === 'featured' || planParam === 'plan_growth') {
+      setSelectedPackage('Growth Featured Pack ($69)');
+    } else if (planParam === 'featured_article' || planParam === 'plan_featured_article') {
+      setSelectedPackage('Featured & Article Package ($129)');
+    } else if (planParam === 'premium') {
+      setSelectedPackage('Verified Premium ($29/mo)');
+    }
+  }, [planParam]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -80,7 +94,9 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
       websiteUrl: websiteUrl.trim(),
       ownerId: user?.id || 'guest',
       tags: [categorySlug],
-      adminNotes: additionalNotes ? `Contact Email: ${email.trim()}\nNotes: ${additionalNotes.trim()}` : `Contact Email: ${email.trim()}`,
+      adminNotes: selectedPackage
+        ? `[Selected Package: ${selectedPackage}]\nContact Email: ${email.trim()}\nNotes: ${additionalNotes.trim()}`
+        : additionalNotes ? `Contact Email: ${email.trim()}\nNotes: ${additionalNotes.trim()}` : `Contact Email: ${email.trim()}`,
       status: 'pending' as const,
     };
 
@@ -144,6 +160,12 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
               <span style={{ color: 'var(--text-muted)' }}>Submission Reference:</span>
               <span style={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--color-primary)' }}>{submissionId}</span>
             </div>
+            {selectedPackage && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Selected Plan:</span>
+                <span style={{ fontWeight: 'bold', color: 'var(--color-primary)' }}>{selectedPackage}</span>
+              </div>
+            )}
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
               <span style={{ color: 'var(--text-muted)' }}>Status:</span>
               <span style={{ fontWeight: 'bold', color: 'var(--color-gold)' }}>Pending Review</span>
@@ -182,6 +204,29 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
               Know a great AI tool that should be listed? Submit it here and we'll review it within 48 hours.
             </p>
           </div>
+
+          {/* Selected Plan Banner if passed from pricing */}
+          {selectedPackage && (
+            <div
+              style={{
+                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                border: '1px solid var(--color-primary)',
+                borderRadius: 'var(--radius-lg)',
+                padding: '14px 20px',
+                marginBottom: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-primary)' }}>
+                <strong>Requested Plan:</strong> {selectedPackage}
+              </span>
+              <span style={{ fontSize: '11px', color: 'var(--color-primary)', fontWeight: 'bold', textTransform: 'uppercase' }}>
+                Selected
+              </span>
+            </div>
+          )}
 
           {/* Visibility Banner Box */}
           <div
