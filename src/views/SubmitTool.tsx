@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useDatabase } from '../context/DatabaseContext';
 import { useAuth } from '../context/AuthContext';
 import { SEOHead } from '../components/shared/SEOHead';
+import { CashfreeModal } from '../components/shared/CashfreeModal';
 
 interface SubmitToolProps {
   onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
@@ -16,6 +17,7 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submissionId, setSubmissionId] = useState('');
+  const [isCashfreeOpen, setIsCashfreeOpen] = useState(false);
 
   // Form state
   const [name, setName] = useState('');
@@ -26,16 +28,21 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
   const [email, setEmail] = useState(user?.email || '');
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [selectedPackage, setSelectedPackage] = useState<string>('');
+  const [packageAmount, setPackageAmount] = useState<number>(0);
 
   useEffect(() => {
     if (planParam === 'popular' || planParam === 'plan_starter') {
-      setSelectedPackage('Popular Tools Spot ($39)');
+      setSelectedPackage('Popular Tools Spot');
+      setPackageAmount(39);
     } else if (planParam === 'featured' || planParam === 'plan_growth') {
-      setSelectedPackage('Growth Featured Pack ($69)');
+      setSelectedPackage('Growth Featured Pack');
+      setPackageAmount(69);
     } else if (planParam === 'featured_article' || planParam === 'plan_featured_article') {
-      setSelectedPackage('Featured & Article Package ($129)');
+      setSelectedPackage('Featured & Article Package');
+      setPackageAmount(129);
     } else if (planParam === 'premium') {
-      setSelectedPackage('Verified Premium ($29/mo)');
+      setSelectedPackage('Verified Premium Plan');
+      setPackageAmount(29);
     }
   }, [planParam]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -177,13 +184,37 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
           </div>
 
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            {packageAmount > 0 && (
+              <button
+                onClick={() => setIsCashfreeOpen(true)}
+                className="btn btn-primary"
+                style={{ backgroundColor: 'var(--color-primary)', fontWeight: 'bold' }}
+              >
+                💳 Pay ${packageAmount} with Cashfree (UPI / Card)
+              </button>
+            )}
             <button onClick={handleReset} className="btn btn-outline">
               Submit Another Tool
             </button>
-            <Link to="/pricing" className="btn btn-primary">
-              Explore Paid Plans ($99+)
+            <Link to="/pricing" className="btn btn-outline">
+              Explore Paid Plans
             </Link>
           </div>
+
+          {/* Cashfree Modal for Submission Payment */}
+          {packageAmount > 0 && (
+            <CashfreeModal
+              isOpen={isCashfreeOpen}
+              onClose={() => setIsCashfreeOpen(false)}
+              planName={selectedPackage || 'AI Tool Listing Plan'}
+              amount={packageAmount}
+              userEmail={email}
+              toolName={name}
+              onPaymentSuccess={(payId) => {
+                console.log('Cashfree payment completed for submission:', payId);
+              }}
+            />
+          )}
         </div>
       ) : (
         <div>

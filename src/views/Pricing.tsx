@@ -1,15 +1,26 @@
 /* src/views/Pricing.tsx */
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { SEOHead } from '../components/shared/SEOHead';
 import { Check } from '../components/shared/Icons';
+import { CashfreeModal } from '../components/shared/CashfreeModal';
+import { useAuth } from '../context/AuthContext';
 
 export const Pricing: React.FC = () => {
+  const { user } = useAuth();
+  const [selectedPlan, setSelectedPlan] = useState<{ name: string; amount: number } | null>(null);
+  const [isCashfreeOpen, setIsCashfreeOpen] = useState(false);
+
+  const handleOpenCashfree = (planName: string, amount: number) => {
+    setSelectedPlan({ name: planName, amount });
+    setIsCashfreeOpen(true);
+  };
+
   return (
     <div className="container section">
       <SEOHead
-        title="Directory Submission & Premium Pricing Plans"
-        description="Verify and update your AI tool listings. Choose between free directory submissions, premium owner profiles, or custom sponsorship campaigns."
+        title="Directory Submission & Premium Pricing Plans — Cashfree Payments"
+        description="Verify and update your AI tool listings. Choose between free directory submissions, premium owner profiles, or custom sponsorship campaigns with Cashfree Payments."
       />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', textAlign: 'center' }}>
@@ -71,12 +82,17 @@ export const Pricing: React.FC = () => {
               <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Claim Owner Dashboard Analytics</span></li>
               <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Expedited Review Safety</span></li>
             </ul>
-            <Link to="/submit-tool" className="btn btn-outline" style={{ marginTop: 'auto' }}>
-              List Premium
-            </Link>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
+              <button onClick={() => handleOpenCashfree('Verified Premium Plan', 29)} className="btn btn-primary" style={{ fontSize: '12px' }}>
+                Pay $29 with Cashfree
+              </button>
+              <Link to="/submit-tool?plan=premium" className="btn btn-outline" style={{ fontSize: '11px' }}>
+                Submit Listing First
+              </Link>
+            </div>
           </div>
 
-          {/* Sponsoring Plan */}
+          {/* Sponsoring Plan ($99) */}
           <div style={planCardStyle}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <h3 style={planTitleStyle}>Sponsored Growth</h3>
@@ -92,9 +108,14 @@ export const Pricing: React.FC = () => {
               <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Sponsored Search Banners</span></li>
               <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Analytics Feeds</span></li>
             </ul>
-            <Link to="/advertise" className="btn btn-outline" style={{ marginTop: 'auto' }}>
-              Learn Sponsoring
-            </Link>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
+              <button onClick={() => handleOpenCashfree('Sponsored Growth Plan', 99)} className="btn btn-primary" style={{ fontSize: '12px' }}>
+                Pay $99 with Cashfree
+              </button>
+              <Link to="/submit-tool?plan=featured" className="btn btn-outline" style={{ fontSize: '11px' }}>
+                Submit Listing First
+              </Link>
+            </div>
           </div>
 
           {/* Featured + Article Plan ($129) */}
@@ -133,12 +154,31 @@ export const Pricing: React.FC = () => {
               <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Express 24-hr Verification Queue</span></li>
               <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Full Analytics & Review Dashboard</span></li>
             </ul>
-            <Link to="/submit-tool" className="btn btn-primary" style={{ marginTop: 'auto' }}>
-              Get Featured & Article
-            </Link>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
+              <button onClick={() => handleOpenCashfree('Featured & Article Package', 129)} className="btn btn-primary" style={{ fontSize: '12px' }}>
+                Pay $129 with Cashfree
+              </button>
+              <Link to="/submit-tool?plan=featured_article" className="btn btn-outline" style={{ fontSize: '11px' }}>
+                Submit Listing First
+              </Link>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Cashfree Payment Modal */}
+      {selectedPlan && (
+        <CashfreeModal
+          isOpen={isCashfreeOpen}
+          onClose={() => setIsCashfreeOpen(false)}
+          planName={selectedPlan.name}
+          amount={selectedPlan.amount}
+          userEmail={user?.email || ''}
+          onPaymentSuccess={(paymentId) => {
+            console.log('Cashfree payment completed successfully:', paymentId);
+          }}
+        />
+      )}
 
       <style>{`
         @media (max-width: 1024px) {

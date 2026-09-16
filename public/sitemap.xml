@@ -881,17 +881,17 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://aifynest.com/tools/suno</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://aifynest.com/tools/slidesai</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://aifynest.com/tools/frase</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/tools/suno</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
