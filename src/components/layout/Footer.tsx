@@ -46,18 +46,18 @@ export const Footer: React.FC = () => {
         >
           {/* Logo & Newsletter Column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }} className="footer-col-1">
-            <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)', fontWeight: 'var(--font-bold)', fontSize: 'var(--text-lg)', textDecoration: 'none' }}>
-              <div style={{ background: 'var(--gradient-brand)', color: 'white', padding: '6px', borderRadius: 'var(--radius-sm)', display: 'flex' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="3" width="7" height="7" />
-                  <rect x="14" y="3" width="7" height="7" />
-                  <rect x="14" y="14" width="7" height="7" />
-                  <rect x="3" y="14" width="7" height="7" />
-                </svg>
-              </div>
-              <span style={{ fontWeight: 800 }}>
-                <span>AI</span><span style={{ color: 'var(--color-primary)' }}>Fynest</span>
-              </span>
+            <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+              <img
+                src="/logo.png"
+                alt="AIFynest"
+                style={{
+                  height: '36px',
+                  width: 'auto',
+                  maxHeight: '36px',
+                  objectFit: 'contain',
+                  display: 'block',
+                }}
+              />
             </Link>
             <p style={{ lineHeight: '1.6', fontSize: 'var(--text-xs)' }}>
               Discover, save, compare, and review the best artificial intelligence tools to accelerate your workflow, creative projects, and SaaS operations.
