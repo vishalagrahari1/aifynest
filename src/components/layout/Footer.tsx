@@ -51,9 +51,9 @@ export const Footer: React.FC = () => {
                 src="/logo.png"
                 alt="AIFynest"
                 style={{
-                  height: '36px',
+                  height: '44px',
                   width: 'auto',
-                  maxHeight: '36px',
+                  maxHeight: '44px',
                   objectFit: 'contain',
                   display: 'block',
                 }}

@@ -350,9 +350,9 @@ export const Header: React.FC = () => {
             src="/logo.png"
             alt="AIFynest"
             style={{
-              height: '38px',
+              height: '48px',
               width: 'auto',
-              maxHeight: '38px',
+              maxHeight: '48px',
               objectFit: 'contain',
               display: 'block',
             }}
