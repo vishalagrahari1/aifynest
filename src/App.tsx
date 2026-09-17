@@ -222,6 +222,9 @@ const AppContent: React.FC<{
           <Route path="/dashboard/tools" element={<OwnerDashboard onToast={showToast} />} />
           <Route path="/dashboard/tools/:id/edit" element={<ManageTool />} />
           <Route path="/admin" element={<AdminDashboard onToast={showToast} />} />
+
+          {/* Catch-all fallback route for invalid URLs */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </React.Suspense>
     </main>
