@@ -196,6 +196,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://aifynest.com/tools/chatgpt</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://aifynest.com/tools/pi</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -351,11 +356,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/chatgpt</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://aifynest.com/tools/10web</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -381,6 +381,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://aifynest.com/tools/synthesia</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://aifynest.com/tools/wordtune</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -392,11 +397,6 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/upscayl</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/tools/synthesia</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>

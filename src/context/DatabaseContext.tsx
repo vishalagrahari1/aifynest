@@ -125,25 +125,30 @@ const DatabaseContext = createContext<DatabaseContextType | undefined>(undefined
 const useSupabase = !import.meta.env.VITE_SUPABASE_URL?.includes('placeholder-url');
 
 export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const sanitizeToolsSlugs = (list: Tool[]) => list.map(t => ({
+    ...t,
+    slug: t.slug ? t.slug.replace(/-[0-9]+$/, '') : t.slug
+  }));
+
   const [tools, setTools] = useState<Tool[]>(() => {
     const cached = localStorage.getItem('ai_tools');
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const existingIds = new Set(parsed.map((t: Tool) => t.id));
-          const existingSlugs = new Set(parsed.map((t: Tool) => t.slug));
-          const missingInitial = initialTools.filter(t => !existingIds.has(t.id) && !existingSlugs.has(t.slug));
-          if (missingInitial.length > 0) {
-            const merged = [...parsed, ...missingInitial];
-            localStorage.setItem('ai_tools', JSON.stringify(merged));
-            return merged;
-          }
-          return parsed;
+          const sanitized = sanitizeToolsSlugs(parsed);
+          const existingIds = new Set(sanitized.map((t: Tool) => t.id));
+          const existingSlugs = new Set(sanitized.map((t: Tool) => t.slug));
+          const missingInitial = sanitizeToolsSlugs(initialTools).filter(t => !existingIds.has(t.id) && !existingSlugs.has(t.slug));
+          const merged = missingInitial.length > 0 ? [...sanitized, ...missingInitial] : sanitized;
+          localStorage.setItem('ai_tools', JSON.stringify(merged));
+          return merged;
         }
       } catch (e) {}
     }
-    return initialTools;
+    const cleanInitial = sanitizeToolsSlugs(initialTools);
+    localStorage.setItem('ai_tools', JSON.stringify(cleanInitial));
+    return cleanInitial;
   });
 
   const [categories, setCategories] = useState<Category[]>(() => {
@@ -233,7 +238,7 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const mapToolRow = (t: any): Tool => ({
     id: t.id,
     name: t.name,
-    slug: t.slug,
+    slug: (t.slug || '').replace(/-[0-9]+$/, ''),
     tagline: t.tagline,
     description: t.description,
     categorySlug: t.category_slug,
