@@ -115,3 +115,19 @@ export const mapToolRow = (t: any): Tool => {
     verification_status: t.verification_status || 'unverified',
   };
 };
+
+/**
+ * Ensures an external destination URL has a valid protocol (http:// or https://).
+ * Prevents local relative URL redirects when opening external tool websites.
+ */
+export const formatExternalUrl = (url?: string): string => {
+  if (!url) return '#';
+  const trimmed = url.trim();
+  if (!trimmed || trimmed === '#' || trimmed === 'undefined' || trimmed === 'null') {
+    return '#';
+  }
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+  return `https://${trimmed}`;
+};

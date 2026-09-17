@@ -141,6 +141,11 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://aifynest.com/tools/cursor-2</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://aifynest.com/tools/lalal-ai</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -187,11 +192,6 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/meta-ai</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/tools/perplexity</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -336,16 +336,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/chatgpt-3</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/tools/cursor-2</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://aifynest.com/tools/midjourney-4</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -357,6 +347,11 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/lovable</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://aifynest.com/tools/chatgpt-3</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -1107,6 +1102,11 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/hostinger-ai-website-builder</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://aifynest.com/tools/perplexity</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>

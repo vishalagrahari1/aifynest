@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Tool } from '../../utils/seedData';
-import { getToolLogoUrl, handleLogoError } from '../../utils/toolHelpers';
+import { getToolLogoUrl, handleLogoError, formatExternalUrl } from '../../utils/toolHelpers';
 import { StarRating } from './StarRating';
 import { Heart, Globe, Plus, Check } from './Icons';
 import { useDatabase } from '../../context/DatabaseContext';
@@ -80,9 +80,13 @@ export const ToolCard: React.FC<ToolCardProps> = ({
 
   const handleVisitToolClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // Track outbound click event
     trackEvent('tool_click', tool.id);
-    window.open(tool.websiteUrl, '_blank', 'noopener,noreferrer');
+    const targetUrl = formatExternalUrl(tool.websiteUrl);
+    if (targetUrl && targetUrl !== '#') {
+      window.open(targetUrl, '_blank', 'noopener,noreferrer');
+    } else {
+      onToast('Website URL is not available for this tool.', 'error');
+    }
   };
 
   const handleCardClick = () => {

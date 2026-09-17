@@ -5,6 +5,8 @@ import { useDatabase } from '../context/DatabaseContext';
 import { SEOHead } from '../components/shared/SEOHead';
 import { Sparkles } from '../components/shared/Icons';
 
+import { formatExternalUrl } from '../utils/toolHelpers';
+
 interface AffiliateRedirectProps {
   onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
 }
@@ -32,18 +34,19 @@ export const AffiliateRedirect: React.FC<AffiliateRedirectProps> = ({ onToast })
 
     // Track the analytics outbound click
     const isAffiliateActive = toolObj.affiliateStatus === 'active' && toolObj.affiliateUrl;
-    const finalUrl = isAffiliateActive ? toolObj.affiliateUrl! : toolObj.websiteUrl;
+    const rawUrl = isAffiliateActive ? toolObj.affiliateUrl! : toolObj.websiteUrl;
+    const finalUrl = formatExternalUrl(rawUrl);
     const eventType = isAffiliateActive ? 'affiliate_click' : 'tool_click';
 
     trackEvent(eventType, toolObj.id, toolObj.categorySlug, undefined, document.referrer);
     trackEvent('website_click', toolObj.id, toolObj.categorySlug, undefined, document.referrer);
 
-    // Redirect timeout to ensure visual wow & compliance exposure
-    const timer = setTimeout(() => {
+    if (finalUrl && finalUrl !== '#') {
       window.location.replace(finalUrl);
-    }, 1500);
-
-    return () => clearTimeout(timer);
+    } else {
+      onToast('External website link is not available.', 'error');
+      navigate(`/tools/${toolObj.slug}`, { replace: true });
+    }
   }, [slug, tools, navigate, onToast, trackEvent]);
 
   return (

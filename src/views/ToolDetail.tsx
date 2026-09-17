@@ -8,7 +8,7 @@ import { SEOHead } from '../components/shared/SEOHead';
 import { Heart, Share2, Award } from '../components/shared/Icons';
 import { Modal } from '../components/shared/Modal';
 import { ToolDetailActions } from '../components/shared/ToolDetailActions';
-import { getToolLogoUrl, handleLogoError } from '../utils/toolHelpers';
+import { getToolLogoUrl, handleLogoError, formatExternalUrl } from '../utils/toolHelpers';
 
 interface ToolDetailProps {
   onToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
@@ -116,8 +116,21 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
     onToast('URL copied to clipboard! Share it with your friends.', 'success');
   };
 
-  const handleVisitToolClick = () => {
-    window.open(`/go/${tool.slug}`, '_blank', 'noopener,noreferrer');
+  const rawExternalUrl = tool.isSponsored || (tool.affiliateStatus === 'active' && tool.affiliateUrl) ? (tool.affiliateUrl || tool.websiteUrl) : tool.websiteUrl;
+  const externalTargetUrl = formatExternalUrl(rawExternalUrl);
+
+  const handleVisitToolClick = (e?: React.MouseEvent) => {
+    trackEvent(
+      tool.affiliateStatus === 'active' && tool.affiliateUrl ? 'affiliate_click' : 'website_click',
+      tool.id,
+      tool.categorySlug
+    );
+    if (externalTargetUrl && externalTargetUrl !== '#') {
+      window.open(externalTargetUrl, '_blank', 'noopener,noreferrer');
+    } else {
+      if (e) e.preventDefault();
+      onToast('Website URL is not available for this tool.', 'error');
+    }
   };
 
   const handleReportSubmit = async (e: React.FormEvent) => {
@@ -367,9 +380,16 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
 
         {/* Action Button stack */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', justifyContent: 'center' }}>
-          <button onClick={handleVisitToolClick} className="btn btn-primary btn-lg w-full">
+          <a 
+            href={externalTargetUrl} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            onClick={handleVisitToolClick} 
+            className="btn btn-primary btn-lg w-full"
+            style={{ textDecoration: 'none', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
             <span>Visit Tool ↗</span>
-          </button>
+          </a>
           <div style={{ fontSize: '10px', color: 'var(--text-muted)', textAlign: 'center', lineHeight: '1.3' }}>
             AIFynest may earn a commission when you purchase through certain links.
           </div>
