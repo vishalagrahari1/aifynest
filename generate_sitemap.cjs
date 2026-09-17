@@ -71,8 +71,9 @@ function writeSitemap(categories, tools) {
   // Write approved tool detail routes
   if (tools && tools.length > 0) {
     tools.forEach((tool) => {
+      const cleanSlug = (tool.slug || '').replace(/-[0-9]+$/, '');
       xml += `  <url>\n`;
-      xml += `    <loc>${SITE_URL}/tools/${tool.slug}</loc>\n`;
+      xml += `    <loc>${SITE_URL}/tools/${cleanSlug}</loc>\n`;
       xml += `    <changefreq>weekly</changefreq>\n`;
       xml += `    <priority>0.6</priority>\n`;
       xml += `  </url>\n`;

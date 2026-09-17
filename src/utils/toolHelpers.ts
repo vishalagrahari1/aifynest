@@ -81,7 +81,7 @@ export const mapToolRow = (t: any): Tool => {
   return {
     id: String(t.id || ''),
     name: toolName,
-    slug: t.slug || toolName.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+    slug: (t.slug || toolName.toLowerCase().replace(/[^a-z0-9]+/g, '-')).replace(/-[0-9]+$/, ''),
     tagline: t.tagline || '',
     description: t.description || '',
     categorySlug: t.categorySlug || t.category_slug || '',
