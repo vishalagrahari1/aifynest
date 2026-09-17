@@ -4,7 +4,9 @@ export const BUSINESS_CONFIG = {
   name: 'AIFynest Directory',
   legalName: 'AIFynest Directory Platform',
   siteUrl: 'https://aifynest.com',
-  supportEmail: 'support@aifynest.com',
+  supportEmail: 'contact@aifynest.com',
+  contactEmail: 'contact@aifynest.com',
+  officialEmail: 'aifynestofficial@gmail.com',
   businessAddress: null, // Configurable placeholder: populate when official business address is available
   companyRegistration: null, // Configurable placeholder: populate when official company registration ID is available
   sponsorshipPlans: [

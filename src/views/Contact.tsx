@@ -60,24 +60,24 @@ export const Contact: React.FC<ContactProps> = ({ onToast }) => {
 
         {/* Official Contact Info Card */}
         <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'bold', margin: 0 }}>Direct Support Channels</h3>
+          <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'bold', margin: 0 }}>Direct Support & Business Channels</h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }} className="contact-info-grid">
             <div style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
-              <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 'bold', display: 'block' }}>EMAIL SUPPORT</span>
-              <a href={`mailto:${BUSINESS_CONFIG.supportEmail}`} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-primary)', fontWeight: 'bold', textDecoration: 'none' }}>
-                {BUSINESS_CONFIG.supportEmail}
+              <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 'bold', display: 'block', marginBottom: '2px' }}>PRIMARY CONTACT</span>
+              <a href={`mailto:${BUSINESS_CONFIG.contactEmail}`} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-primary)', fontWeight: 'bold', textDecoration: 'none', wordBreak: 'break-all' }}>
+                {BUSINESS_CONFIG.contactEmail}
               </a>
               <span style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginTop: '4px' }}>
-                Response time: Within 24-48 business hours
+                For general support & directory inquiries
               </span>
             </div>
             <div style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
-              <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 'bold', display: 'block' }}>ONLINE PORTAL</span>
-              <span style={{ fontSize: 'var(--text-sm)', fontWeight: 'bold', color: 'var(--text-primary)' }}>
-                Web Inquiry Form
-              </span>
+              <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 'bold', display: 'block', marginBottom: '2px' }}>OFFICIAL BUSINESS</span>
+              <a href={`mailto:${BUSINESS_CONFIG.officialEmail}`} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-primary)', fontWeight: 'bold', textDecoration: 'none', wordBreak: 'break-all' }}>
+                {BUSINESS_CONFIG.officialEmail}
+              </a>
               <span style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginTop: '4px' }}>
-                Submit inquiries directly below
+                For official partnerships & business relations
               </span>
             </div>
           </div>

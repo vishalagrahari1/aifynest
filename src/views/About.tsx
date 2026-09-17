@@ -77,16 +77,45 @@ export const About: React.FC = () => {
           </div>
         </div>
 
-        {/* Sponsorship & Advertising Transparency */}
+        {/* Contact & Support Channels */}
         <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '32px' }}>
-          <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', margin: '0 0 16px 0' }}>
-            Promotions & Sponsorship Transparency
+          <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', margin: '0 0 12px 0' }}>
+            Get in Touch with Us
           </h2>
-          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', lineHeight: '1.7', margin: '0 0 16px 0' }}>
-            To support directory maintenance and ongoing moderation operations, {BUSINESS_CONFIG.name} offers optional **fixed-duration promotional sponsorships** for approved AI tools.
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', lineHeight: '1.6', margin: '0 0 20px 0' }}>
+            Have questions about tool directory listings, partnership proposals, listing updates, or general feedback? Reach out to our team directly:
           </p>
-          <div style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '16px', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-            <strong>Disclosure:</strong> Sponsored listings are clearly labeled with a prominent “SPONSORED” badge. Sponsorship provides promotional placement within designated directory areas but does not guarantee specific traffic numbers, clicks, leads, or conversions. All tools, whether organic or sponsored, are held to the same editorial standards.
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }} className="contact-emails-grid">
+            <div style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '20px' }}>
+              <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
+                Primary Contact Email
+              </span>
+              <a 
+                href={`mailto:${BUSINESS_CONFIG.contactEmail}`} 
+                style={{ fontSize: 'var(--text-base)', color: 'var(--color-primary)', fontWeight: 'bold', textDecoration: 'none', wordBreak: 'break-all' }}
+              >
+                {BUSINESS_CONFIG.contactEmail}
+              </a>
+              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', margin: '6px 0 0 0', lineHeight: '1.5' }}>
+                For general support, tool submissions, and directory inquiries.
+              </p>
+            </div>
+
+            <div style={{ backgroundColor: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '20px' }}>
+              <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
+                Official Business Email
+              </span>
+              <a 
+                href={`mailto:${BUSINESS_CONFIG.officialEmail}`} 
+                style={{ fontSize: 'var(--text-base)', color: 'var(--color-primary)', fontWeight: 'bold', textDecoration: 'none', wordBreak: 'break-all' }}
+              >
+                {BUSINESS_CONFIG.officialEmail}
+              </a>
+              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', margin: '6px 0 0 0', lineHeight: '1.5' }}>
+                For official business communications, partnerships, and press.
+              </p>
+            </div>
           </div>
         </div>
 
@@ -97,7 +126,7 @@ export const About: React.FC = () => {
           </Link>
           <span style={{ margin: '0 12px', color: 'var(--text-muted)' }}>|</span>
           <Link to="/contact" className="btn btn-outline btn-md">
-            Contact Support
+            Contact Support Form
           </Link>
         </div>
       </div>

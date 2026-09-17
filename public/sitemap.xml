@@ -666,12 +666,12 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/khanmigo</loc>
+    <loc>https://aifynest.com/tools/whisper</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/whisper</loc>
+    <loc>https://aifynest.com/tools/khanmigo</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
