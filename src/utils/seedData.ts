@@ -1303,7 +1303,7 @@ export const initialTools: Tool[] = [
     "categorySlug": "writing",
     "subCategory": "Interactive AI Story Generator",
     "pricing": "freemium",
-    "pricingUrl": "https://aitoptools.com/tool/ai-erotic-smut/",
+    "pricingUrl": "https://lynote.com",
     "platforms": [
       "Web"
     ],
@@ -1339,7 +1339,7 @@ export const initialTools: Tool[] = [
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1474366521946-c3d4b507abf2?w=800&h=450&fit=crop"
     ],
-    "websiteUrl": "https://aitoptools.com/tool/ai-erotic-smut/?ref=aifynest",
+    "websiteUrl": "https://lynote.com",
     "rating": 4.4,
     "reviewCount": 48,
     "isVerified": false,
@@ -1365,7 +1365,7 @@ export const initialTools: Tool[] = [
     "categorySlug": "writing",
     "subCategory": "AI Roleplay & Voice Companion",
     "pricing": "freemium",
-    "pricingUrl": "https://aitoptools.com/tool/xotic-ai/",
+    "pricingUrl": "https://xotic.ai",
     "platforms": [
       "Web",
       "iOS",
@@ -1414,7 +1414,7 @@ export const initialTools: Tool[] = [
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&h=450&fit=crop"
     ],
-    "websiteUrl": "https://aitoptools.com/tool/xotic-ai/?ref=aifynest",
+    "websiteUrl": "https://xotic.ai",
     "rating": 4.8,
     "reviewCount": 95,
     "isVerified": true,
@@ -1441,7 +1441,7 @@ export const initialTools: Tool[] = [
     "categorySlug": "audio",
     "subCategory": "Real-Time Multilingual Video Dubbing",
     "pricing": "freemium",
-    "pricingUrl": "https://aitoptools.com/tool/ezdubs/",
+    "pricingUrl": "https://ezdubs.ai",
     "platforms": [
       "Web",
       "Chrome Extension",
@@ -1490,7 +1490,7 @@ export const initialTools: Tool[] = [
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=800&h=450&fit=crop"
     ],
-    "websiteUrl": "https://aitoptools.com/tool/ezdubs/?ref=aifynest",
+    "websiteUrl": "https://ezdubs.ai",
     "rating": 4.8,
     "reviewCount": 112,
     "isVerified": true,
@@ -1517,7 +1517,7 @@ export const initialTools: Tool[] = [
     "categorySlug": "image-generation",
     "subCategory": "AI Image Styling & Enhancement",
     "pricing": "freemium",
-    "pricingUrl": "https://aitoptools.com/tool/hotgens/",
+    "pricingUrl": "https://hotgens.com",
     "platforms": [
       "Web"
     ],
@@ -1554,7 +1554,7 @@ export const initialTools: Tool[] = [
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1563089145-599997674d42?w=800&h=450&fit=crop"
     ],
-    "websiteUrl": "https://aitoptools.com/tool/hotgens/?ref=aifynest",
+    "websiteUrl": "https://hotgens.com",
     "rating": 4.5,
     "reviewCount": 41,
     "isVerified": false,
@@ -1581,7 +1581,7 @@ export const initialTools: Tool[] = [
     "categorySlug": "audio",
     "subCategory": "Web-Based Audio Effects & Tools",
     "pricing": "free",
-    "pricingUrl": "https://aitoptools.com/tool/audioalter/",
+    "pricingUrl": "https://audioalter.com",
     "platforms": [
       "Web"
     ],
@@ -1620,7 +1620,7 @@ export const initialTools: Tool[] = [
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&h=450&fit=crop"
     ],
-    "websiteUrl": "https://aitoptools.com/tool/audioalter/?ref=aifynest",
+    "websiteUrl": "https://audioalter.com",
     "rating": 4.9,
     "reviewCount": 145,
     "isVerified": true,
@@ -1647,7 +1647,7 @@ export const initialTools: Tool[] = [
     "categorySlug": "productivity",
     "subCategory": "WhatsApp & Messenger AI Assistant",
     "pricing": "freemium",
-    "pricingUrl": "https://aitoptools.com/tool/whatgpt/",
+    "pricingUrl": "https://whatgpt.ai",
     "platforms": [
       "Web",
       "iOS",
@@ -1696,7 +1696,7 @@ export const initialTools: Tool[] = [
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1614680376593-902f749f7b9c?w=800&h=450&fit=crop"
     ],
-    "websiteUrl": "https://aitoptools.com/tool/whatgpt/?ref=aifynest",
+    "websiteUrl": "https://whatgpt.ai",
     "rating": 4.7,
     "reviewCount": 88,
     "isVerified": true,
@@ -1723,7 +1723,7 @@ export const initialTools: Tool[] = [
     "categorySlug": "productivity",
     "subCategory": "AI Prompt & Chat Management",
     "pricing": "freemium",
-    "pricingUrl": "https://aitoptools.com/tool/chatorg/",
+    "pricingUrl": "https://chatorg.com",
     "platforms": [
       "Web",
       "Chrome Extension"
@@ -1771,7 +1771,7 @@ export const initialTools: Tool[] = [
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&h=450&fit=crop"
     ],
-    "websiteUrl": "https://aitoptools.com/tool/chatorg/?ref=aifynest",
+    "websiteUrl": "https://chatorg.com",
     "rating": 4.7,
     "reviewCount": 49,
     "isVerified": true,
@@ -1798,7 +1798,7 @@ export const initialTools: Tool[] = [
     "categorySlug": "image-generation",
     "subCategory": "AI Image Processing & Editing",
     "pricing": "freemium",
-    "pricingUrl": "https://aitoptools.com/tool/nudiva-io/",
+    "pricingUrl": "https://nudiva.io",
     "platforms": [
       "Web"
     ],
@@ -1833,7 +1833,7 @@ export const initialTools: Tool[] = [
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&h=450&fit=crop"
     ],
-    "websiteUrl": "https://aitoptools.com/tool/nudiva-io/?ref=aifynest",
+    "websiteUrl": "https://nudiva.io",
     "rating": 4.3,
     "reviewCount": 30,
     "isVerified": false,
@@ -1859,7 +1859,7 @@ export const initialTools: Tool[] = [
     "categorySlug": "writing",
     "subCategory": "Custom Character & Studio Generator",
     "pricing": "freemium",
-    "pricingUrl": "https://aitoptools.com/tool/alphazria/",
+    "pricingUrl": "https://alphazria.com",
     "platforms": [
       "Web"
     ],
@@ -1906,7 +1906,7 @@ export const initialTools: Tool[] = [
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&h=450&fit=crop"
     ],
-    "websiteUrl": "https://aitoptools.com/tool/alphazria/?ref=aifynest",
+    "websiteUrl": "https://alphazria.com",
     "rating": 4.6,
     "reviewCount": 67,
     "isVerified": true,
@@ -2007,7 +2007,7 @@ export const initialTools: Tool[] = [
     "categorySlug": "writing",
     "subCategory": "Intimate AI Fantasy Character Chat",
     "pricing": "freemium",
-    "pricingUrl": "https://aitoptools.com/tool/fapai/",
+    "pricingUrl": "https://creatok.ai",
     "platforms": [
       "Web"
     ],
@@ -2041,7 +2041,7 @@ export const initialTools: Tool[] = [
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&h=450&fit=crop"
     ],
-    "websiteUrl": "https://aitoptools.com/tool/fapai/?ref=aifynest",
+    "websiteUrl": "https://creatok.ai",
     "rating": 4.5,
     "reviewCount": 50,
     "isVerified": false,
@@ -2067,7 +2067,7 @@ export const initialTools: Tool[] = [
     "categorySlug": "video",
     "subCategory": "All-in-One AI Video, Image & Music Studio",
     "pricing": "free-trial",
-    "pricingUrl": "https://aitoptools.com/tool/crano-ai/",
+    "pricingUrl": "https://crano.ai",
     "platforms": [
       "Web"
     ],
@@ -2113,7 +2113,7 @@ export const initialTools: Tool[] = [
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&h=450&fit=crop"
     ],
-    "websiteUrl": "https://aitoptools.com/tool/crano-ai/?ref=aifynest",
+    "websiteUrl": "https://crano.ai",
     "rating": 4.7,
     "reviewCount": 62,
     "isVerified": true,
@@ -2140,7 +2140,7 @@ export const initialTools: Tool[] = [
     "categorySlug": "productivity",
     "subCategory": "Conversational AI Assistant",
     "pricing": "free",
-    "pricingUrl": "https://aitoptools.com/tool/talkai/",
+    "pricingUrl": "https://talkai.info",
     "platforms": [
       "Web",
       "iOS",
@@ -2179,7 +2179,7 @@ export const initialTools: Tool[] = [
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&h=450&fit=crop"
     ],
-    "websiteUrl": "https://aitoptools.com/tool/talkai/?ref=aifynest",
+    "websiteUrl": "https://talkai.info",
     "rating": 4.6,
     "reviewCount": 80,
     "isVerified": true,
@@ -2206,7 +2206,7 @@ export const initialTools: Tool[] = [
     "categorySlug": "education",
     "subCategory": "Dating & Social Skills AI Coach",
     "pricing": "freemium",
-    "pricingUrl": "https://aitoptools.com/tool/mgai/",
+    "pricingUrl": "https://mgai.ai",
     "platforms": [
       "Web",
       "iOS"
@@ -2252,7 +2252,7 @@ export const initialTools: Tool[] = [
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&h=450&fit=crop"
     ],
-    "websiteUrl": "https://aitoptools.com/tool/mgai/?ref=aifynest",
+    "websiteUrl": "https://mgai.ai",
     "rating": 4.7,
     "reviewCount": 54,
     "isVerified": true,
@@ -2279,7 +2279,7 @@ export const initialTools: Tool[] = [
     "categorySlug": "audio",
     "subCategory": "AI Song Meaning & Lyric Interpreter",
     "pricing": "free",
-    "pricingUrl": "https://aitoptools.com/tool/songtell/",
+    "pricingUrl": "https://www.songtell.com",
     "platforms": [
       "Web"
     ],
@@ -2317,7 +2317,7 @@ export const initialTools: Tool[] = [
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&h=450&fit=crop"
     ],
-    "websiteUrl": "https://aitoptools.com/tool/songtell/?ref=aifynest",
+    "websiteUrl": "https://www.songtell.com",
     "rating": 4.8,
     "reviewCount": 124,
     "isVerified": true,
@@ -2344,7 +2344,7 @@ export const initialTools: Tool[] = [
     "categorySlug": "writing",
     "subCategory": "Slang & Social Copy Translator",
     "pricing": "free",
-    "pricingUrl": "https://aitoptools.com/tool/gen-z-translator/",
+    "pricingUrl": "https://genztranslator.com",
     "platforms": [
       "Web"
     ],
@@ -2382,7 +2382,7 @@ export const initialTools: Tool[] = [
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&h=450&fit=crop"
     ],
-    "websiteUrl": "https://aitoptools.com/tool/gen-z-translator/?ref=aifynest",
+    "websiteUrl": "https://genztranslator.com",
     "rating": 4.9,
     "reviewCount": 97,
     "isVerified": true,
@@ -2409,7 +2409,7 @@ export const initialTools: Tool[] = [
     "categorySlug": "writing",
     "subCategory": "AI Pickup Line & Icebreaker Generator",
     "pricing": "free",
-    "pricingUrl": "https://aitoptools.com/tool/flirtify/",
+    "pricingUrl": "https://flirtify.ai",
     "platforms": [
       "Web"
     ],
@@ -2445,7 +2445,7 @@ export const initialTools: Tool[] = [
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=800&h=450&fit=crop"
     ],
-    "websiteUrl": "https://aitoptools.com/tool/flirtify/?ref=aifynest",
+    "websiteUrl": "https://flirtify.ai",
     "rating": 4.6,
     "reviewCount": 63,
     "isVerified": false,
@@ -2472,7 +2472,7 @@ export const initialTools: Tool[] = [
     "categorySlug": "video",
     "subCategory": "AI Video Processing & Transformation",
     "pricing": "freemium",
-    "pricingUrl": "https://aitoptools.com/tool/ai-undress-video/",
+    "pricingUrl": "https://undress.ai",
     "platforms": [
       "Web"
     ],
@@ -2505,7 +2505,7 @@ export const initialTools: Tool[] = [
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1535016120720-40c646be5580?w=800&h=450&fit=crop"
     ],
-    "websiteUrl": "https://aitoptools.com/tool/ai-undress-video/?ref=aifynest",
+    "websiteUrl": "https://undress.ai",
     "rating": 4.2,
     "reviewCount": 28,
     "isVerified": false,
@@ -2531,7 +2531,7 @@ export const initialTools: Tool[] = [
     "categorySlug": "business",
     "subCategory": "Workflow Automation & Process Monitoring",
     "pricing": "freemium",
-    "pricingUrl": "https://aitoptools.com/tool/shuttle/",
+    "pricingUrl": "https://shuttle.dev",
     "platforms": [
       "Web",
       "API"
@@ -2579,7 +2579,7 @@ export const initialTools: Tool[] = [
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=450&fit=crop"
     ],
-    "websiteUrl": "https://aitoptools.com/tool/shuttle/?ref=aifynest",
+    "websiteUrl": "https://shuttle.dev",
     "rating": 4.8,
     "reviewCount": 45,
     "isVerified": true,
