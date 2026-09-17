@@ -22,7 +22,7 @@ export function useSEO({
 }: SEOMetadata) {
   useEffect(() => {
     // 1. Title
-    const formattedTitle = `${title} | AI Hub Directory`;
+    const formattedTitle = title.includes('AIFynest') ? title : `${title} | AIFynest`;
     document.title = formattedTitle;
 
     // Helper to find or create meta tag
