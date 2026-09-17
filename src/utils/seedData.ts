@@ -1715,68 +1715,6 @@ export const initialTools: Tool[] = [
     "approvedAt": "2026-09-14T00:00:00.000Z"
   },
   {
-    "id": "tool-spicygen",
-    "name": "SpicyGen",
-    "slug": "spicygen",
-    "tagline": "Turn AI Still Images into Dynamic AI Videos",
-    "description": "SpicyGen converts static AI character portraits and photos into animated video clips with fluid motion.",
-    "categorySlug": "video",
-    "subCategory": "AI Image-to-Video Generator",
-    "pricing": "freemium",
-    "pricingUrl": "https://aitoptools.com/tool/spicygen/",
-    "platforms": [
-      "Web"
-    ],
-    "pricingPlans": [
-      {
-        "name": "Free Trial",
-        "price": "$0",
-        "features": [
-          "3 Free Video Renders",
-          "Standard FPS"
-        ],
-        "billingPeriod": "free"
-      }
-    ],
-    "features": [
-      "Image to Video Animation",
-      "Camera Motion Control",
-      "High Frame Rate Export"
-    ],
-    "useCases": [
-      "Animate character art",
-      "Create video teasers from still images",
-      "Digital avatar animation"
-    ],
-    "pros": [
-      "Smooth motion rendering",
-      "Fast render queue"
-    ],
-    "cons": [
-      "Watermark on free tier"
-    ],
-    "logoUrl": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=120&h=120&fit=crop",
-    "screenshotUrls": [
-      "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=450&fit=crop"
-    ],
-    "websiteUrl": "https://aitoptools.com/tool/spicygen/?ref=aifynest",
-    "rating": 4.5,
-    "reviewCount": 36,
-    "isVerified": false,
-    "isFeatured": false,
-    "isSponsored": false,
-    "status": "approved",
-    "ownerId": null,
-    "claimStatus": "unclaimed",
-    "lastUpdated": "2026-09-14T00:00:00.000Z",
-    "tags": [
-      "AI Animation",
-      "Image to Video",
-      "Motion Generator"
-    ],
-    "approvedAt": "2026-09-14T00:00:00.000Z"
-  },
-  {
     "id": "tool-chatorg",
     "name": "ChatOrg",
     "slug": "chatorg",

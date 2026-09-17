@@ -125,10 +125,12 @@ const DatabaseContext = createContext<DatabaseContextType | undefined>(undefined
 const useSupabase = !import.meta.env.VITE_SUPABASE_URL?.includes('placeholder-url');
 
 export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const sanitizeToolsSlugs = (list: Tool[]) => list.map(t => ({
-    ...t,
-    slug: t.slug ? t.slug.replace(/-[0-9]+$/, '') : t.slug
-  }));
+  const sanitizeToolsSlugs = (list: Tool[]) => list
+    .filter(t => t && t.id !== 'tool-spicygen' && t.slug !== 'spicygen' && t.name?.toLowerCase() !== 'spicygen')
+    .map(t => ({
+      ...t,
+      slug: t.slug ? t.slug.replace(/-[0-9]+$/, '') : t.slug
+    }));
 
   const [tools, setTools] = useState<Tool[]>(() => {
     const cached = localStorage.getItem('ai_tools');
