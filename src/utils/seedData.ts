@@ -70,6 +70,7 @@ export interface Tool {
   isFeatured: boolean;
   isSponsored: boolean;
   isPopularPlacement?: boolean;
+  sponsorshipEndDate?: string | null;
   status: 'draft' | 'pending' | 'needs_changes' | 'approved' | 'rejected' | 'suspended' | 'archived';
   ownerId: string | null;
   claimStatus: 'unclaimed' | 'pending' | 'claimed';

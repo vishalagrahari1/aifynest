@@ -237,38 +237,44 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [sponsorshipPayments] = useState<any[]>([]);
 
   // DB Row to frontend UI model mapper helpers
-  const mapToolRow = (t: any): Tool => ({
-    id: t.id,
-    name: t.name,
-    slug: (t.slug || '').replace(/-[0-9]+$/, ''),
-    tagline: t.tagline,
-    description: t.description,
-    categorySlug: t.category_slug,
-    subCategory: t.sub_category,
-    pricing: t.pricing,
-    pricingUrl: t.pricing_url || '',
-    platforms: t.platforms || [],
-    pricingPlans: t.pricing_plans || [],
-    features: t.features || [],
-    useCases: t.use_cases || [],
-    pros: t.pros || [],
-    cons: t.cons || [],
-    logoUrl: t.logo_url,
-    screenshotUrls: t.screenshot_urls || [],
-    videoUrl: t.video_url || '',
-    websiteUrl: t.website_url,
-    rating: Number(t.rating || 0.0),
-    reviewCount: Number(t.review_count || 0),
-    isVerified: t.is_verified || false,
-    isFeatured: t.is_featured || false,
-    isSponsored: t.is_sponsored || false,
-    status: t.status,
-    ownerId: t.owner_id,
-    claimStatus: t.claim_status,
-    lastUpdated: t.last_updated,
-    tags: t.tags || [],
-    verification_status: t.verification_status || 'unverified',
-  });
+  const mapToolRow = (t: any): Tool => {
+    const endDate = t.sponsorship_end_date || t.sponsorshipEndDate;
+    const isExpired = endDate ? new Date(endDate).getTime() < Date.now() : false;
+
+    return {
+      id: t.id,
+      name: t.name,
+      slug: (t.slug || '').replace(/-[0-9]+$/, ''),
+      tagline: t.tagline,
+      description: t.description,
+      categorySlug: t.category_slug,
+      subCategory: t.sub_category,
+      pricing: t.pricing,
+      pricingUrl: t.pricing_url || '',
+      platforms: t.platforms || [],
+      pricingPlans: t.pricing_plans || [],
+      features: t.features || [],
+      useCases: t.use_cases || [],
+      pros: t.pros || [],
+      cons: t.cons || [],
+      logoUrl: t.logo_url,
+      screenshotUrls: t.screenshot_urls || [],
+      videoUrl: t.video_url || '',
+      websiteUrl: t.website_url,
+      rating: Number(t.rating || 0.0),
+      reviewCount: Number(t.review_count || 0),
+      isVerified: t.is_verified || false,
+      isFeatured: isExpired ? false : (t.is_featured || false),
+      isSponsored: isExpired ? false : (t.is_sponsored || false),
+      sponsorshipEndDate: endDate || null,
+      status: t.status,
+      ownerId: t.owner_id,
+      claimStatus: t.claim_status,
+      lastUpdated: t.last_updated,
+      tags: t.tags || [],
+      verification_status: t.verification_status || 'unverified',
+    };
+  };
 
   const fetchDatabaseState = async () => {
     if (!useSupabase) return;

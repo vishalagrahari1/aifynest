@@ -107,6 +107,9 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
 
     const isPaid = activeTier.price > 0 && !!cashfreeTxId;
 
+    const durationDays = activeTier.id === 'annual_pass' ? 365 : 90;
+    const sponsorshipEndDate = isPaid ? new Date(Date.now() + durationDays * 86400000).toISOString().split('T')[0] : null;
+
     const toolPayload = {
       name: name.trim(),
       slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
@@ -130,8 +133,9 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
       isVerified: isPaid,
       isFeatured: isPaid && activeTier.price >= 99,
       isSponsored: isPaid,
+      sponsorshipEndDate: sponsorshipEndDate,
       adminNotes: isPaid
-        ? `[VERIFIED CASHFREE PAYMENT - Tx: ${cashfreeTxId}]\nSelected Tier: ${activeTier.name} ($${activeTier.price})\nContact Email: ${email.trim()}\nNotes: ${additionalNotes.trim()}`
+        ? `[VERIFIED CASHFREE PAYMENT - Tx: ${cashfreeTxId}]\nSelected Tier: ${activeTier.name} ($${activeTier.price}) - Valid until ${sponsorshipEndDate}\nContact Email: ${email.trim()}\nNotes: ${additionalNotes.trim()}`
         : activeTier.price > 0
         ? `[SELECTED PLAN: ${activeTier.name} ($${activeTier.price})]\nContact Email: ${email.trim()}\nNotes: ${additionalNotes.trim()}`
         : additionalNotes ? `Contact Email: ${email.trim()}\nNotes: ${additionalNotes.trim()}` : `Contact Email: ${email.trim()}`,
