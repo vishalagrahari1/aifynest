@@ -256,11 +256,13 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
       '@type': 'SoftwareApplication',
       'name': tool.name,
       'description': tool.description,
+      'url': `${siteUrl}/tools/${tool.slug}`,
+      'image': tool.logoUrl,
       'applicationCategory': tool.categorySlug,
-      'operatingSystem': tool.platforms.join(', '),
+      'operatingSystem': tool.platforms && tool.platforms.length > 0 ? tool.platforms.join(', ') : 'Web',
       'offers': {
         '@type': 'Offer',
-        'price': tool.pricingPlans.length > 0 && tool.pricingPlans[0].price !== 'Custom' ? tool.pricingPlans[0].price.replace('$', '') : '0',
+        'price': tool.pricingPlans && tool.pricingPlans.length > 0 && tool.pricingPlans[0].price !== 'Custom' ? tool.pricingPlans[0].price.replace(/[^0-9.]/g, '') || '0' : '0',
         'priceCurrency': 'USD',
       },
       ...(tool.rating > 0 && tool.reviewCount > 0
@@ -269,6 +271,8 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
               '@type': 'AggregateRating',
               'ratingValue': tool.rating,
               'reviewCount': tool.reviewCount,
+              'bestRating': '5',
+              'worstRating': '1',
             },
           }
         : {}),
@@ -305,11 +309,21 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
     }
   ];
 
+  const toolSeoTitle = tool.seoTitle || `${tool.name} — Features, Pricing, Reviews & Alternatives`;
+  const defaultMetaDescription = tool.description && tool.description.length > 30
+    ? `${tool.name}: ${tool.tagline}. Read verified user reviews, compare ${tool.pricing} pricing plans, key features, and top alternatives on AIFynest.`
+    : `Discover ${tool.name}: ${tool.tagline}. Read ratings, compare ${tool.pricing} pricing, key features, and alternatives on AIFynest.`;
+
+  const toolMetaDescription = (tool.metaDescription || defaultMetaDescription).slice(0, 160);
+
   return (
     <div className="container section">
       <SEOHead
-        title={`${tool.name} – Features, Pricing, Reviews & Alternatives`}
-        description={`Read verified reviews, compare pricing tiers, find platform integrations, and explore alternatives for ${tool.name}. ${tool.tagline}.`}
+        title={toolSeoTitle}
+        description={toolMetaDescription}
+        ogType="product"
+        ogImage={tool.socialImage || (tool.screenshotUrls && tool.screenshotUrls.length > 0 ? tool.screenshotUrls[0] : tool.logoUrl)}
+        canonicalUrl={tool.canonicalUrl || `${siteUrl}/tools/${tool.slug}`}
         schemaMarkup={schemaMarkup}
         robots={tool.status === 'approved' ? 'index, follow' : 'noindex, nofollow'}
       />
