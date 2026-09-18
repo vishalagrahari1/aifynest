@@ -244,7 +244,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
           'url': 'https://aifynest.com/',
           'potentialAction': {
             '@type': 'SearchAction',
-            'target': 'https://ai-hub-directory.com/ai-tools?q={search_term_string}',
+            'target': 'https://aifynest.com/ai-tools?q={search_term_string}',
             'query-input': 'required name=search_term_string'
           }
         }}
