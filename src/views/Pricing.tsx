@@ -16,153 +16,223 @@ export const Pricing: React.FC = () => {
     setIsCashfreeOpen(true);
   };
 
+  const officialPlans = [
+    {
+      id: 'popular_spot',
+      name: 'Popular Tools Spot',
+      price: 69,
+      duration: '90 Days',
+      badge: null,
+      description: 'Guaranteed high-visibility placement in the Popular Tools grid on the Homepage.',
+      features: [
+        'Homepage Popular Tools grid placement',
+        '90 Days guaranteed promotion',
+        'Direct outbound traffic booster',
+        'Click & impression analytics',
+      ],
+      planParam: 'popular_spot',
+    },
+    {
+      id: 'featured_spot',
+      name: 'Featured Tools Spot',
+      price: 99,
+      duration: '90 Days',
+      badge: null,
+      description: 'Guaranteed high-visibility placement in the Featured Tools grid on the Homepage.',
+      features: [
+        'Homepage Featured Tools grid placement',
+        '90 Days guaranteed promo',
+        'Priority category positioning',
+        'Verified Blue Checkmark badge',
+      ],
+      planParam: 'featured_spot',
+    },
+    {
+      id: 'growth_pack',
+      name: 'Growth Featured Pack',
+      price: 149,
+      duration: '90 Days',
+      badge: 'RECOMMENDED',
+      description: 'Promote your tool across Popular Tools and Featured section for 3 months.',
+      features: [
+        'Popular Tools + Featured Hero combo',
+        '90 Days active placement',
+        'Dual section Homepage exposure',
+        'Verified Blue Checkmark badge',
+        'Express 24-hr editor verification',
+      ],
+      planParam: 'growth_pack',
+    },
+    {
+      id: 'featured_article',
+      name: 'Featured + Article Package',
+      price: 199,
+      duration: 'Lifetime Article',
+      badge: '🔥 BEST VALUE',
+      description: 'Get your AI tool listed in the Featured section for 90 days and get a dedicated editorial article published on the site.',
+      features: [
+        'Featured Section placement for 90 days',
+        'Dedicated Editorial Article published on site',
+        'Permanent blog backlinks & SEO indexing',
+        'Verified Blue Checkmark badge',
+        'Priority search & analytics feed',
+      ],
+      planParam: 'featured_article',
+    },
+    {
+      id: 'annual_pass',
+      name: 'Annual Pass',
+      price: 299,
+      duration: '365 Days',
+      badge: 'ENTERPRISE',
+      description: 'Keep your AI tool continuously promoted in Popular & Featured sections all year with a dedicated editorial article published on the site.',
+      features: [
+        '365 Days continuous promotion',
+        'Promoted in Popular & Featured all year',
+        'Dedicated Editorial Article published on site',
+        'Verified Blue Checkmark badge',
+        'Priority support & analytics dashboard',
+      ],
+      planParam: 'annual_pass',
+    },
+  ];
+
   return (
     <div className="container section">
       <SEOHead
-        title="Directory Submission & Premium Pricing Plans — Cashfree Payments"
-        description="Verify and update your AI tool listings. Choose between free directory submissions, premium owner profiles, or custom sponsorship campaigns with Cashfree Payments."
+        title="Official Promotion & Pricing Plans — AIFynest"
+        description="Promote your AI tool on AIFynest. Choose between Popular Tools placement, Featured Packs, or Annual Pass for high visibility."
       />
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', textAlign: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '36px', textAlign: 'center' }}>
         {/* Title Header */}
-        <div style={{ maxWidth: '640px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '720px', margin: '0 auto' }}>
           <h1 style={{ margin: 0, fontSize: 'var(--text-3xl)', fontWeight: 'var(--font-bold)' }}>
-            Simple Pricing for Tool Owners
+            Official Promotion & Listing Plans
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: '8px 0 0 0' }}>
-            List your artificial intelligence product, claim listing ownership, and unlock premium analytics to increase CTR conversions.
+          <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-base)', margin: '10px 0 0 0', lineHeight: '1.6' }}>
+            Boost your AI tool's traffic, brand visibility, and user conversions with our official promo packages.
           </p>
         </div>
 
-        {/* Pricing Cards */}
+        {/* 5 Official Pricing Cards Grid */}
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '20px',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '24px',
             maxWidth: '1200px',
             margin: '0 auto',
             width: '100%',
           }}
           className="pricing-grid"
         >
-          {/* Free plan */}
-          <div style={planCardStyle}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <h3 style={planTitleStyle}>Standard Listing</h3>
-              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Get listed in our directory catalog.</p>
-              <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 'bold', margin: '16px 0' }}>
-                $0
-                <span style={{ fontSize: 'var(--text-xs)', fontWeight: 'normal', color: 'var(--text-muted)' }}> / lifetime</span>
-              </div>
-            </div>
-            <ul style={featuresListStyle}>
-              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Basic Listing Details</span></li>
-              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>1 Primary Category</span></li>
-              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Community Review Collection</span></li>
-            </ul>
-            <Link to="/submit-tool" className="btn btn-outline" style={{ marginTop: 'auto' }}>
-              Submit For Free
-            </Link>
-          </div>
-
-          {/* Premium Plan */}
-          <div style={planCardStyle}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <h3 style={planTitleStyle}>Verified Premium</h3>
-              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Optimize conversion and edit custom content.</p>
-              <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 'bold', color: 'var(--color-primary)', margin: '16px 0' }}>
-                $29
-                <span style={{ fontSize: 'var(--text-xs)', fontWeight: 'normal', color: 'var(--text-muted)' }}> / month</span>
-              </div>
-            </div>
-            <ul style={featuresListStyle}>
-              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Verified Blue Check Badge</span></li>
-              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Add Pricing Plans & Screenshots</span></li>
-              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Claim Owner Dashboard Analytics</span></li>
-              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Expedited Review Safety</span></li>
-            </ul>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
-              <button onClick={() => handleOpenCashfree('Verified Premium Plan', 29)} className="btn btn-primary" style={{ fontSize: '12px' }}>
-                Pay $29 with Cashfree
-              </button>
-              <Link to="/submit-tool?plan=premium" className="btn btn-outline" style={{ fontSize: '11px' }}>
-                Submit Listing First
-              </Link>
-            </div>
-          </div>
-
-          {/* Sponsoring Plan ($99) */}
-          <div style={planCardStyle}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <h3 style={planTitleStyle}>Sponsored Growth</h3>
-              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Maximize traffic on search results.</p>
-              <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 'bold', margin: '16px 0' }}>
-                $99
-                <span style={{ fontSize: 'var(--text-xs)', fontWeight: 'normal', color: 'var(--text-muted)' }}> / month</span>
-              </div>
-            </div>
-            <ul style={featuresListStyle}>
-              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>All Verified Premium Features</span></li>
-              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Featured Listing in Target Category</span></li>
-              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Sponsored Search Banners</span></li>
-              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Analytics Feeds</span></li>
-            </ul>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
-              <button onClick={() => handleOpenCashfree('Sponsored Growth Plan', 99)} className="btn btn-primary" style={{ fontSize: '12px' }}>
-                Pay $99 with Cashfree
-              </button>
-              <Link to="/submit-tool?plan=featured" className="btn btn-outline" style={{ fontSize: '11px' }}>
-                Submit Listing First
-              </Link>
-            </div>
-          </div>
-
-          {/* Featured + Article Plan ($129) */}
-          <div style={{ ...planCardStyle, border: '2px solid var(--color-primary)', boxShadow: 'var(--shadow-xl)', position: 'relative' }}>
+          {officialPlans.map((plan) => (
             <div
+              key={plan.id}
               style={{
-                position: 'absolute',
-                top: '-12px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                backgroundColor: 'var(--color-primary)',
-                color: 'white',
-                padding: '2px 12px',
-                borderRadius: 'var(--radius-full)',
-                fontSize: '9px',
-                fontWeight: 'bold',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                whiteSpace: 'nowrap',
+                ...planCardStyle,
+                border: plan.badge ? '2px solid var(--color-primary)' : '1px solid var(--border-color)',
+                boxShadow: plan.badge ? '0 10px 30px -10px rgba(99, 102, 241, 0.3)' : 'none',
+                position: 'relative',
               }}
             >
-              🔥 Featured + Article
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <h3 style={planTitleStyle}>Featured & Article</h3>
-              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Featured placement + published blog article review.</p>
-              <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 'bold', color: 'var(--color-primary)', margin: '16px 0' }}>
-                $129
-                <span style={{ fontSize: 'var(--text-xs)', fontWeight: 'normal', color: 'var(--text-muted)' }}> / package</span>
+              {plan.badge && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '-12px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'white',
+                    padding: '3px 14px',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: '10px',
+                    fontWeight: 'bold',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {plan.badge}
+                </div>
+              )}
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <h3 style={planTitleStyle}>{plan.name}</h3>
+                <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', lineHeight: '1.4', margin: 0, minHeight: '36px' }}>
+                  {plan.description}
+                </p>
+                <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'bold', color: 'var(--text-primary)', margin: '16px 0 8px 0' }}>
+                  ${plan.price}
+                  <span style={{ fontSize: 'var(--text-xs)', fontWeight: 'normal', color: 'var(--text-muted)', marginLeft: '4px' }}>
+                    / {plan.duration}
+                  </span>
+                </div>
+              </div>
+
+              <ul style={featuresListStyle}>
+                {plan.features.map((feature, idx) => (
+                  <li key={idx} style={featureItemStyle}>
+                    <Check size={14} style={{ color: 'var(--color-success)', flexShrink: 0 }} />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
+                <button
+                  onClick={() => handleOpenCashfree(plan.name, plan.price)}
+                  className="btn btn-primary"
+                  style={{ fontSize: '13px', width: '100%', fontWeight: 'bold' }}
+                >
+                  Pay ${plan.price} with Cashfree
+                </button>
+                <Link
+                  to={`/submit-tool?plan=${plan.planParam}`}
+                  className="btn btn-outline"
+                  style={{ fontSize: '11px', width: '100%', textAlign: 'center' }}
+                >
+                  Submit Listing First
+                </Link>
               </div>
             </div>
-            <ul style={featuresListStyle}>
-              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span><strong>Featured Section Placement</strong></span></li>
-              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span><strong>Dedicated Article Published on Site</strong></span></li>
-              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Verified Blue Checkmark Badge</span></li>
-              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Express 24-hr Verification Queue</span></li>
-              <li style={featureItemStyle}><Check size={14} style={{ color: 'var(--color-success)' }} /> <span>Full Analytics & Review Dashboard</span></li>
-            </ul>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
-              <button onClick={() => handleOpenCashfree('Featured & Article Package', 129)} className="btn btn-primary" style={{ fontSize: '12px' }}>
-                Pay $129 with Cashfree
-              </button>
-              <Link to="/submit-tool?plan=featured_article" className="btn btn-outline" style={{ fontSize: '11px' }}>
-                Submit Listing First
-              </Link>
-            </div>
+          ))}
+        </div>
+
+        {/* Guest Post Notice */}
+        <div
+          style={{
+            maxWidth: '800px',
+            margin: '20px auto 0 auto',
+            backgroundColor: 'var(--bg-card)',
+            border: '1px dashed var(--color-primary)',
+            borderRadius: 'var(--radius-lg)',
+            padding: '24px 32px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '16px',
+            textAlign: 'left',
+          }}
+        >
+          <div>
+            <h4 style={{ margin: '0 0 4px 0', fontSize: 'var(--text-base)', fontWeight: 'bold', color: 'var(--text-primary)' }}>
+              📝 Looking for Guest Post Articles?
+            </h4>
+            <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+              For custom guest post requests, sponsored article publishing, or editorial guidelines, contact our official team:
+            </p>
           </div>
+          <a
+            href="mailto:aifynestofficial@gmail.com"
+            className="btn btn-primary btn-sm"
+            style={{ textDecoration: 'none', fontWeight: 'bold', padding: '10px 20px', whiteSpace: 'nowrap' }}
+          >
+            Contact aifynestofficial@gmail.com
+          </a>
         </div>
       </div>
 
@@ -230,3 +300,4 @@ const featureItemStyle: React.CSSProperties = {
   fontSize: 'var(--text-xs)',
   color: 'var(--text-secondary)',
 };
+

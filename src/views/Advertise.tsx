@@ -2,48 +2,55 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { SEOHead } from '../components/shared/SEOHead';
-import { Sparkles, Check, Info, Lock } from '../components/shared/Icons';
-import { paymentProvider } from '../services/payments/paymentProvider';
+import { Sparkles, Check, Info } from '../components/shared/Icons';
 
 export const Advertise: React.FC = () => {
-  const isPaymentsDisabled = !paymentProvider.isPaymentsEnabled();
 
   const plans = [
     {
-      id: 'plan_starter',
+      id: 'popular_spot',
       name: 'Popular Tools Spot',
-      duration: '30 Days',
-      price: '$39',
-      description: 'Guaranteed high-visibility placement in the Popular Tools grid on the Homepage.',
-      badge: null,
-      features: ['Top 8 Popular Tools grid placement', 'Promoted badge tag', 'Direct outbound traffic booster'],
-    },
-    {
-      id: 'plan_growth',
-      name: 'Growth Featured Pack',
       duration: '90 Days',
       price: '$69',
+      description: 'Guaranteed high-visibility placement in the Popular Tools grid on the Homepage.',
+      badge: null,
+      features: ['Homepage Popular Tools grid placement', '90 Days guaranteed promotion', 'Direct outbound traffic booster'],
+    },
+    {
+      id: 'featured_spot',
+      name: 'Featured Tools Spot',
+      duration: '90 Days',
+      price: '$99',
+      description: 'Guaranteed high-visibility placement in the Featured Tools grid on the Homepage.',
+      badge: null,
+      features: ['Homepage Featured Tools grid placement', '90 Days guaranteed promo', 'Priority category positioning'],
+    },
+    {
+      id: 'growth_pack',
+      name: 'Growth Featured Pack',
+      duration: '90 Days',
+      price: '$149',
       description: 'Promote your tool across Popular Tools and Featured section for 3 months.',
       badge: 'RECOMMENDED',
-      features: ['Popular Tools + Featured combo', '90 Days active placement', 'Priority search placement'],
+      features: ['Popular Tools + Featured Hero combo', '90 Days active placement', 'Verified Blue Checkmark badge'],
     },
     {
-      id: 'plan_featured_article',
+      id: 'featured_article',
       name: 'Featured + Article Package',
       duration: 'Lifetime Article',
-      price: '$129',
-      description: 'Get your AI tool listed in the Featured section and get a dedicated editorial article published on the site.',
+      price: '$199',
+      description: 'Get your AI tool listed in the Featured section for 90 days and get a dedicated editorial article published on the site.',
       badge: '🔥 BEST VALUE',
-      features: ['Featured Section placement on Homepage', 'Dedicated Editorial Article published on /blog', 'Verified Blue Checkmark badge', 'Express 24-hr editor verification', 'Priority search & analytics dashboard'],
+      features: ['Featured Section placement for 90 days', 'Dedicated Editorial Article published on site', 'Permanent blog backlinks & SEO indexing'],
     },
     {
-      id: 'plan_annual',
+      id: 'annual_pass',
       name: 'Annual Pass',
       duration: '365 Days',
-      price: '$199',
-      description: 'Keep your AI tool continuously promoted in Popular & Featured sections all year.',
+      price: '$299',
+      description: 'Keep your AI tool continuously promoted in Popular & Featured sections all year with a dedicated editorial article published on the site.',
       badge: 'ENTERPRISE',
-      features: ['365 Days uninterrupted promo', 'All placement zones included', 'Dedicated support & analytics'],
+      features: ['365 Days continuous promotion', 'Promoted in Popular & Featured all year', 'Dedicated Editorial Article published on site'],
     },
   ];
 
@@ -51,7 +58,7 @@ export const Advertise: React.FC = () => {
     <div className="container section">
       <SEOHead
         title="Sponsor Your AI Tool — AIFynest"
-        description="Get premium visibility for your AI tool with a simple fixed-duration sponsorship plan. Choose 30, 90, 180, or 365 days of promotion."
+        description="Get premium visibility for your AI tool with a simple fixed-duration sponsorship plan. Choose 90 Days or 365 Days of promotion."
       />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
@@ -78,40 +85,12 @@ export const Advertise: React.FC = () => {
             Sponsor Your AI Tool
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: '12px 0 0 0', lineHeight: '1.6' }}>
-            Get more visibility for your AI tool with a simple fixed-duration sponsorship. Choose how long you want your tool promoted. Pay once and enjoy sponsored placement for your selected period.
+            Get maximum traffic and visibility for your AI tool with our official sponsorship packages.
           </p>
         </div>
 
-        {/* Payments Coming Soon Banner */}
-        {isPaymentsDisabled && (
-          <div
-            style={{
-              backgroundColor: 'var(--bg-card)',
-              border: '1px solid var(--border-color)',
-              borderLeft: '4px solid var(--color-primary)',
-              borderRadius: 'var(--radius-md)',
-              padding: '16px 24px',
-              maxWidth: '840px',
-              margin: '0 auto',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '16px',
-            }}
-          >
-            <Lock size={24} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
-            <div>
-              <h4 style={{ margin: '0 0 4px 0', fontSize: 'var(--text-sm)', fontWeight: 'bold' }}>
-                Sponsorship Payments Coming Soon
-              </h4>
-              <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
-                Online sponsorship payments are currently being configured. You can review sponsorship plans now. Purchases will become available once payments are enabled through Stripe.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Four Sponsorship Pricing Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }} className="plans-grid">
+        {/* 5 Official Sponsorship Pricing Cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }} className="plans-grid">
           {plans.map((plan) => (
             <div
               key={plan.id}
@@ -156,18 +135,47 @@ export const Advertise: React.FC = () => {
               </p>
 
               <div style={{ marginTop: 'auto' }}>
-                {isPaymentsDisabled ? (
-                  <button className="btn btn-outline w-full" disabled style={{ opacity: 0.7, cursor: 'not-allowed' }}>
-                    Payments Coming Soon
-                  </button>
-                ) : (
-                  <Link to={`/dashboard?tab=sponsorship&plan=${plan.id}`} className="btn btn-primary w-full">
-                    Sponsor for {plan.price}
-                  </Link>
-                )}
+                <Link to={`/pricing`} className="btn btn-primary w-full" style={{ fontSize: '13px', textAlign: 'center' }}>
+                  Select Plan ({plan.price})
+                </Link>
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Guest Post Banner */}
+        <div
+          style={{
+            maxWidth: '840px',
+            margin: '0 auto',
+            width: '100%',
+            backgroundColor: 'var(--bg-card)',
+            border: '1px dashed var(--color-primary)',
+            borderRadius: 'var(--radius-lg)',
+            padding: '24px 32px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '16px',
+            textAlign: 'left',
+          }}
+        >
+          <div>
+            <h4 style={{ margin: '0 0 4px 0', fontSize: 'var(--text-base)', fontWeight: 'bold', color: 'var(--text-primary)' }}>
+              📝 Looking for Guest Post Articles?
+            </h4>
+            <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+              For custom guest post requests, sponsored article publishing, or editorial guidelines, contact our official team:
+            </p>
+          </div>
+          <a
+            href="mailto:aifynestofficial@gmail.com"
+            className="btn btn-primary btn-sm"
+            style={{ textDecoration: 'none', fontWeight: 'bold', padding: '10px 20px', whiteSpace: 'nowrap' }}
+          >
+            Contact aifynestofficial@gmail.com
+          </a>
         </div>
 
         {/* Why Sponsor Your Tool */}
@@ -201,37 +209,8 @@ export const Advertise: React.FC = () => {
               <Check size={18} style={{ color: 'var(--color-success)', flexShrink: 0, marginTop: '2px' }} />
               <div>
                 <strong style={{ fontSize: 'var(--text-sm)', display: 'block', marginBottom: '2px' }}>Simple & Transparent</strong>
-                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>Choose your duration, pay securely, and know exactly how long your sponsorship lasts.</span>
+                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>Choose your plan, pay securely via Cashfree, and start gaining traffic immediately.</span>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* How It Works */}
-        <div style={{ maxWidth: '840px', margin: '0 auto', width: '100%' }}>
-          <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', margin: '0 0 20px 0', textAlign: 'center' }}>
-            How It Works
-          </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }} className="how-grid">
-            <div style={{ backgroundColor: 'var(--bg-card)', padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', textAlign: 'center' }}>
-              <div style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '4px' }}>STEP 1</div>
-              <strong style={{ fontSize: 'var(--text-xs)', display: 'block', marginBottom: '4px' }}>Choose Your Tool</strong>
-              <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Select an AI tool you own.</span>
-            </div>
-            <div style={{ backgroundColor: 'var(--bg-card)', padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', textAlign: 'center' }}>
-              <div style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '4px' }}>STEP 2</div>
-              <strong style={{ fontSize: 'var(--text-xs)', display: 'block', marginBottom: '4px' }}>Select a Plan</strong>
-              <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Choose 1, 3, 6, or 12 months.</span>
-            </div>
-            <div style={{ backgroundColor: 'var(--bg-card)', padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', textAlign: 'center' }}>
-              <div style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '4px' }}>STEP 3</div>
-              <strong style={{ fontSize: 'var(--text-xs)', display: 'block', marginBottom: '4px' }}>Complete Payment</strong>
-              <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>When payments are available, pay via Stripe.</span>
-            </div>
-            <div style={{ backgroundColor: 'var(--bg-card)', padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', textAlign: 'center' }}>
-              <div style={{ fontSize: 'var(--text-xs)', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '4px' }}>STEP 4</div>
-              <strong style={{ fontSize: 'var(--text-xs)', display: 'block', marginBottom: '4px' }}>Get Sponsored</strong>
-              <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>After payment verification, your tool receives placement.</span>
             </div>
           </div>
         </div>
@@ -248,7 +227,7 @@ export const Advertise: React.FC = () => {
           .plans-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
         @media (max-width: 576px) {
-          .plans-grid, .why-grid, .how-grid { grid-template-columns: 1fr !important; }
+          .plans-grid, .why-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </div>

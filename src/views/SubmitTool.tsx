@@ -26,29 +26,37 @@ const LISTING_TIERS: ListingPlanTier[] = [
     description: 'Catalog index, community reviews, standard verification queue.',
   },
   {
-    id: 'premium',
-    name: 'Verified Premium',
-    price: 29,
-    description: 'Verified Blue Check mark, add pricing plans & screenshots, dashboard access.',
-  },
-  {
-    id: 'popular',
+    id: 'popular_spot',
     name: 'Popular Tools Spot',
-    price: 39,
-    description: 'Guaranteed placement in the Homepage Popular Tools section for 30 days.',
+    price: 69,
+    description: 'Guaranteed high-visibility placement in the Popular Tools grid on the Homepage for 90 days.',
   },
   {
-    id: 'featured',
+    id: 'featured_spot',
+    name: 'Featured Tools Spot',
+    price: 99,
+    description: 'Guaranteed high-visibility placement in the Featured Tools grid on the Homepage for 90 days.',
+  },
+  {
+    id: 'growth_pack',
     name: 'Growth Featured Pack',
-    price: 69,
-    description: 'Popular Tools + Featured Hero section combo for 90 days.',
+    price: 149,
+    badge: 'RECOMMENDED',
+    description: 'Promote your tool across Popular Tools and Featured section for 3 months.',
   },
   {
     id: 'featured_article',
-    name: 'Featured & Article Package',
-    price: 129,
+    name: 'Featured + Article Package',
+    price: 199,
     badge: '🔥 BEST VALUE',
-    description: 'Featured section placement + dedicated editorial review article published on the site.',
+    description: 'Get your AI tool listed in the Featured section for 90 days + dedicated editorial article published on the site.',
+  },
+  {
+    id: 'annual_pass',
+    name: 'Annual Pass',
+    price: 299,
+    badge: 'ENTERPRISE',
+    description: 'Keep your AI tool continuously promoted in Popular & Featured sections all year with a dedicated editorial article.',
   },
 ];
 
@@ -74,14 +82,16 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
   const [selectedTierId, setSelectedTierId] = useState<string>('free');
 
   useEffect(() => {
-    if (planParam === 'popular' || planParam === 'plan_starter') {
-      setSelectedTierId('popular');
-    } else if (planParam === 'featured' || planParam === 'plan_growth') {
-      setSelectedTierId('featured');
+    if (planParam === 'popular_spot' || planParam === 'popular' || planParam === 'plan_starter') {
+      setSelectedTierId('popular_spot');
+    } else if (planParam === 'featured_spot') {
+      setSelectedTierId('featured_spot');
+    } else if (planParam === 'growth_pack' || planParam === 'featured' || planParam === 'plan_growth') {
+      setSelectedTierId('growth_pack');
     } else if (planParam === 'featured_article' || planParam === 'plan_featured_article') {
       setSelectedTierId('featured_article');
-    } else if (planParam === 'premium') {
-      setSelectedTierId('premium');
+    } else if (planParam === 'annual_pass' || planParam === 'annual' || planParam === 'plan_annual') {
+      setSelectedTierId('annual_pass');
     }
   }, [planParam]);
 
@@ -118,8 +128,8 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
       ownerId: user?.id || 'guest',
       tags: [categorySlug],
       isVerified: isPaid,
-      isFeatured: isPaid && activeTier.price >= 69,
-      isSponsored: isPaid && (activeTier.price === 39 || activeTier.price === 69),
+      isFeatured: isPaid && activeTier.price >= 99,
+      isSponsored: isPaid,
       adminNotes: isPaid
         ? `[VERIFIED CASHFREE PAYMENT - Tx: ${cashfreeTxId}]\nSelected Tier: ${activeTier.name} ($${activeTier.price})\nContact Email: ${email.trim()}\nNotes: ${additionalNotes.trim()}`
         : activeTier.price > 0
