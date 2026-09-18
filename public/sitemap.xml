@@ -256,12 +256,12 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/bolt-new</loc>
+    <loc>https://aifynest.com/tools/remini</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/remini</loc>
+    <loc>https://aifynest.com/tools/bolt-new</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
