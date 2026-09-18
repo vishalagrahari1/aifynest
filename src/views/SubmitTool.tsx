@@ -62,7 +62,7 @@ const LISTING_TIERS: ListingPlanTier[] = [
 
 export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
   const { categories, addTool } = useDatabase();
-  const { user } = useAuth();
+  const { user, signup } = useAuth();
   const [searchParams] = useSearchParams();
   const planParam = searchParams.get('plan');
 
@@ -80,6 +80,28 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
   const [email, setEmail] = useState(user?.email || '');
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [selectedTierId, setSelectedTierId] = useState<string>('free');
+
+  // Account creation state on confirmation screen
+  const [accountPassword, setAccountPassword] = useState('');
+  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
+  const [accountCreatedSuccess, setAccountCreatedSuccess] = useState(false);
+
+  const handleCreateAccountOnConfirmation = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!accountPassword || accountPassword.length < 6) {
+      onToast('Password must be at least 6 characters long.', 'error');
+      return;
+    }
+    setIsCreatingAccount(true);
+    const result = await signup(name || 'Tool Owner', email.trim(), accountPassword, 'owner');
+    setIsCreatingAccount(false);
+    if (result.success) {
+      setAccountCreatedSuccess(true);
+      onToast(`Account created for ${email}! You can now log in anytime.`, 'success');
+    } else {
+      onToast(result.error || 'Failed to create account.', 'error');
+    }
+  };
 
   useEffect(() => {
     if (planParam === 'popular_spot' || planParam === 'popular' || planParam === 'plan_starter') {
@@ -266,6 +288,59 @@ export const SubmitTool: React.FC<SubmitToolProps> = ({ onToast }) => {
               <span style={{ fontWeight: 'bold' }}>{email}</span>
             </div>
           </div>
+
+          {/* Create Account Card for Guest Submitters */}
+          {!user && (
+            <div
+              style={{
+                backgroundColor: 'var(--bg-primary)',
+                border: '1px solid var(--color-primary)',
+                borderRadius: 'var(--radius-lg)',
+                padding: '24px',
+                maxWidth: '460px',
+                margin: '0 auto 32px auto',
+                textAlign: 'left',
+              }}
+            >
+              {accountCreatedSuccess ? (
+                <div style={{ textAlign: 'center', color: 'var(--color-success)' }}>
+                  <span style={{ fontSize: '20px', fontWeight: 'bold' }}>✅ Account Created!</span>
+                  <p style={{ margin: '4px 0 0 0', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
+                    You can now log in anytime with <strong>{email}</strong> to manage <strong>{name}</strong>.
+                  </p>
+                </div>
+              ) : (
+                <form onSubmit={handleCreateAccountOnConfirmation}>
+                  <h4 style={{ margin: '0 0 4px 0', fontSize: 'var(--text-sm)', fontWeight: 'bold', color: 'var(--text-primary)' }}>
+                    🔒 Create Your Account Password
+                  </h4>
+                  <p style={{ margin: '0 0 14px 0', fontSize: '11px', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+                    Set a password for <strong>{email}</strong> so you can log in, edit <strong>{name}</strong>, and view performance analytics.
+                  </p>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <input
+                      type="password"
+                      required
+                      minLength={6}
+                      placeholder="Choose a password (min 6 chars)"
+                      value={accountPassword}
+                      onChange={(e) => setAccountPassword(e.target.value)}
+                      className="form-input"
+                      style={{ fontSize: '12px', padding: '10px 12px', flex: 1 }}
+                    />
+                    <button
+                      type="submit"
+                      disabled={isCreatingAccount}
+                      className="btn btn-primary"
+                      style={{ fontSize: '12px', fontWeight: 'bold', whiteSpace: 'nowrap', padding: '10px 16px' }}
+                    >
+                      {isCreatingAccount ? 'Creating...' : 'Create Account'}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          )}
 
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <button onClick={handleReset} className="btn btn-outline">
