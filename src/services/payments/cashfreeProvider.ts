@@ -149,9 +149,9 @@ class CashfreeService {
       const activeMode = envMode || this.environment;
       console.log('Initializing Cashfree SDK Checkout with mode:', activeMode);
 
-      const cashfree = new window.Cashfree({
-        mode: activeMode,
-      });
+      const cashfree = typeof window.Cashfree === 'function' 
+        ? window.Cashfree({ mode: activeMode }) 
+        : new window.Cashfree({ mode: activeMode });
 
       cashfree.checkout({
         paymentSessionId: paymentSessionId,

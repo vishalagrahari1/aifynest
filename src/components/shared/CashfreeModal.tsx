@@ -76,9 +76,11 @@ export const CashfreeModal: React.FC<CashfreeModalProps> = ({
               setPaidStatus(true);
               onPaymentSuccess(orderId);
             } else {
-              alert(typeof err === 'string' ? err : 'Payment was canceled or could not be completed. Please try again.');
+              const errMsg = typeof err === 'string' ? err : (err?.message || 'Payment was canceled or could not be completed. Please try again.');
+              alert(errMsg);
             }
-          }
+          },
+          orderSession.environmentMode
         );
       } else {
         setIsProcessing(false);
