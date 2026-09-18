@@ -34,15 +34,23 @@ export default async function handler(req, res) {
     : 'https://sandbox.cashfree.com/pg';
 
   try {
+    const rawCurrency = (order_currency || 'USD').toUpperCase();
+    const rawAmount = Number(order_amount || 69);
+
+    // Standard Cashfree accounts process payments in INR. Convert USD to INR if needed.
+    const exchangeRate = 86.5;
+    const finalAmount = rawCurrency === 'USD' ? Math.round(rawAmount * exchangeRate) : Math.round(rawAmount);
+    const finalCurrency = 'INR';
+
     const payload = {
       order_id: order_id || `cf_ord_${Math.random().toString(36).substring(2, 10)}`,
-      order_amount: Number(order_amount || 69),
-      order_currency: order_currency || 'USD',
+      order_amount: finalAmount,
+      order_currency: finalCurrency,
       customer_details: {
-        customer_id: (customer_details?.customer_email || 'guest').replace(/[^a-zA-Z0-9]/g, '_'),
+        customer_id: (customer_details?.customer_email || 'guest_user').replace(/[^a-zA-Z0-9]/g, '_').substring(0, 45) || 'guest_user',
         customer_name: customer_details?.customer_name || 'Tool Owner',
         customer_email: customer_details?.customer_email || 'contact@aifynest.com',
-        customer_phone: customer_details?.customer_phone || '9999999999',
+        customer_phone: (customer_details?.customer_phone || '9999999999').replace(/[^0-9]/g, '').slice(-10) || '9999999999',
       },
       order_meta: order_meta || {
         return_url: `https://aifynest.com/pricing`,
@@ -72,7 +80,7 @@ export default async function handler(req, res) {
       console.error('Cashfree order endpoint error response:', data);
       return res.status(400).json({ 
         success: false, 
-        message: data.message || 'Cashfree API rejected order creation',
+        message: data.message || data.type || 'Cashfree API rejected order creation',
         details: data 
       });
     }

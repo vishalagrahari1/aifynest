@@ -82,29 +82,41 @@ class CashfreeService {
         }),
       });
 
-      if (response.ok) {
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          const data = await response.json();
-          if (data && data.payment_session_id) {
-            return {
-              success: true,
-              paymentSessionId: data.payment_session_id,
-              orderId: req.orderId,
-            };
-          }
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const data = await response.json();
+        if (response.ok && data && data.payment_session_id) {
+          return {
+            success: true,
+            paymentSessionId: data.payment_session_id,
+            orderId: req.orderId,
+          };
+        } else if (data && data.message) {
+          return {
+            success: false,
+            orderId: req.orderId,
+            message: data.message,
+          };
         }
       }
-    } catch (e) {
-      console.warn('Backend Cashfree order session endpoint not connected, falling back to client session generator:', e);
+    } catch (e: any) {
+      console.warn('Backend Cashfree order session endpoint error:', e);
     }
 
-    // Client fallback session response for prototype / test mode
+    // Client fallback session response ONLY for local localhost dev test mode
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return {
+        success: true,
+        paymentSessionId: `cs_test_${Math.random().toString(36).substring(2, 12)}`,
+        orderId: req.orderId,
+        message: 'Cashfree Order Created (Local Dev Mode)',
+      };
+    }
+
     return {
-      success: true,
-      paymentSessionId: `cs_test_${Math.random().toString(36).substring(2, 12)}`,
+      success: false,
       orderId: req.orderId,
-      message: 'Cashfree Order Created',
+      message: 'Could not connect to Cashfree payment server. Please try again.',
     };
   }
 
