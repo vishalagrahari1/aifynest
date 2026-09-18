@@ -58,7 +58,9 @@ export const CashfreeModal: React.FC<CashfreeModalProps> = ({
       });
 
       if (orderSession.success && orderSession.paymentSessionId) {
-        // Attempt Cashfree SDK Launch
+        const isTestSession = orderSession.paymentSessionId.startsWith('cs_test_');
+
+        // Launch Cashfree SDK
         await cashfreeService.launchCheckout(
           orderSession.paymentSessionId,
           () => {
@@ -67,26 +69,25 @@ export const CashfreeModal: React.FC<CashfreeModalProps> = ({
             onPaymentSuccess(orderId);
           },
           (err) => {
-            console.warn('Cashfree Checkout Error or Test Mode:', err);
-            // Simulate clean test payment success for sandbox testing
-            setTimeout(() => {
-              setIsProcessing(false);
+            console.warn('Cashfree Checkout Error:', err);
+            setIsProcessing(false);
+            if (isTestSession) {
+              // Local Dev / Prototype Test Mode Fallback
               setPaidStatus(true);
               onPaymentSuccess(orderId);
-            }, 1200);
+            } else {
+              alert(typeof err === 'string' ? err : 'Payment was canceled or could not be completed. Please try again.');
+            }
           }
         );
       } else {
-        // Fallback test payment completion
-        setTimeout(() => {
-          setIsProcessing(false);
-          setPaidStatus(true);
-          onPaymentSuccess(orderId);
-        }, 1200);
+        setIsProcessing(false);
+        alert('Could not initiate Cashfree payment session. Please check your credentials or try again.');
       }
     } catch (err) {
       console.error(err);
       setIsProcessing(false);
+      alert('An error occurred while connecting to Cashfree. Please try again.');
     }
   };
 
