@@ -16,6 +16,7 @@ export interface CashfreeOrderResponse {
   paymentSessionId?: string;
   orderId: string;
   message?: string;
+  environmentMode?: 'sandbox' | 'production';
 }
 
 declare global {
@@ -77,7 +78,7 @@ class CashfreeService {
             customer_phone: req.customerPhone || '9999999999',
           },
           order_meta: {
-            return_url: `${window.location.origin}/dashboard?cashfree_order_id=${req.orderId}`,
+            return_url: `${window.location.origin}/pricing?cashfree_order_id=${req.orderId}`,
           },
         }),
       });
@@ -90,6 +91,7 @@ class CashfreeService {
             success: true,
             paymentSessionId: data.payment_session_id,
             orderId: req.orderId,
+            environmentMode: data.environment_mode || this.environment,
           };
         } else if (data && data.message) {
           return {
@@ -110,6 +112,7 @@ class CashfreeService {
         paymentSessionId: `cs_test_${Math.random().toString(36).substring(2, 12)}`,
         orderId: req.orderId,
         message: 'Cashfree Order Created (Local Dev Mode)',
+        environmentMode: 'sandbox',
       };
     }
 
@@ -121,7 +124,12 @@ class CashfreeService {
   }
 
   // Launch Cashfree Payment Checkout Modal
-  public async launchCheckout(paymentSessionId: string, onSuccess?: () => void, onFailure?: (err: any) => void) {
+  public async launchCheckout(
+    paymentSessionId: string, 
+    onSuccess?: () => void, 
+    onFailure?: (err: any) => void,
+    envMode?: 'sandbox' | 'production'
+  ) {
     // For local prototype / test mode with client mock session IDs:
     if (paymentSessionId.startsWith('cs_test_')) {
       console.log('Simulating Cashfree Sandbox checkout completion for test session:', paymentSessionId);
@@ -138,8 +146,11 @@ class CashfreeService {
     }
 
     try {
+      const activeMode = envMode || this.environment;
+      console.log('Initializing Cashfree SDK Checkout with mode:', activeMode);
+
       const cashfree = new window.Cashfree({
-        mode: this.environment,
+        mode: activeMode,
       });
 
       cashfree.checkout({
