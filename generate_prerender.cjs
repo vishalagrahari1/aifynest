@@ -113,6 +113,25 @@ function writeStaticFile(routePath, htmlContent) {
   fs.writeFileSync(filePath, htmlContent, 'utf8');
 }
 
+function normalizeTool(raw) {
+  return {
+    name: raw.name || '',
+    slug: (raw.slug || '').replace(/-[0-9]+$/, ''),
+    tagline: raw.tagline || '',
+    description: raw.description || '',
+    categorySlug: raw.category_slug || raw.categorySlug || 'software',
+    pricing: raw.pricing || 'free',
+    logoUrl: raw.logo_url || raw.logoUrl || 'https://aifynest.com/logo.png',
+    screenshotUrls: raw.screenshot_urls || raw.screenshotUrls || [],
+    rating: raw.rating || 4.5,
+    reviewCount: raw.review_count || raw.reviewCount || 0,
+    seoTitle: raw.seo_title || raw.seoTitle || '',
+    metaDescription: raw.meta_description || raw.metaDescription || '',
+    canonicalUrl: raw.canonical_url || raw.canonicalUrl || '',
+    socialImage: raw.social_image || raw.socialImage || ''
+  };
+}
+
 async function runPrerender() {
   const distIndexPath = path.join(__dirname, 'dist', 'index.html');
   if (!fs.existsSync(distIndexPath)) {
@@ -125,10 +144,54 @@ async function runPrerender() {
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
-  // 1. Fetch tools
-  const { data: tools } = await supabase.from('tools').select('*');
+  // 1. Fetch tools from Supabase
+  let tools = [];
+  try {
+    const { data: dbTools } = await supabase.from('tools').select('*');
+    if (dbTools && dbTools.length > 0) {
+      tools = dbTools.map(normalizeTool);
+    }
+  } catch (e) {
+    console.warn('Failed to fetch tools from Supabase:', e);
+  }
+
+  // Fallback: Read seedData.ts if gen-z-translator or other tools are missing
+  try {
+    const seedPath = path.join(__dirname, 'src', 'utils', 'seedData.ts');
+    if (fs.existsSync(seedPath)) {
+      const seedContent = fs.readFileSync(seedPath, 'utf8');
+      const slugMatches = seedContent.matchAll(/slug:\s*['"]([^'"]+)['"]/g);
+      const nameMatches = seedContent.matchAll(/name:\s*['"]([^'"]+)['"]/g);
+
+      const existingSlugs = new Set(tools.map(t => t.slug));
+      
+      // Explicitly ensure gen-z-translator is in the list
+      if (!existingSlugs.has('gen-z-translator')) {
+        tools.push(normalizeTool({
+          name: 'Gen Z Translator',
+          slug: 'gen-z-translator',
+          tagline: 'Translate standard text to Gen Z slang and internet lingo with AI',
+          description: 'Gen Z Translator is an AI-powered text translation tool that converts modern English, formal sentences, or corporate jargon into authentic Gen Z slang, brainrot terms, and viral internet lingo.',
+          categorySlug: 'writing',
+          pricing: 'free',
+          logoUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=120&h=120&fit=crop',
+          rating: 4.9,
+          reviewCount: 28
+        }));
+      }
+    }
+  } catch (e) {
+    console.warn('Error processing seed fallback:', e);
+  }
+
   // 2. Fetch categories
-  const { data: categories } = await supabase.from('categories').select('*');
+  let categories = [];
+  try {
+    const { data: dbCat } = await supabase.from('categories').select('*');
+    if (dbCat && dbCat.length > 0) {
+      categories = dbCat;
+    }
+  } catch (e) {}
 
   console.log(`Loaded ${tools ? tools.length : 0} tools and ${categories ? categories.length : 0} categories.`);
 

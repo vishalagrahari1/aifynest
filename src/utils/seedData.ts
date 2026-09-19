@@ -567,8 +567,41 @@ export const initialTools: Tool[] = [
     claimStatus: 'unclaimed',
     lastUpdated: '2026-08-11',
     tags: ['developer search', 'programming engine', 'code solutions', 'syntax search']
-  }
-,
+  },
+  {
+    id: 'tool-gen-z-translator',
+    name: 'Gen Z Translator',
+    slug: 'gen-z-translator',
+    tagline: 'Translate standard text to Gen Z slang and internet lingo with AI',
+    description: 'Gen Z Translator is an AI-powered text translation tool that converts modern English, formal sentences, or corporate jargon into authentic Gen Z slang, brainrot terms, and viral internet lingo. Perfect for content creators, social media managers, and marketers looking to connect with younger audiences.',
+    categorySlug: 'writing',
+    subCategory: 'AI Translator & Slang Generator',
+    pricing: 'free',
+    pricingUrl: 'https://aifynest.com/tools/gen-z-translator',
+    platforms: ['Web'],
+    pricingPlans: [
+      { name: 'Free Plan', price: '$0', billingPeriod: 'free', features: ['Unlimited Slang Translations', 'Gen Z & Brainrot Modes', 'Copy & Share Text'] }
+    ],
+    features: ['Text to Gen Z Slang Translation', 'Tone & Slang Intensity Adjustment', 'Formal to Casual Text Converter', 'Viral Slang Dictionary'],
+    useCases: ['Writing relatable social media captions', 'Understanding youth internet terminology', 'Translating marketing ads for Gen Z demographics'],
+    pros: ['Instant translation speed', 'Hilarious and accurate slang outputs', '100% Free to use'],
+    cons: ['Slang updates rapidly on social platforms'],
+    logoUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=120&h=120&fit=crop',
+    screenshotUrls: [
+      'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=450&fit=crop'
+    ],
+    websiteUrl: 'https://aifynest.com/tools/gen-z-translator',
+    rating: 4.9,
+    reviewCount: 28,
+    isVerified: true,
+    isFeatured: true,
+    isSponsored: false,
+    status: 'approved',
+    ownerId: null,
+    claimStatus: 'unclaimed',
+    lastUpdated: '2026-09-19',
+    tags: ['gen z translator', 'slang generator', 'ai translation', 'writing assistant', 'text converter']
+  },
   {
     "id": "tool-lynote",
     "name": "Lynote",
