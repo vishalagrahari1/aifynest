@@ -1,6 +1,7 @@
 /* src/components/layout/Footer.tsx */
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { InstagramIcon, PinterestIcon, XIcon, GitHubIcon, FacebookIcon } from '../shared/Icons';
 
 
 export const Footer: React.FC = () => {
@@ -135,10 +136,62 @@ export const Footer: React.FC = () => {
           <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
             &copy; {new Date().getFullYear()} AIFynest. All rights reserved.
           </span>
-          <div style={{ display: 'flex', gap: '16px', fontSize: 'var(--text-xs)' }}>
-            <a href="#twitter" style={{ color: 'var(--text-muted)' }}>Twitter / X</a>
-            <a href="#github" style={{ color: 'var(--text-muted)' }}>GitHub</a>
-            <a href="#discord" style={{ color: 'var(--text-muted)' }}>Discord Community</a>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <a
+              href="https://x.com/aifynest"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="AIFynest on X (Twitter)"
+              aria-label="AIFynest on X"
+              style={socialLinkStyle}
+              className="social-footer-icon"
+            >
+              <XIcon size={16} />
+            </a>
+            <a
+              href="https://www.instagram.com/aifynest/"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="AIFynest on Instagram"
+              aria-label="AIFynest on Instagram"
+              style={socialLinkStyle}
+              className="social-footer-icon"
+            >
+              <InstagramIcon size={17} />
+            </a>
+            <a
+              href="https://in.pinterest.com/aifynest/"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="AIFynest on Pinterest"
+              aria-label="AIFynest on Pinterest"
+              style={socialLinkStyle}
+              className="social-footer-icon"
+            >
+              <PinterestIcon size={17} />
+            </a>
+            <a
+              href="https://github.com/aifynest"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="AIFynest on GitHub"
+              aria-label="AIFynest on GitHub"
+              style={socialLinkStyle}
+              className="social-footer-icon"
+            >
+              <GitHubIcon size={17} />
+            </a>
+            <a
+              href="https://www.facebook.com/aifynes"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="AIFynest on Facebook"
+              aria-label="AIFynest on Facebook"
+              style={socialLinkStyle}
+              className="social-footer-icon"
+            >
+              <FacebookIcon size={17} />
+            </a>
           </div>
         </div>
       </div>
@@ -187,6 +240,12 @@ export const Footer: React.FC = () => {
         footer a:hover {
           color: var(--color-primary) !important;
         }
+        .social-footer-icon:hover {
+          border-color: var(--color-primary) !important;
+          color: var(--color-primary) !important;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
       `}</style>
     </footer>
   );
@@ -196,4 +255,18 @@ const footerLinkStyle: React.CSSProperties = {
   fontSize: 'var(--text-xs)',
   color: 'var(--text-muted)',
   transition: 'color var(--transition-fast)',
+};
+
+const socialLinkStyle: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '34px',
+  height: '34px',
+  borderRadius: '50%',
+  backgroundColor: 'var(--bg-primary)',
+  border: '1px solid var(--border-color)',
+  color: 'var(--text-secondary)',
+  textDecoration: 'none',
+  transition: 'all 0.2s ease',
 };
