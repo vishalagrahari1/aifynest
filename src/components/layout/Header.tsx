@@ -237,6 +237,25 @@ export const Header: React.FC = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const savedDropdownRef = useRef<HTMLDivElement>(null);
   const langDropdownRef = useRef<HTMLDivElement>(null);
+  const moreDropdownRef = useRef<HTMLDivElement>(null);
+  const moreTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleMoreMouseEnter = () => {
+    if (moreTimeoutRef.current) {
+      clearTimeout(moreTimeoutRef.current);
+      moreTimeoutRef.current = null;
+    }
+    setMoreDropdownOpen(true);
+  };
+
+  const handleMoreMouseLeave = () => {
+    if (moreTimeoutRef.current) {
+      clearTimeout(moreTimeoutRef.current);
+    }
+    moreTimeoutRef.current = setTimeout(() => {
+      setMoreDropdownOpen(false);
+    }, 250);
+  };
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -268,6 +287,9 @@ export const Header: React.FC = () => {
       }
       if (langDropdownRef.current && !langDropdownRef.current.contains(e.target as Node)) {
         setIsLanguageDropdownOpen(false);
+      }
+      if (moreDropdownRef.current && !moreDropdownRef.current.contains(e.target as Node)) {
+        setMoreDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -373,16 +395,18 @@ export const Header: React.FC = () => {
           <Link to="/blog" style={navLinkStyle}>{t('blog')}</Link>
           
           <div 
+            ref={moreDropdownRef}
             style={{ position: 'relative' }}
-            onMouseEnter={() => setMoreDropdownOpen(true)}
-            onMouseLeave={() => setMoreDropdownOpen(false)}
+            onMouseEnter={handleMoreMouseEnter}
+            onMouseLeave={handleMoreMouseLeave}
           >
             <button
+              onClick={() => setMoreDropdownOpen((prev) => !prev)}
               style={{
                 ...navLinkStyle,
                 background: 'none',
                 border: 'none',
-                padding: 0,
+                padding: '4px 0',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '4px',
@@ -399,34 +423,64 @@ export const Header: React.FC = () => {
                   position: 'absolute',
                   top: '100%',
                   left: 0,
-                  marginTop: '8px',
-                  width: '190px',
-                  backgroundColor: 'var(--bg-card)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: 'var(--radius-md)',
-                  boxShadow: 'var(--shadow-lg)',
-                  padding: '6px',
+                  paddingTop: '6px', // Invisible hit bridge bridging button and dropdown box
                   zIndex: 1000,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '2px',
                 }}
               >
-                <Link to="/trending" className="dropdown-link" style={{ padding: '8px 12px', fontSize: '13px' }}>
-                  {t('trending')}
-                </Link>
-                <Link to="/new" className="dropdown-link" style={{ padding: '8px 12px', fontSize: '13px' }}>
-                  {t('newest')}
-                </Link>
-                <Link to="/collections" className="dropdown-link" style={{ padding: '8px 12px', fontSize: '13px' }}>
-                  {t('collections')}
-                </Link>
-                <Link to="/compare" className="dropdown-link" style={{ padding: '8px 12px', fontSize: '13px' }}>
-                  {t('compare')}
-                </Link>
-                <Link to="/advertise" className="dropdown-link" style={{ padding: '8px 12px', fontSize: '13px' }}>
-                  {t('sponsorship')}
-                </Link>
+                <div
+                  style={{
+                    width: '190px',
+                    backgroundColor: 'var(--bg-card)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-md)',
+                    boxShadow: 'var(--shadow-lg)',
+                    padding: '6px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px',
+                  }}
+                >
+                  <Link 
+                    to="/trending" 
+                    className="dropdown-link" 
+                    style={{ padding: '8px 12px', fontSize: '13px' }}
+                    onClick={() => setMoreDropdownOpen(false)}
+                  >
+                    {t('trending')}
+                  </Link>
+                  <Link 
+                    to="/new" 
+                    className="dropdown-link" 
+                    style={{ padding: '8px 12px', fontSize: '13px' }}
+                    onClick={() => setMoreDropdownOpen(false)}
+                  >
+                    {t('newest')}
+                  </Link>
+                  <Link 
+                    to="/collections" 
+                    className="dropdown-link" 
+                    style={{ padding: '8px 12px', fontSize: '13px' }}
+                    onClick={() => setMoreDropdownOpen(false)}
+                  >
+                    {t('collections')}
+                  </Link>
+                  <Link 
+                    to="/compare" 
+                    className="dropdown-link" 
+                    style={{ padding: '8px 12px', fontSize: '13px' }}
+                    onClick={() => setMoreDropdownOpen(false)}
+                  >
+                    {t('compare')}
+                  </Link>
+                  <Link 
+                    to="/pricing" 
+                    className="dropdown-link" 
+                    style={{ padding: '8px 12px', fontSize: '13px' }}
+                    onClick={() => setMoreDropdownOpen(false)}
+                  >
+                    {t('sponsorship')}
+                  </Link>
+                </div>
               </div>
             )}
           </div>
