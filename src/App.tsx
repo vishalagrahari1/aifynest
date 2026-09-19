@@ -130,6 +130,7 @@ const AppContent: React.FC<{
               />
             }
           />
+          <Route path="/tool/:slug" element={<Navigate to="/tools/:slug" replace />} />
           <Route path="/go/:slug" element={<AffiliateRedirect onToast={showToast} />} />
 
           <Route
@@ -192,6 +193,8 @@ const AppContent: React.FC<{
               />
             }
           />
+          <Route path="/new-tools" element={<Navigate to="/new" replace />} />
+          <Route path="/ai-tools/category/:slug" element={<Navigate to="/categories/:slug" replace />} />
 
           <Route path="/submit-tool" element={<SubmitTool onToast={showToast} />} />
           <Route path="/claim" element={<ClaimListing onToast={showToast} />} />
