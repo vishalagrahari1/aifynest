@@ -344,7 +344,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
               lineHeight: '1.5',
             }}
           >
-            Explore, compare, and review <strong>{tools ? tools.filter(t => t.status === 'approved').length : 0}+ AI tools</strong> across <strong>{categories ? categories.length : 0} categories</strong>.
+            Explore, compare, and review <strong>{tools && tools.length > 0 ? tools.filter(t => t.status === 'approved').length : 196}+ AI tools</strong> across <strong>{categories && categories.length > 0 ? categories.length : 12} categories</strong>.
           </p>
 
           {/* Interactive Search Bar wrapper */}
@@ -360,7 +360,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
               />
               <input
                 type="text"
-                placeholder={`Search ${tools ? tools.filter(t => t.status === 'approved').length : 0}+ AI tools, categories, or tags...`}
+                placeholder={`Search ${tools && tools.length > 0 ? tools.filter(t => t.status === 'approved').length : 196}+ AI tools, categories, or tags...`}
                 value={searchQuery}
                 onChange={handleSearchChange}
                 onFocus={() => setShowSuggestions(suggestions.length > 0)}
@@ -1375,11 +1375,11 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
             className="stats-grid"
           >
             <div>
-              <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '4px' }}>12+</div>
+              <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '4px' }}>{categories && categories.length > 0 ? `${categories.length}+` : '12+'}</div>
               <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}>Curated AI Categories</div>
             </div>
             <div>
-              <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '4px' }}>1,200+</div>
+              <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 'bold', color: 'var(--color-primary)', marginBottom: '4px' }}>{tools && tools.length > 0 ? `${tools.filter(t => t.status === 'approved').length}+` : '196+'}</div>
               <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', fontWeight: 'var(--font-medium)' }}>Indexed AI Tools</div>
             </div>
             <div>
