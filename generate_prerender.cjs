@@ -288,6 +288,11 @@ async function runPrerender() {
       description: 'Check out the latest AI tools and emerging software added to AIFynest today.'
     },
     {
+      path: '/new',
+      title: 'New & Recently Added AI Tools — AIFynest',
+      description: 'Check out the latest AI tools and emerging software added to AIFynest today.'
+    },
+    {
       path: '/compare',
       title: 'Compare AI Tools Side-by-Side — AIFynest',
       description: 'Compare features, pricing, pros & cons, and ratings of top AI tools side-by-side on AIFynest.'
