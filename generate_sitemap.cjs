@@ -108,12 +108,40 @@ async function generate() {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
     
     // 1. Fetch approved tools
-    const { data: tools, error: tErr } = await supabase
+    const { data: dbTools, error: tErr } = await supabase
       .from('tools')
       .select('slug, status')
       .eq('status', 'approved');
     
     if (tErr) throw tErr;
+
+    let allTools = dbTools ? [...dbTools] : [];
+
+    // Fallback: Transpile seedData.ts to ensure ALL seed tools are indexed in sitemap
+    try {
+      const seedPath = path.join(__dirname, 'src', 'utils', 'seedData.ts');
+      if (fs.existsSync(seedPath)) {
+        const ts = require('typescript');
+        const code = fs.readFileSync(seedPath, 'utf8');
+        const js = ts.transpileModule(code, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
+        const m = { exports: {} };
+        const fn = new Function('module', 'exports', 'require', js);
+        fn(m, m.exports, require);
+
+        const seedTools = m.exports.initialTools || [];
+        const existingSlugs = new Set(allTools.map(t => (t.slug || '').replace(/-[0-9]+$/, '')));
+
+        seedTools.forEach(st => {
+          const cleanSlug = (st.slug || '').replace(/-[0-9]+$/, '');
+          if (cleanSlug && !existingSlugs.has(cleanSlug)) {
+            allTools.push({ slug: cleanSlug, status: 'approved' });
+            existingSlugs.add(cleanSlug);
+          }
+        });
+      }
+    } catch (e) {
+      console.warn('Error merging seed fallback in sitemap:', e);
+    }
 
     // 2. Fetch categories
     const { data: categories, error: cErr } = await supabase
@@ -122,7 +150,7 @@ async function generate() {
     
     if (cErr) throw cErr;
 
-    writeSitemap(categories, tools);
+    writeSitemap(categories, allTools);
   } catch (err) {
     console.error('Error fetching data from Supabase for sitemap:', err.message);
     console.warn('Falling back to static-only sitemap generation.');

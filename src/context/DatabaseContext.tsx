@@ -302,8 +302,9 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       if (toolsData && toolsData.length > 0) {
         compiledTools = toolsData.map(t => mapToolRow(t));
         const existingIds = new Set(compiledTools.map(t => t.id));
-        const existingSlugs = new Set(compiledTools.map(t => t.slug));
-        const missingInitial = initialTools.filter(t => !existingIds.has(t.id) && !existingSlugs.has(t.slug));
+        const existingSlugs = new Set(compiledTools.map(t => (t.slug || '').replace(/-[0-9]+$/, '')));
+        const cleanInitial = sanitizeToolsSlugs(initialTools);
+        const missingInitial = cleanInitial.filter(t => !existingIds.has(t.id) && !existingSlugs.has((t.slug || '').replace(/-[0-9]+$/, '')));
         if (missingInitial.length > 0) {
           compiledTools = [...compiledTools, ...missingInitial];
         }

@@ -155,33 +155,33 @@ async function runPrerender() {
     console.warn('Failed to fetch tools from Supabase:', e);
   }
 
-  // Fallback: Read seedData.ts if gen-z-translator or other tools are missing
+  // Fallback: Transpile seedData.ts to ensure ALL seed tools (trustmrr, lynote, pixaryai, etc.) are included
   try {
     const seedPath = path.join(__dirname, 'src', 'utils', 'seedData.ts');
     if (fs.existsSync(seedPath)) {
-      const seedContent = fs.readFileSync(seedPath, 'utf8');
-      const slugMatches = seedContent.matchAll(/slug:\s*['"]([^'"]+)['"]/g);
-      const nameMatches = seedContent.matchAll(/name:\s*['"]([^'"]+)['"]/g);
+      const ts = require('typescript');
+      const code = fs.readFileSync(seedPath, 'utf8');
+      const js = ts.transpileModule(code, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
+      const m = { exports: {} };
+      const fn = new Function('module', 'exports', 'require', js);
+      fn(m, m.exports, require);
 
-      const existingSlugs = new Set(tools.map(t => t.slug));
-      
-      // Explicitly ensure gen-z-translator is in the list
-      if (!existingSlugs.has('gen-z-translator')) {
-        tools.push(normalizeTool({
-          name: 'Gen Z Translator',
-          slug: 'gen-z-translator',
-          tagline: 'Translate standard text to Gen Z slang and internet lingo with AI',
-          description: 'Gen Z Translator is an AI-powered text translation tool that converts modern English, formal sentences, or corporate jargon into authentic Gen Z slang, brainrot terms, and viral internet lingo.',
-          categorySlug: 'writing',
-          pricing: 'free',
-          logoUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=120&h=120&fit=crop',
-          rating: 4.9,
-          reviewCount: 28
-        }));
-      }
+      const seedTools = (m.exports.initialTools || []).map(normalizeTool);
+      const existingSlugs = new Set(tools.map(t => (t.slug || '').replace(/-[0-9]+$/, '')));
+
+      let seedAddedCount = 0;
+      seedTools.forEach(st => {
+        const cleanSlug = (st.slug || '').replace(/-[0-9]+$/, '');
+        if (cleanSlug && !existingSlugs.has(cleanSlug)) {
+          tools.push(st);
+          existingSlugs.add(cleanSlug);
+          seedAddedCount++;
+        }
+      });
+      console.log(`📦 Merged ${seedAddedCount} additional seed tools from seedData.ts into prerender queue.`);
     }
   } catch (e) {
-    console.warn('Error processing seed fallback:', e);
+    console.warn('Error processing seed fallback in prerender:', e);
   }
 
   // 2. Fetch categories
