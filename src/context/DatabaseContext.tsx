@@ -203,20 +203,26 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const cached = localStorage.getItem('ai_blog_posts');
     if (cached) {
       try {
-        const parsed = JSON.parse(cached);
+        const parsed: BlogPost[] = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const existingSlugs = new Set(parsed.map((b: BlogPost) => b.slug));
+          const initialMap = new Map(initialBlogPosts.map(b => [b.slug, b]));
+          const updatedParsed = parsed.map(b => {
+            const seed = initialMap.get(b.slug);
+            return seed ? { ...b, ...seed } : b;
+          });
+          const existingSlugs = new Set(updatedParsed.map((b: BlogPost) => b.slug));
           const missingInitial = initialBlogPosts.filter(b => !existingSlugs.has(b.slug));
-          if (missingInitial.length > 0) {
-            const merged = [...missingInitial, ...parsed];
-            localStorage.setItem('ai_blog_posts', JSON.stringify(merged));
-            return merged;
-          }
-          return parsed;
+          const merged = [...missingInitial, ...updatedParsed];
+
+          merged.sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime());
+          localStorage.setItem('ai_blog_posts', JSON.stringify(merged));
+          return merged;
         }
       } catch (e) {}
     }
-    return initialBlogPosts;
+    const sortedInitial = [...initialBlogPosts].sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime());
+    localStorage.setItem('ai_blog_posts', JSON.stringify(sortedInitial));
+    return sortedInitial;
   });
   const [collections, setCollections] = useState<Collection[]>(() => initialCollections);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(() => initialAuditLogs);
