@@ -230,12 +230,14 @@ async function runPrerender() {
     {
       path: '/best-ai-video-editing-tools-2026',
       title: 'Best AI Video Editing Tools in 2026 — AIFynest',
-      description: 'Looking for the best AI video editing tools in 2026? Compare 8 top AI video editors for YouTube, Shorts, social media, podcasts, and professional video production.'
+      description: 'Looking for the best AI video editing tools in 2026? Compare 8 top AI video editors for YouTube, Shorts, social media, podcasts, and professional video production.',
+      ogImage: 'https://aifynest.com/images/best-ai-video-editing-tools-2026.jpg'
     },
     {
       path: '/blog/best-ai-video-editing-tools-2026',
       title: 'Best AI Video Editing Tools in 2026 — AIFynest Blog',
-      description: 'Looking for the best AI video editing tools in 2026? Compare 8 top AI video editors for YouTube, Shorts, social media, podcasts, and professional video production.'
+      description: 'Looking for the best AI video editing tools in 2026? Compare 8 top AI video editors for YouTube, Shorts, social media, podcasts, and professional video production.',
+      ogImage: 'https://aifynest.com/images/best-ai-video-editing-tools-2026.jpg'
     },
     {
       path: '/about',
