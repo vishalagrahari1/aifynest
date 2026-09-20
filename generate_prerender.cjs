@@ -296,6 +296,31 @@ async function runPrerender() {
       path: '/compare',
       title: 'Compare AI Tools Side-by-Side — AIFynest',
       description: 'Compare features, pricing, pros & cons, and ratings of top AI tools side-by-side on AIFynest.'
+    },
+    {
+      path: '/editorial',
+      title: 'Editorial Policy & Standards — AIFynest',
+      description: 'Read about AIFynest editorial standards, verification processes, and content guidelines.'
+    },
+    {
+      path: '/reviews',
+      title: 'Review Guidelines & Integrity — AIFynest',
+      description: 'Learn how AIFynest collects, moderates, and verifies user reviews for AI tools.'
+    },
+    {
+      path: '/disclosure',
+      title: 'Advertising & Affiliate Disclosure — AIFynest',
+      description: 'Read the official advertising and affiliate disclosure policy for AIFynest.'
+    },
+    {
+      path: '/login',
+      title: 'Log In — AIFynest',
+      description: 'Log in to your AIFynest account to manage listings, save favorite tools, and access dashboard analytics.'
+    },
+    {
+      path: '/signup',
+      title: 'Sign Up — AIFynest Account',
+      description: 'Create an account on AIFynest to review AI software, submit applications, and bookmark favorites.'
     }
   ];
 
