@@ -212,6 +212,7 @@ const AppContent: React.FC<{
           <Route path="/blog/:slug" element={<BlogDetail />} />
           <Route path="/best-image-generation-tools" element={<Navigate to="/blog/best-image-generation-tools" replace />} />
           <Route path="/best-ai-writing-tools-2026" element={<Navigate to="/blog/best-ai-writing-tools-2026" replace />} />
+          <Route path="/best-ai-video-editing-tools-2026" element={<Navigate to="/blog/best-ai-video-editing-tools-2026" replace />} />
 
           {/* Policy & Legal routes */}
           <Route path="/about" element={<About />} />

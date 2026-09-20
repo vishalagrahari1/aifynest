@@ -34,6 +34,8 @@ function writeSitemap(categories, tools) {
     '/best-image-generation-tools',
     '/blog/best-ai-writing-tools-2026',
     '/best-ai-writing-tools-2026',
+    '/blog/best-ai-video-editing-tools-2026',
+    '/best-ai-video-editing-tools-2026',
     '/about',
     '/contact',
     '/terms',

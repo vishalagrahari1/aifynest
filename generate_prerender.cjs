@@ -228,6 +228,16 @@ async function runPrerender() {
       description: 'Compare the top AI writing assistants, copywriting tools, and content generators including ChatGPT, Jasper, and Copy.ai.'
     },
     {
+      path: '/best-ai-video-editing-tools-2026',
+      title: 'Best AI Video Editing Tools in 2026 — AIFynest',
+      description: 'Looking for the best AI video editing tools in 2026? Compare 8 top AI video editors for YouTube, Shorts, social media, podcasts, and professional video production.'
+    },
+    {
+      path: '/blog/best-ai-video-editing-tools-2026',
+      title: 'Best AI Video Editing Tools in 2026 — AIFynest Blog',
+      description: 'Looking for the best AI video editing tools in 2026? Compare 8 top AI video editors for YouTube, Shorts, social media, podcasts, and professional video production.'
+    },
+    {
       path: '/about',
       title: 'About Us — AIFynest',
       description: 'Learn about AIFynest, our mission to curate the best artificial intelligence tools, and our review evaluation standards.'
