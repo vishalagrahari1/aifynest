@@ -322,6 +322,120 @@ export const initialTools: Tool[] = [
     metaDescription: 'Discover Wispr Flow: the AI voice dictation app that converts speech to text 3x faster than typing across all Mac and Windows apps.'
   },
   {
+    id: 'tool-ideogram-ai',
+    name: 'Ideogram AI',
+    slug: 'ideogram-ai',
+    tagline: 'State-of-the-art AI image generator with superior text rendering & typography',
+    description: 'Ideogram AI is an advanced generative image model renowned for rendering crisp, accurate text within generated images. Perfect for graphic designers, marketers, and poster creators looking for reliable text-in-image typography.',
+    categorySlug: 'image-generation',
+    subCategory: 'Text to Image',
+    pricing: 'freemium',
+    pricingUrl: 'https://ideogram.ai/pricing',
+    websiteUrl: 'https://ideogram.ai/',
+    affiliateUrl: 'https://ideogram.ai/',
+    affiliateStatus: 'active',
+    platforms: ['Web'],
+    pricingPlans: [
+      { name: 'Free Tier', price: '$0', features: ['10 slow credits per day', 'Public gallery access', 'Standard resolution'], billingPeriod: 'free' },
+      { name: 'Basic Plan', price: '$8', features: ['400 fast credits per month', 'Private image generation', 'Higher resolution export'], billingPeriod: 'monthly' }
+    ],
+    features: [
+      'Flawless Text Rendering inside Images',
+      'Magic Prompt Enhancer',
+      'Aspect Ratio Presets',
+      'Image Remix and Variations',
+      'Typography Style Presets'
+    ],
+    useCases: [
+      'Designing logos and typography posters',
+      'Social media ad banner creation',
+      'Creating stylized merchandise designs'
+    ],
+    pros: [
+      'Unmatched text rendering accuracy in images',
+      'Generous daily free credits',
+      'Intuitive prompt suggestions'
+    ],
+    cons: [
+      'Fast generation queue requires paid plan during peak hours'
+    ],
+    logoUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=120&h=120&fit=crop',
+    screenshotUrls: [
+      'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=450&fit=crop'
+    ],
+    rating: 4.9,
+    reviewCount: 86,
+    isVerified: true,
+    isFeatured: true,
+    isSponsored: true,
+    isPopularPlacement: true,
+    status: 'approved',
+    ownerId: null,
+    claimStatus: 'unclaimed',
+    lastUpdated: '2026-09-22',
+    approvedAt: '2026-09-22T10:00:00.000Z',
+    tags: ['AI Image Generator', 'Typography', 'Graphic Design', 'Text In Image'],
+    seoTitle: 'Ideogram AI — Advanced Text-in-Image Generator',
+    metaDescription: 'Ideogram AI renders accurate text inside generated images. Create posters, logos, and graphics with typography.'
+  },
+  {
+    id: 'tool-radarkit-ai',
+    name: 'RadarKit AI',
+    slug: 'radarkit-ai',
+    tagline: 'All-in-one AI monitoring, competitor analysis, and market intelligence platform',
+    description: 'RadarKit AI provides real-time tracking, competitor insights, social sentiment analysis, and keyword monitoring to help growth teams, founders, and marketers stay ahead of market trends.',
+    categorySlug: 'marketing',
+    subCategory: 'Analytics & Intelligence',
+    pricing: 'freemium',
+    pricingUrl: 'https://radarkit.ai/',
+    websiteUrl: 'https://radarkit.ai/',
+    affiliateUrl: 'https://radarkit.ai/',
+    affiliateStatus: 'active',
+    platforms: ['Web'],
+    pricingPlans: [
+      { name: 'Free Tier', price: '$0', features: ['Track up to 3 competitors', 'Daily updates', 'Basic sentiment analysis'], billingPeriod: 'free' },
+      { name: 'Pro Plan', price: '$29', features: ['Real-time alerts', 'Unlimited competitor tracking', 'Export PDF reports', 'API Access'], billingPeriod: 'monthly' }
+    ],
+    features: [
+      'Competitor Tracking',
+      'Social Sentiment Analysis',
+      'Real-time Market Alerts',
+      'SEO Keyword Radar',
+      'Custom PDF Reports'
+    ],
+    useCases: [
+      'Monitoring competitor product releases',
+      'Tracking brand mentions and public sentiment',
+      'Spotting trending keywords in your niche'
+    ],
+    pros: [
+      'Automated daily digest alerts',
+      'Clean and intuitive dashboard',
+      'Fast setup with no coding required'
+    ],
+    cons: [
+      'Advanced API limits on basic tier'
+    ],
+    logoUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=120&h=120&fit=crop',
+    screenshotUrls: [
+      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop'
+    ],
+    rating: 4.8,
+    reviewCount: 34,
+    isVerified: true,
+    isFeatured: true,
+    isSponsored: true,
+    isPopularPlacement: true,
+    status: 'approved',
+    ownerId: null,
+    claimStatus: 'unclaimed',
+    lastUpdated: '2026-09-22',
+    approvedAt: '2026-09-22T10:00:00.000Z',
+    tags: ['Competitor Analysis', 'Market Intelligence', 'SEO Radar', 'Brand Monitoring'],
+    seoTitle: 'RadarKit AI — Competitor Analysis & Market Intelligence',
+    metaDescription: 'RadarKit AI provides real-time market tracking, competitor insights, and brand sentiment monitoring.'
+  },
+  {
     id: '1',
     name: 'ChatGPT',
     slug: 'chatgpt',
@@ -2802,110 +2916,6 @@ export const initialTools: Tool[] = [
       "Security Checker",
       "Reputation"
     ],
-    "approvedAt": "2026-09-14T00:00:00.000Z"
-  },
-  {
-    "id": "tool-radarkit-ai",
-    "name": "RadarKit AI",
-    "slug": "radarkit-ai",
-    "tagline": "All-in-one AI monitoring, competitor analysis, and market intelligence platform",
-    "description": "RadarKit AI provides real-time tracking, competitor insights, social sentiment analysis, and keyword monitoring to help growth teams, founders, and marketers stay ahead of market trends.",
-    "categorySlug": "marketing",
-    "subCategory": "Analytics & Intelligence",
-    "pricing": "freemium",
-    "pricingUrl": "https://radarkit.ai/",
-    "platforms": ["Web"],
-    "pricingPlans": [
-      { "name": "Free Tier", "price": "$0", "features": ["Track up to 3 competitors", "Daily updates", "Basic sentiment analysis"], "billingPeriod": "free" },
-      { "name": "Pro Plan", "price": "$29", "features": ["Real-time alerts", "Unlimited competitor tracking", "Export PDF reports", "API Access"], "billingPeriod": "monthly" }
-    ],
-    "features": [
-      "Competitor Tracking",
-      "Social Sentiment Analysis",
-      "Real-time Market Alerts",
-      "SEO Keyword Radar",
-      "Custom PDF Reports"
-    ],
-    "useCases": [
-      "Monitoring competitor product releases",
-      "Tracking brand mentions and public sentiment",
-      "Spotting trending keywords in your niche"
-    ],
-    "pros": [
-      "Automated daily digest alerts",
-      "Clean and intuitive dashboard",
-      "Fast setup with no coding required"
-    ],
-    "cons": [
-      "Advanced API limits on basic tier"
-    ],
-    "logoUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=120&h=120&fit=crop",
-    "screenshotUrls": [
-      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop"
-    ],
-    "websiteUrl": "https://radarkit.ai/?ref=aifynest",
-    "rating": 4.8,
-    "reviewCount": 34,
-    "isVerified": true,
-    "isFeatured": true,
-    "isSponsored": false,
-    "status": "approved",
-    "ownerId": null,
-    "claimStatus": "unclaimed",
-    "lastUpdated": "2026-09-14T00:00:00.000Z",
-    "tags": ["Competitor Analysis", "Market Intelligence", "SEO Radar", "Brand Monitoring"],
-    "approvedAt": "2026-09-14T00:00:00.000Z"
-  },
-  {
-    "id": "tool-ideogram-ai",
-    "name": "Ideogram AI",
-    "slug": "ideogram-ai",
-    "tagline": "State-of-the-art AI image generator with superior text rendering & typography",
-    "description": "Ideogram AI is an advanced generative image model renowned for rendering crisp, accurate text within generated images. Perfect for graphic designers, marketers, and poster creators looking for reliable text-in-image typography.",
-    "categorySlug": "image-generation",
-    "subCategory": "Text to Image",
-    "pricing": "freemium",
-    "pricingUrl": "https://ideogram.ai/pricing",
-    "platforms": ["Web"],
-    "pricingPlans": [
-      { "name": "Free Tier", "price": "$0", "features": ["10 slow credits per day", "Public gallery access", "Standard resolution"], "billingPeriod": "free" },
-      { "name": "Basic Plan", "price": "$8", "features": ["400 fast credits per month", "Private image generation", "Higher resolution export"], "billingPeriod": "monthly" }
-    ],
-    "features": [
-      "Flawless Text Rendering inside Images",
-      "Magic Prompt Enhancer",
-      "Aspect Ratio Presets",
-      "Image Remix and Variations",
-      "Typography Style Presets"
-    ],
-    "useCases": [
-      "Designing logos and typography posters",
-      "Social media ad banner creation",
-      "Creating stylized merchandise designs"
-    ],
-    "pros": [
-      "Unmatched text rendering accuracy in images",
-      "Generous daily free credits",
-      "Intuitive prompt suggestions"
-    ],
-    "cons": [
-      "Fast generation queue requires paid plan during peak hours"
-    ],
-    "logoUrl": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=120&h=120&fit=crop",
-    "screenshotUrls": [
-      "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=450&fit=crop"
-    ],
-    "websiteUrl": "https://ideogram.ai/?ref=aifynest",
-    "rating": 4.9,
-    "reviewCount": 86,
-    "isVerified": true,
-    "isFeatured": true,
-    "isSponsored": false,
-    "status": "approved",
-    "ownerId": null,
-    "claimStatus": "unclaimed",
-    "lastUpdated": "2026-09-14T00:00:00.000Z",
-    "tags": ["AI Image Generator", "Typography", "Graphic Design", "Text In Image"],
     "approvedAt": "2026-09-14T00:00:00.000Z"
   }
 ];
