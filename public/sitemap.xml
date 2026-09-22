@@ -191,17 +191,22 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://aifynest.com/tools/semantic-scholar</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://aifynest.com/tools/lalal-ai</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/zoice</loc>
+    <loc>https://aifynest.com/tools/cursor</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/cursor</loc>
+    <loc>https://aifynest.com/tools/zoice</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -616,12 +621,12 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/askyourpdf</loc>
+    <loc>https://aifynest.com/tools/scispace</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/scispace</loc>
+    <loc>https://aifynest.com/tools/askyourpdf</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -761,17 +766,17 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/researchrabbit</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://aifynest.com/tools/lovo-ai</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://aifynest.com/tools/read-ai</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://aifynest.com/tools/researchrabbit</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -1166,7 +1171,7 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/semantic-scholar</loc>
+    <loc>https://aifynest.com/tools/wispr-flow</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>

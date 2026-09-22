@@ -139,10 +139,15 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
           const sanitized = sanitizeToolsSlugs(parsed);
-          const existingIds = new Set(sanitized.map((t: Tool) => t.id));
-          const existingSlugs = new Set(sanitized.map((t: Tool) => t.slug));
+          const initialMap = new Map(sanitizeToolsSlugs(initialTools).map(t => [t.id, t]));
+          const updatedSanitized = sanitized.map((t: Tool) => {
+            const seed = initialMap.get(t.id) || Array.from(initialMap.values()).find(s => s.slug === t.slug);
+            return seed ? { ...t, ...seed } : t;
+          });
+          const existingIds = new Set(updatedSanitized.map((t: Tool) => t.id));
+          const existingSlugs = new Set(updatedSanitized.map((t: Tool) => t.slug));
           const missingInitial = sanitizeToolsSlugs(initialTools).filter(t => !existingIds.has(t.id) && !existingSlugs.has(t.slug));
-          const merged = missingInitial.length > 0 ? [...sanitized, ...missingInitial] : sanitized;
+          const merged = missingInitial.length > 0 ? [...missingInitial, ...updatedSanitized] : updatedSanitized;
           localStorage.setItem('ai_tools', JSON.stringify(merged));
           return merged;
         }

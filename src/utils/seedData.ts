@@ -280,6 +280,48 @@ export const initialCategories: Category[] = [
 // Initial preloaded Tools
 export const initialTools: Tool[] = [
   {
+    id: 'wispr-flow',
+    name: 'Wispr Flow',
+    slug: 'wispr-flow',
+    tagline: 'The fastest AI voice dictation & speech-to-text app for Mac & Windows',
+    description: 'Wispr Flow is an advanced AI voice dictation tool that converts spoken voice into perfectly formatted, clear text 3x faster than typing. It automatically removes filler words ("um", "ah"), fixes grammar, inserts smart punctuation, and works seamlessly across all Mac and Windows desktop applications.',
+    categorySlug: 'productivity',
+    subCategory: 'Meeting Assistants',
+    pricing: 'freemium',
+    pricingUrl: 'https://ref.wisprflow.ai/vishal-agrahari-zqbq',
+    websiteUrl: 'https://ref.wisprflow.ai/vishal-agrahari-zqbq',
+    affiliateUrl: 'https://ref.wisprflow.ai/vishal-agrahari-zqbq',
+    affiliateStatus: 'active',
+    platforms: ['Mac', 'Windows', 'Web'],
+    pricingPlans: [
+      { name: 'Free', price: '$0', billingPeriod: 'free', features: ['2,000 dictation words/mo', 'Auto filler word removal', 'Mac & Windows desktop apps'] },
+      { name: 'Pro', price: '$12', billingPeriod: 'monthly', features: ['Unlimited voice dictation', 'Custom vocabulary & shorthand', 'Advanced multi-language support', 'Priority speech model processing'] }
+    ],
+    features: ['Instant Speech-to-Text Dictation', 'Auto Filler Word Removal', 'Smart Formatting & Punctuation', 'Cross-App Desktop Compatibility', 'Multi-Language Support'],
+    useCases: ['Voice drafting emails and documents 3x faster', 'Taking quick hands-free notes during meetings', 'Voice drafting code comments and Slack messages', 'Improving typing speed for creators, founders & developers'],
+    pros: ['Extremely fast real-time transcription', 'Eliminates filler words and stutters automatically', 'Works inside any text box or application', 'Generous free tier with referral benefits'],
+    cons: ['Requires desktop app background permissions', 'Offline dictation requires downloading offline voice models'],
+    logoUrl: 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=120&h=120&fit=crop',
+    screenshotUrls: [
+      'https://images.unsplash.com/photo-1589254065878-42c9da997008?w=800&h=500&fit=crop',
+      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=500&fit=crop'
+    ],
+    rating: 4.9,
+    reviewCount: 38,
+    isVerified: true,
+    isFeatured: true,
+    isSponsored: true,
+    isPopularPlacement: true,
+    status: 'approved',
+    ownerId: null,
+    claimStatus: 'unclaimed',
+    lastUpdated: '2026-09-22',
+    approvedAt: '2026-09-22T10:00:00.000Z',
+    tags: ['dictation', 'speech to text', 'voice typing', 'productivity', 'mac', 'windows'],
+    seoTitle: 'Wispr Flow — Fastest AI Voice Dictation App for Mac & Windows',
+    metaDescription: 'Discover Wispr Flow: the AI voice dictation app that converts speech to text 3x faster than typing across all Mac and Windows apps.'
+  },
+  {
     id: '1',
     name: 'ChatGPT',
     slug: 'chatgpt',
