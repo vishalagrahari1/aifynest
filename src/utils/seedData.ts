@@ -280,6 +280,50 @@ export const initialCategories: Category[] = [
 // Initial preloaded Tools
 export const initialTools: Tool[] = [
   {
+    id: 'tool-zoice',
+    name: 'Zoice',
+    slug: 'zoice',
+    tagline: 'Ultra-Realistic 4K AI Avatar Video & Image Generator',
+    description: 'Zoice generates lifelike ultra-realistic avatar character videos, 4K text-to-image artwork, AI image-to-video avatar generation, and end-to-end frame motion support powered by the in-house Zoice Avatar X model.',
+    categorySlug: 'video',
+    subCategory: 'Avatars',
+    pricing: 'freemium',
+    pricingUrl: 'https://zoice.ai',
+    websiteUrl: 'https://zoice.ai',
+    affiliateUrl: 'https://zoice.ai',
+    affiliateStatus: 'active',
+    platforms: ['Web'],
+    pricingPlans: [
+      { name: 'Free Trial', price: '$0', billingPeriod: 'free', features: ['AI Image Generation', 'Sample Avatar Video', '4K Preview'] },
+      { name: 'Pro Creator', price: '$19', billingPeriod: 'monthly', features: ['4K AI Avatar Videos', 'Custom Avatar Character Builder', 'Text-to-Video & Motion Support', 'Voice Profile Cloning'] }
+    ],
+    features: ['4K AI Avatar Character Videos', 'Text-to-Image & Image-to-Video Generator', 'Voice Profile Cloning & Audio Sync', 'End-to-End Frame Support for Motion', 'Multiple Realistic, Dark & Fantasy Presets'],
+    useCases: ['Generate ultra-realistic AI avatar spokesperson videos', 'Create 4K AI images and fantasy artwork', 'Transform static photos into high-definition video motion'],
+    pros: ['In-house Zoice Avatar X model for unmatched video & voice quality', 'Supports 4K resolution and multiple aspect ratios', 'Wide variety of art styles including Realistic, Dark, and Fantasy'],
+    cons: ['High quality 4K rendering requires pro subscription credits'],
+    logoUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=120&h=120&fit=crop',
+    screenshotUrls: [
+      '/images/zoice-1.png',
+      '/images/zoice-2.png',
+      '/images/zoice-3.png',
+      '/images/zoice-4.png'
+    ],
+    rating: 4.9,
+    reviewCount: 42,
+    isVerified: true,
+    isFeatured: true,
+    isSponsored: true,
+    isPopularPlacement: true,
+    status: 'approved',
+    ownerId: null,
+    claimStatus: 'unclaimed',
+    lastUpdated: '2026-09-22',
+    approvedAt: '2026-09-22T10:00:00.000Z',
+    tags: ['AI Avatar', 'AI Video Generator', '4K Video', 'Voice Cloning', 'Text to Video', 'AI Images'],
+    seoTitle: 'Zoice — Ultra-Realistic 4K AI Avatar Video & Image Generator',
+    metaDescription: 'Zoice generates lifelike AI avatar character videos and 4K images with unmatched video and voice quality.'
+  },
+  {
     id: 'wispr-flow',
     name: 'Wispr Flow',
     slug: 'wispr-flow',
