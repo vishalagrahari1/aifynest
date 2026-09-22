@@ -280,7 +280,7 @@ export const initialCategories: Category[] = [
 // Initial preloaded Tools
 export const initialTools: Tool[] = [
   {
-    id: 'tool-zoice',
+    id: '9b096a39-fea0-4900-aef3-4f0371381e74',
     name: 'Zoice',
     slug: 'zoice',
     tagline: 'Ultra-Realistic 4K AI Avatar Video & Image Generator',
