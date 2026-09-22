@@ -911,11 +911,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/ideogram</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://aifynest.com/tools/taplio</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -932,6 +927,11 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/microsoft-copilot</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://aifynest.com/tools/ideogram</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
