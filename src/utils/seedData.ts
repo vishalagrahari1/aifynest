@@ -418,7 +418,9 @@ export const initialTools: Tool[] = [
     ],
     logoUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=120&h=120&fit=crop',
     screenshotUrls: [
-      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop'
+      '/images/radarkit-ai-1.png',
+      '/images/radarkit-ai-2.png',
+      '/images/radarkit-ai-3.png'
     ],
     rating: 4.8,
     reviewCount: 34,
