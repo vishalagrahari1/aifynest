@@ -1582,7 +1582,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                   borderRadius: 'var(--radius-lg)'
                 }}
               >
-                <div style={{ height: '160px', overflow: 'hidden', position: 'relative' }}>
+                <Link to={`/blog/${post.slug}`} style={{ display: 'block', height: '160px', overflow: 'hidden', position: 'relative' }}>
                   <img 
                     src={post.image} 
                     alt={post.title} 
@@ -1604,12 +1604,14 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                   >
                     {post.category}
                   </span>
-                </div>
+                </Link>
 
                 <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between', gap: '12px' }}>
                   <div>
                     <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'bold', margin: '0 0 8px 0', lineHeight: '1.4', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                      {post.title}
+                      <Link to={`/blog/${post.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                        {post.title}
+                      </Link>
                     </h3>
                     <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', lineHeight: '1.5', margin: 0, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {post.excerpt}
