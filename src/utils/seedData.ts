@@ -3698,7 +3698,7 @@ CapCut, Filmora, and VEED are generally easier starting points than professional
   {
     slug: 'best-ai-tools-dropshipping-2026',
     title: 'Best AI Tools for Dropshipping 2026: Top Tools to Automate and Grow Your Store',
-    image: 'https://images.unsplash.com/photo-1556742049-0a67dd35817d?w=800&h=400&fit=crop',
+    image: '/images/best-ai-tools-dropshipping-2026.jpg',
     excerpt: 'Discover the best AI tools for dropshipping in 2026. Learn how to automate product research, supplier sourcing, product descriptions, marketing, ad creatives, and customer support for your ecommerce store.',
     content: `# Best AI Tools for Dropshipping 2026: Top Tools to Automate and Grow Your Store
 

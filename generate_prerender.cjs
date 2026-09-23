@@ -242,12 +242,14 @@ async function runPrerender() {
     {
       path: '/best-ai-tools-dropshipping-2026',
       title: 'Best AI Tools for Dropshipping 2026 — AIFynest',
-      description: 'Discover the best AI tools for dropshipping in 2026. Learn how to automate product research, supplier sourcing, product descriptions, marketing, ad creatives, and customer support.'
+      description: 'Discover the best AI tools for dropshipping in 2026. Learn how to automate product research, supplier sourcing, product descriptions, marketing, ad creatives, and customer support.',
+      ogImage: 'https://aifynest.com/images/best-ai-tools-dropshipping-2026.jpg'
     },
     {
       path: '/blog/best-ai-tools-dropshipping-2026',
       title: 'Best AI Tools for Dropshipping 2026 — AIFynest Blog',
-      description: 'Discover the best AI tools for dropshipping in 2026. Learn how to automate product research, supplier sourcing, product descriptions, marketing, ad creatives, and customer support.'
+      description: 'Discover the best AI tools for dropshipping in 2026. Learn how to automate product research, supplier sourcing, product descriptions, marketing, ad creatives, and customer support.',
+      ogImage: 'https://aifynest.com/images/best-ai-tools-dropshipping-2026.jpg'
     },
     {
       path: '/about',
