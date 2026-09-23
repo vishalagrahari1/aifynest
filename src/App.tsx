@@ -202,6 +202,7 @@ const AppContent: React.FC<{
               />
             }
           />
+          <Route path="/home" element={<Navigate to="/" replace />} />
           <Route path="/ai-tools/category/:slug" element={<Navigate to="/categories/:slug" replace />} />
 
           <Route path="/submit-tool" element={<SubmitTool onToast={showToast} />} />

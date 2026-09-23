@@ -357,6 +357,22 @@ async function runPrerender() {
     writeStaticFile(route.path, html);
   });
 
+  // Explicit static redirect page for /home -> https://aifynest.com/
+  const homeRedirectHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="0; url=https://aifynest.com/">
+  <link rel="canonical" href="https://aifynest.com/">
+  <title>Redirecting to AIFynest Homepage...</title>
+  <script>window.location.replace("https://aifynest.com/");</script>
+</head>
+<body>
+  <p>Redirecting to <a href="https://aifynest.com/">https://aifynest.com/</a>...</p>
+</body>
+</html>`;
+  writeStaticFile('/home', homeRedirectHtml);
+
   // B. Category Pages
   if (categories && categories.length > 0) {
     categories.forEach(cat => {
