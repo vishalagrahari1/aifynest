@@ -339,7 +339,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "High quality 4K rendering requires pro subscription credits"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=zoice.ai&sz=128",
     "screenshotUrls": [
       "/images/zoice-1.png",
       "/images/zoice-2.png",
@@ -432,7 +432,7 @@ export const initialTools: Tool[] = [
       "Requires desktop app background permissions",
       "Offline dictation requires downloading offline voice models"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=flow.wispr.ai&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1589254065878-42c9da997008?w=800&h=500&fit=crop",
       "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=500&fit=crop"
@@ -517,7 +517,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Fast generation queue requires paid plan during peak hours"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=ideogram.ai&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=450&fit=crop"
     ],
@@ -600,7 +600,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Advanced API limits on basic tier"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=radarkit.ai&sz=128",
     "screenshotUrls": [
       "/images/radarkit-ai-1.png",
       "/images/radarkit-ai-2.png",
@@ -700,7 +700,7 @@ export const initialTools: Tool[] = [
       "Advanced models capped in free tier",
       "Privacy concerns on training data"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1678787150117-cdca2776c5b0?w=100&h=100&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=chatgpt.com&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=500&fit=crop",
       "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=800&h=500&fit=crop"
@@ -791,7 +791,7 @@ export const initialTools: Tool[] = [
       "Prompt adjustment has a steep learning curve",
       "Discord interface is overwhelming for beginners"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=100&h=100&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=midjourney.com&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=800&h=500&fit=crop",
       "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=500&fit=crop"
@@ -884,7 +884,7 @@ export const initialTools: Tool[] = [
       "Basic plan has very limited minutes",
       "Limited character movements"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&h=100&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=synthesia.io&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=800&h=500&fit=crop"
     ],
@@ -976,7 +976,7 @@ export const initialTools: Tool[] = [
       "Composer edits can sometimes introduce conflicts",
       "High computing specs required for large repo indexing"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=100&h=100&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=cursor.com&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=800&h=500&fit=crop"
     ],
@@ -1070,7 +1070,7 @@ export const initialTools: Tool[] = [
       "Steep learning curve for Campaigns builder",
       "Must be fact-checked as content can be repetitive"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=100&h=100&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=jasper.ai&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=500&fit=crop"
     ],
@@ -1163,7 +1163,7 @@ export const initialTools: Tool[] = [
       "Advanced queries require basic math understanding to verify",
       "Can be slow when processing massive datasets"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=100&h=100&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=julius.ai&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=500&fit=crop"
     ],
@@ -1255,7 +1255,7 @@ export const initialTools: Tool[] = [
       "API billing can scale quickly",
       "Deepfake ethical security risks"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=100&h=100&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=elevenlabs.io&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&h=500&fit=crop"
     ],
@@ -1335,7 +1335,7 @@ export const initialTools: Tool[] = [
       "Complex logic debugging requires Pro models",
       "Chat interface is fairly basic"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=100&h=100&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=phind.com&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=500&fit=crop"
     ],
@@ -1400,7 +1400,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Slang updates rapidly on social platforms"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=aifynest.com&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=450&fit=crop"
     ],
@@ -1477,7 +1477,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Free plan has monthly usage limits"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=lynote.ai&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=450&fit=crop"
     ],
@@ -1553,7 +1553,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Requires VIP subscription for image generation"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=anirole.ai&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&h=450&fit=crop"
     ],
@@ -1627,7 +1627,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Complex poses may occasionally distort clothing edges"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=pixaryai.com&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&h=450&fit=crop"
     ],
@@ -1704,7 +1704,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Peak hours may increase queue time for free users"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=joyfun.ai&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&h=450&fit=crop"
     ],
@@ -1769,7 +1769,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Only works on videos with auto-generated or manual subtitles"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=findtube.ai&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=800&h=450&fit=crop"
     ],
@@ -1834,7 +1834,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Video length limited to 4-second clips"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=fixart.ai&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800&h=450&fit=crop"
     ],
@@ -1909,7 +1909,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Free plan task limits"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=moxt.ai&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=450&fit=crop"
     ],
@@ -1985,7 +1985,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Voice calls require premium upgrade"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=miocai.com&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&h=450&fit=crop"
     ],
@@ -2060,7 +2060,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Listing fee for founders selling startups"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=trustmrr.com&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800&h=450&fit=crop"
     ],
@@ -2126,7 +2126,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Requires small deposit for pay-as-you-go usage"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=hiapi.ai&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&h=450&fit=crop"
     ],
@@ -2189,7 +2189,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Requires account login"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1474366521946-c3d4b507abf2?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=lynote.com&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1474366521946-c3d4b507abf2?w=800&h=450&fit=crop"
     ],
@@ -2264,7 +2264,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Voice calls require paid subscription"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=xotic.ai&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&h=450&fit=crop"
     ],
@@ -2340,7 +2340,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Free plan has 5-minute monthly cap"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=ezdubs.ai&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=800&h=450&fit=crop"
     ],
@@ -2404,7 +2404,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Limited advanced prompt controls"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1563089145-599997674d42?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=hotgens.com&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1563089145-599997674d42?w=800&h=450&fit=crop"
     ],
@@ -2470,7 +2470,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Batch processing not supported"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=audioalter.com&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&h=450&fit=crop"
     ],
@@ -2546,7 +2546,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Free plan message limit"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1614680376593-902f749f7b9c?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=whatgpt.ai&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1614680376593-902f749f7b9c?w=800&h=450&fit=crop"
     ],
@@ -2621,7 +2621,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Free plan limits prompt count"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=chatorg.com&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&h=450&fit=crop"
     ],
@@ -2683,7 +2683,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Limited free credits"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=nudiva.io&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&h=450&fit=crop"
     ],
@@ -2756,7 +2756,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Image generation requires credits"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=alphazria.com&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&h=450&fit=crop"
     ],
@@ -2830,7 +2830,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Free videos carry watermark"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1611162616475-46b635cb6868?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=creatok.ai&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1611162616475-46b635cb6868?w=800&h=450&fit=crop"
     ],
@@ -2891,7 +2891,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Contains mature content"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=creatok.ai&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&h=450&fit=crop"
     ],
@@ -2963,7 +2963,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Video rendering takes 2-3 minutes"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=crano.ai&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&h=450&fit=crop"
     ],
@@ -3029,7 +3029,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Lacks persistent session history on web"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=talkai.info&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&h=450&fit=crop"
     ],
@@ -3102,7 +3102,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Free plan queries are capped daily"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=mgai.ai&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&h=450&fit=crop"
     ],
@@ -3167,7 +3167,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Obscure tracks may require manual song submission"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=songtell.com&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&h=450&fit=crop"
     ],
@@ -3232,7 +3232,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Intended primarily for casual or marketing content"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=genztranslator.com&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&h=450&fit=crop"
     ],
@@ -3295,7 +3295,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Some lines can be overly cheesy"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=flirtify.ai&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=800&h=450&fit=crop"
     ],
@@ -3355,7 +3355,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Strict content moderation policies"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1535016120720-40c646be5580?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=undress.ai&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1535016120720-40c646be5580?w=800&h=450&fit=crop"
     ],
@@ -3429,7 +3429,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Requires basic API familiarity for complex webhooks"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=shuttle.dev&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=450&fit=crop"
     ],
@@ -3495,7 +3495,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "Interface is minimalist developer-focused"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=aitoptools.com&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&h=450&fit=crop"
     ],
@@ -3560,7 +3560,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "App database updated weekly"
     ],
-    "logoUrl": "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=120&h=120&fit=crop",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=teachecker.com&sz=128",
     "screenshotUrls": [
       "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&h=450&fit=crop"
     ],
