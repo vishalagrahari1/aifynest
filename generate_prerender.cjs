@@ -240,6 +240,16 @@ async function runPrerender() {
       ogImage: 'https://aifynest.com/images/best-ai-video-editing-tools-2026.jpg'
     },
     {
+      path: '/best-ai-tools-dropshipping-2026',
+      title: 'Best AI Tools for Dropshipping 2026 — AIFynest',
+      description: 'Discover the best AI tools for dropshipping in 2026. Learn how to automate product research, supplier sourcing, product descriptions, marketing, ad creatives, and customer support.'
+    },
+    {
+      path: '/blog/best-ai-tools-dropshipping-2026',
+      title: 'Best AI Tools for Dropshipping 2026 — AIFynest Blog',
+      description: 'Discover the best AI tools for dropshipping in 2026. Learn how to automate product research, supplier sourcing, product descriptions, marketing, ad creatives, and customer support.'
+    },
+    {
       path: '/about',
       title: 'About Us — AIFynest',
       description: 'Learn about AIFynest, our mission to curate the best artificial intelligence tools, and our review evaluation standards.'

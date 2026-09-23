@@ -36,6 +36,8 @@ function writeSitemap(categories, tools) {
     '/best-ai-writing-tools-2026',
     '/blog/best-ai-video-editing-tools-2026',
     '/best-ai-video-editing-tools-2026',
+    '/blog/best-ai-tools-dropshipping-2026',
+    '/best-ai-tools-dropshipping-2026',
     '/about',
     '/contact',
     '/terms',
