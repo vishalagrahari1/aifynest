@@ -289,9 +289,9 @@ export const initialTools: Tool[] = [
     "categorySlug": "video",
     "subCategory": "Avatars",
     "pricing": "freemium",
-    "pricingUrl": "https://zoice.ai",
-    "websiteUrl": "https://zoice.ai",
-    "affiliateUrl": "https://zoice.ai",
+    "pricingUrl": "https://zoice.com/pricing",
+    "websiteUrl": "https://zoice.com",
+    "affiliateUrl": "https://zoice.com",
     "affiliateStatus": "active",
     "platforms": [
       "Web"
@@ -339,7 +339,7 @@ export const initialTools: Tool[] = [
     "cons": [
       "High quality 4K rendering requires pro subscription credits"
     ],
-    "logoUrl": "https://www.google.com/s2/favicons?domain=zoice.ai&sz=128",
+    "logoUrl": "https://www.google.com/s2/favicons?domain=zoice.com&sz=128",
     "screenshotUrls": [
       "/images/zoice-1.png",
       "/images/zoice-2.png",

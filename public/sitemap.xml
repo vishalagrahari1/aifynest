@@ -666,11 +666,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/voicemod</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://aifynest.com/tools/rows-ai</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -687,6 +682,11 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/hubspot-ai</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://aifynest.com/tools/voicemod</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -921,12 +921,12 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/microsoft-copilot</loc>
+    <loc>https://aifynest.com/tools/ideogram</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/ideogram</loc>
+    <loc>https://aifynest.com/tools/microsoft-copilot</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
