@@ -206,12 +206,12 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/semantic-scholar</loc>
+    <loc>https://aifynest.com/tools/cursor</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/cursor</loc>
+    <loc>https://aifynest.com/tools/semantic-scholar</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -286,12 +286,12 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/julius-ai</loc>
+    <loc>https://aifynest.com/tools/canva-ai</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/canva-ai</loc>
+    <loc>https://aifynest.com/tools/julius-ai</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -311,12 +311,17 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://aifynest.com/tools/microsoft-designer</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://aifynest.com/tools/gamma</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/microsoft-designer</loc>
+    <loc>https://aifynest.com/tools/bolt-new</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -327,11 +332,6 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/remini</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/tools/bolt-new</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -601,12 +601,12 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/uizard</loc>
+    <loc>https://aifynest.com/tools/capcut</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/capcut</loc>
+    <loc>https://aifynest.com/tools/uizard</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -636,12 +636,12 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/koala</loc>
+    <loc>https://aifynest.com/tools/manus</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/manus</loc>
+    <loc>https://aifynest.com/tools/koala</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -1091,12 +1091,12 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/writer</loc>
+    <loc>https://aifynest.com/tools/openai-operator</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/openai-operator</loc>
+    <loc>https://aifynest.com/tools/writer</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
