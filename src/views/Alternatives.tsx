@@ -1,9 +1,9 @@
 /* src/views/Alternatives.tsx */
 import React, { useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, Navigate } from 'react-router-dom';
 import { useDatabase } from '../context/DatabaseContext';
 import { SEOHead } from '../components/shared/SEOHead';
-import { Shield, MessageSquare } from '../components/shared/Icons';
+import { MessageSquare } from '../components/shared/Icons';
 import { getToolLogoUrl, handleLogoError } from '../utils/toolHelpers';
 
 export const Alternatives: React.FC = () => {
@@ -21,18 +21,7 @@ export const Alternatives: React.FC = () => {
   }, [toolSlug, currentTool]);
 
   if (!currentTool) {
-    return (
-      <div className="container section text-center" style={{ maxWidth: '480px' }}>
-        <Shield size={48} style={{ color: 'var(--color-danger)', margin: '0 auto 16px auto' }} />
-        <h2>Tool Not Found</h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
-          The tool you are seeking alternatives for could not be located in our directory.
-        </p>
-        <Link to="/ai-tools" className="btn btn-primary">
-          Browse Directory
-        </Link>
-      </div>
-    );
+    return <Navigate to="/" replace />;
   }
 
   // Get other tools in the same category

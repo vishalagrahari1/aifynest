@@ -1,6 +1,6 @@
 /* src/views/BlogDetail.tsx */
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import { useDatabase } from '../context/DatabaseContext';
 import { SEOHead } from '../components/shared/SEOHead';
 import { ArrowLeft } from '../components/shared/Icons';
@@ -14,17 +14,7 @@ export const BlogDetail: React.FC = () => {
   const post = blogPosts.find((p) => p.slug === slug);
 
   if (!post) {
-    return (
-      <div className="container section text-center">
-        <h2>Article Not Found</h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
-          The requested blog article does not exist in our sitemap.
-        </p>
-        <Link to="/blog" className="btn btn-primary">
-          Back to Blog
-        </Link>
-      </div>
-    );
+    return <Navigate to="/" replace />;
   }
 
   // Recommended tools widget: extract matching tools if post content mentions their names

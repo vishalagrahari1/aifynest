@@ -1,6 +1,6 @@
 /* src/views/ToolDetail.tsx */
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, Navigate } from 'react-router-dom';
 import { useDatabase } from '../context/DatabaseContext';
 import { useAuth } from '../context/AuthContext';
 import { StarRating } from '../components/shared/StarRating';
@@ -71,23 +71,7 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
       (user && (user.role === 'admin' || user.id === tool.ownerId)));
 
   if (!tool || !canAccess) {
-    return (
-      <div className="container section text-center" style={{ maxWidth: '540px' }}>
-        <SEOHead 
-          title="Listing Under Moderation" 
-          description="This AI tool listing is currently pending review, needs revisions, or is not published yet." 
-          robots="noindex, nofollow" 
-        />
-        <h2>Listing Under Moderation</h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: '1.6' }}>
-          This AI tool listing is currently pending review, needs revisions, or is not published yet.
-          Only administrators and the verified owner can view the draft profile.
-        </p>
-        <Link to="/" className="btn btn-primary">
-          Back to Homepage
-        </Link>
-      </div>
-    );
+    return <Navigate to="/" replace />;
   }
 
   // Get reviews of this tool (only approved status)

@@ -1,6 +1,6 @@
 /* src/views/CollectionDetail.tsx */
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import { useDatabase } from '../context/DatabaseContext';
 import { ToolCard } from '../components/shared/ToolCard';
 import { SEOHead } from '../components/shared/SEOHead';
@@ -23,17 +23,7 @@ export const CollectionDetail: React.FC<CollectionDetailProps> = ({
   const collection = collections.find((c) => c.id === id);
 
   if (!collection) {
-    return (
-      <div className="container section text-center">
-        <h2>Collection Not Found</h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
-          The requested curated collection does not exist in our system.
-        </p>
-        <Link to="/collections" className="btn btn-primary">
-          Back to Collections
-        </Link>
-      </div>
-    );
+    return <Navigate to="/" replace />;
   }
 
   // Filter approved tools that belong to this collection

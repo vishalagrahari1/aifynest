@@ -1,6 +1,6 @@
 /* src/views/CategoryDetail.tsx */
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import { useDatabase } from '../context/DatabaseContext';
 import { ToolCard } from '../components/shared/ToolCard';
 import { SEOHead } from '../components/shared/SEOHead';
@@ -32,17 +32,7 @@ export const CategoryDetail: React.FC<CategoryDetailProps> = ({
   }, [slug]);
 
   if (!category) {
-    return (
-      <div className="container section text-center">
-        <h2 style={{ marginBottom: '12px' }}>Category Not Found</h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
-          The requested AI category slug does not exist in our directory.
-        </p>
-        <Link to="/categories" className="btn btn-primary">
-          View All Categories
-        </Link>
-      </div>
-    );
+    return <Navigate to="/" replace />;
   }
 
   // Filter tools for this category (must be approved status)
