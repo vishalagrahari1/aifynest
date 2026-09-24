@@ -237,17 +237,46 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
       <SEOHead
         title="AIFynest — Discover the Best AI Tools in One Place"
         description="Search, filter, compare, save, and review the best artificial intelligence tools. Find the right AI for your workflow on AIFynest."
-        schemaMarkup={{
-          '@context': 'https://schema.org',
-          '@type': 'WebSite',
-          'name': 'AIFynest',
-          'url': 'https://aifynest.com/',
-          'potentialAction': {
-            '@type': 'SearchAction',
-            'target': 'https://aifynest.com/ai-tools?q={search_term_string}',
-            'query-input': 'required name=search_term_string'
+        schemaMarkup={[
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            'name': 'AIFynest',
+            'url': 'https://aifynest.com/',
+            'logo': 'https://aifynest.com/logo.png',
+            'description': 'AIFynest is the premier curated directory for discovering, comparing, and reviewing top artificial intelligence tools, LLM applications, and productivity software.',
+            'sameAs': [
+              'https://x.com/aifynest',
+              'https://www.instagram.com/aifynest/',
+              'https://in.pinterest.com/aifynest/',
+              'https://github.com/aifynest',
+              'https://www.facebook.com/aifynes'
+            ]
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            'name': 'AIFynest',
+            'url': 'https://aifynest.com/',
+            'potentialAction': {
+              '@type': 'SearchAction',
+              'target': 'https://aifynest.com/ai-tools?q={search_term_string}',
+              'query-input': 'required name=search_term_string'
+            }
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            'mainEntity': faqs.map(faq => ({
+              '@type': 'Question',
+              'name': faq.q,
+              'acceptedAnswer': {
+                '@type': 'Answer',
+                'text': faq.a
+              }
+            }))
           }
-        }}
+        ]}
       />
 
       {/* Hero Glowing background effect */}

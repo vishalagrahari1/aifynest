@@ -56,12 +56,38 @@ export const CategoryDetail: React.FC<CategoryDetailProps> = ({
   // Other categories for sidebar recommendations
   const otherCategories = categories.filter((c) => c.slug !== category.slug).slice(0, 5);
 
+  const siteUrl = import.meta.env.VITE_SITE_URL || 'https://aifynest.com';
   const seoTitle = `Best AI ${category.name} Tools in 2026 – Reviews & Pricing`;
   const seoDesc = `Discover the top-rated artificial intelligence software and platforms in ${category.name}. Read detailed reviews, view screen captures, compare costs, and choose the right AI tool.`;
 
+  const schemaMarkup = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    'itemListElement': [
+      {
+        '@type': 'ListItem',
+        'position': 1,
+        'name': 'Home',
+        'item': siteUrl
+      },
+      {
+        '@type': 'ListItem',
+        'position': 2,
+        'name': 'Categories',
+        'item': `${siteUrl}/categories`
+      },
+      {
+        '@type': 'ListItem',
+        'position': 3,
+        'name': category.name,
+        'item': `${siteUrl}/categories/${category.slug}`
+      }
+    ]
+  };
+
   return (
     <div className="container section">
-      <SEOHead title={seoTitle} description={seoDesc} />
+      <SEOHead title={seoTitle} description={seoDesc} canonicalUrl={`${siteUrl}/categories/${category.slug}`} schemaMarkup={schemaMarkup} />
 
       {/* Breadcrumbs */}
       <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}>

@@ -255,7 +255,7 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
       '@context': 'https://schema.org',
       '@type': 'SoftwareApplication',
       'name': tool.name,
-      'description': tool.description,
+      'description': tool.description || tool.tagline,
       'url': `${siteUrl}/tools/${tool.slug}`,
       'image': tool.logoUrl,
       'applicationCategory': tool.categorySlug,
@@ -265,6 +265,7 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
         'price': tool.pricingPlans && tool.pricingPlans.length > 0 && tool.pricingPlans[0].price !== 'Custom' ? tool.pricingPlans[0].price.replace(/[^0-9.]/g, '') || '0' : '0',
         'priceCurrency': 'USD',
       },
+      ...(tool.websiteUrl ? { 'sameAs': formatExternalUrl(tool.websiteUrl) } : {}),
       ...(tool.rating > 0 && tool.reviewCount > 0
         ? {
             'aggregateRating': {
@@ -297,13 +298,35 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
           '@type': 'ListItem',
           'position': 3,
           'name': tool.categorySlug.toUpperCase(),
-          'item': `${siteUrl}/ai-tools/${tool.categorySlug}`,
+          'item': `${siteUrl}/categories/${tool.categorySlug}`,
         },
         {
           '@type': 'ListItem',
           'position': 4,
           'name': tool.name,
           'item': `${siteUrl}/tools/${tool.slug}`,
+        }
+      ]
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      'mainEntity': [
+        {
+          '@type': 'Question',
+          'name': `Is ${tool.name} free to use?`,
+          'acceptedAnswer': {
+            '@type': 'Answer',
+            'text': `${tool.name} is available under a ${tool.pricing} model. Check the pricing section on this page to view details of the free, trial, and basic subscription pricing tiers.`
+          }
+        },
+        {
+          '@type': 'Question',
+          'name': 'Which operating systems and environments are supported?',
+          'acceptedAnswer': {
+            '@type': 'Answer',
+            'text': `You can access ${tool.name} on the following platforms: ${tool.platforms && tool.platforms.length > 0 ? tool.platforms.join(', ') : 'Web'}.`
+          }
         }
       ]
     }

@@ -1,0 +1,42 @@
+# AIFynest - AI Tools Discovery & Listing Directory
+
+> AIFynest (https://aifynest.com/) is a premier curated directory for discovering, comparing, and reviewing top artificial intelligence tools, platforms, LLM applications, and software across writing, image generation, video, audio, coding, marketing, productivity, and business automation.
+
+## Core Navigation & Directories
+- [AIFynest Homepage](https://aifynest.com/): Search and discover 230+ curated AI tools, trending applications, and user reviews.
+- [AI Tools Directory](https://aifynest.com/ai-tools): Complete index of all approved AI tools and software applications.
+- [Categories Directory](https://aifynest.com/categories): Browse AI tools organized by specialized industry categories.
+- [Trending AI Tools](https://aifynest.com/trending): Popular and trending AI tools ranked by community engagement and reviews.
+- [Recently Added AI Tools](https://aifynest.com/new-tools): Newest AI software listings added to the directory.
+- [Compare AI Tools](https://aifynest.com/compare): Side-by-side comparison engine for features, pricing, and pros & cons.
+- [AI Insights & Articles Blog](https://aifynest.com/blog): In-depth guides, technology analysis, and comparison roundups.
+
+## Tool Categories
+- [AI Writing Tools](https://aifynest.com/ai-tools/writing): Copywriting, blogging, email generation, and text summarization assistants.
+- [AI Image Generation Tools](https://aifynest.com/ai-tools/image-generation): Text-to-image creators, photo editing, and digital art studios.
+- [AI Video Tools](https://aifynest.com/ai-tools/video): Video creation, avatar generators, text-to-video, and automated video editors.
+- [AI Audio Tools](https://aifynest.com/ai-tools/audio): Voiceovers, voice cloning, music generation, and audio editing utilities.
+- [AI Coding Tools](https://aifynest.com/ai-tools/coding): Code completion IDEs, pair programming assistants, and debugging compilers.
+- [AI Marketing Tools](https://aifynest.com/ai-tools/marketing): SEO keyword optimizers, ad copy generators, and campaign intelligence trackers.
+- [AI Productivity Tools](https://aifynest.com/ai-tools/productivity): Task automation, voice dictation, note-taking, and workflow managers.
+- [AI Design Tools](https://aifynest.com/ai-tools/design): UI/UX prototyping, logo creation, and vector design generators.
+- [AI Research Tools](https://aifynest.com/ai-tools/research): Literature synthesis, transcript search, and scientific analysis tools.
+- [AI Education Tools](https://aifynest.com/ai-tools/education): AI tutors, course builders, and flashcard learning platforms.
+- [AI Business Tools](https://aifynest.com/ai-tools/business): Workflow automation, contract analysis, and operational intelligence.
+- [AI Finance Tools](https://aifynest.com/ai-tools/finance): SaaS revenue tracking, financial forecasting, and expense auditing.
+
+## Featured High-Value Articles & Roundups
+- [Best AI Tools for Dropshipping 2026](https://aifynest.com/blog/best-ai-tools-dropshipping-2026): Comprehensive guide to automating product research, ad creation, and e-commerce fulfillment.
+- [Best AI Video Editing Tools in 2026](https://aifynest.com/blog/best-ai-video-editing-tools-2026): Side-by-side review of top AI video editors for YouTube, Shorts, and video ads.
+- [Best AI Writing Tools & Assistants 2026](https://aifynest.com/blog/best-ai-writing-tools-2026): Deep dive comparison of leading AI copywriters and conversational assistants.
+- [Best AI Image Generation Tools in 2026](https://aifynest.com/blog/best-image-generation-tools): Guide to photorealistic AI art creators and design studios.
+
+## For AI Tool Builders & Owners
+- [Submit a Tool](https://aifynest.com/submit-tool): Submit a new AI tool or software application to AIFynest.
+- [Claim Listing](https://aifynest.com/claim): Verify ownership of an existing tool profile to manage details and sponsorship.
+- [Promote & Pricing](https://aifynest.com/pricing): Sponsored placement, featured listings, and advertising options.
+
+## Trust & Legal Policies
+- [About AIFynest](https://aifynest.com/about): Mission, editorial standards, and platform overview.
+- [Contact & Support](https://aifynest.com/contact): Get in touch with the AIFynest team.
+- [Advertising Disclosure](https://aifynest.com/disclosure): Official monetization, sponsorship, and affiliate disclosures.

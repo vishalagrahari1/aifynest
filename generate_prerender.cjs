@@ -348,11 +348,183 @@ async function runPrerender() {
     }
   ];
 
+  // 0. Update Root Homepage (dist/index.html) with Organization, WebSite, and visible FAQPage schemas
+  const rootHomeHtml = buildPageHTML(templateHTML, {
+    title: 'AIFynest — Discover the Best AI Tools in One Place',
+    description: 'Search, filter, compare, save, and review the best artificial intelligence tools. Find the right AI for your workflow on AIFynest.',
+    canonicalUrl: `${SITE_URL}/`,
+    schemaMarkup: [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        'name': 'AIFynest',
+        'url': `${SITE_URL}/`,
+        'logo': `${SITE_URL}/logo.png`,
+        'description': 'AIFynest is the premier curated directory for discovering, comparing, and reviewing top artificial intelligence tools, LLM applications, and productivity software.',
+        'sameAs': [
+          'https://x.com/aifynest',
+          'https://www.instagram.com/aifynest/',
+          'https://in.pinterest.com/aifynest/',
+          'https://github.com/aifynest',
+          'https://www.facebook.com/aifynes'
+        ]
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        'name': 'AIFynest',
+        'url': `${SITE_URL}/`,
+        'potentialAction': {
+          '@type': 'SearchAction',
+          'target': `${SITE_URL}/ai-tools?q={search_term_string}`,
+          'query-input': 'required name=search_term_string'
+        }
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        'mainEntity': [
+          {
+            '@type': 'Question',
+            'name': 'How does AIFynest curate and review submitted AI tools?',
+            'acceptedAnswer': {
+              '@type': 'Answer',
+              'text': 'Every submission is reviewed by our administration editors. We verify the destination URL, product capabilities, pricing plans accuracy, and ensure it meets our guidelines before publishing it to the public directory.'
+            }
+          },
+          {
+            '@type': 'Question',
+            'name': 'How can I claim my AI tool listing?',
+            'acceptedAnswer': {
+              '@type': 'Answer',
+              'text': 'Simply navigate to the tool detail page, click "Claim this listing" link, and fill out the claim form. Our team will verify your ownership email (usually matching the tool domain) within 24-48 hours.'
+            }
+          },
+          {
+            '@type': 'Question',
+            'name': 'Does AIFynest charge any commission on affiliate referral clicks?',
+            'acceptedAnswer': {
+              '@type': 'Answer',
+              'text': 'We do not charge owners for referral clicks. Outbound clicks are tracked to calculate CPC metrics for builder analytics. If you join our sponsor network, we charge flat advertising placements campaign budgets.'
+            }
+          },
+          {
+            '@type': 'Question',
+            'name': 'Can standard users write reviews and rank tools?',
+            'acceptedAnswer': {
+              '@type': 'Answer',
+              'text': 'Yes, any registered user can write ratings and pros/cons feedback on published tools. All reviews are curated by editors to eliminate fake feedback, keeping AIFynest trustworthy and transparent.'
+            }
+          }
+        ]
+      }
+    ]
+  });
+  fs.writeFileSync(distIndexPath, rootHomeHtml, 'utf8');
+
+  // A. Static Pages & Blog Articles
   staticRoutes.forEach(route => {
+    let schemaMarkup = null;
+
+    if (route.path.startsWith('/blog/')) {
+      const slug = route.path.replace('/blog/', '');
+      schemaMarkup = [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'Article',
+          'headline': route.title.split(' — ')[0],
+          'description': route.description,
+          'author': {
+            '@type': 'Person',
+            'name': 'AIFynest Editorial Team'
+          },
+          'datePublished': '2026-09-16',
+          'dateModified': '2026-09-16',
+          'image': route.ogImage || `${SITE_URL}/logo.png`,
+          'mainEntityOfPage': {
+            '@type': 'WebPage',
+            '@id': `${SITE_URL}${route.path}`
+          },
+          'publisher': {
+            '@type': 'Organization',
+            'name': 'AIFynest',
+            'logo': {
+              '@type': 'ImageObject',
+              'url': `${SITE_URL}/logo.png`
+            }
+          }
+        },
+        {
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          'itemListElement': [
+            {
+              '@type': 'ListItem',
+              'position': 1,
+              'name': 'Home',
+              'item': `${SITE_URL}/`
+            },
+            {
+              '@type': 'ListItem',
+              'position': 2,
+              'name': 'Blog',
+              'item': `${SITE_URL}/blog`
+            },
+            {
+              '@type': 'ListItem',
+              'position': 3,
+              'name': route.title.split(' — ')[0],
+              'item': `${SITE_URL}${route.path}`
+            }
+          ]
+        }
+      ];
+    } else if (route.path === '/blog') {
+      schemaMarkup = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+          {
+            '@type': 'ListItem',
+            'position': 1,
+            'name': 'Home',
+            'item': `${SITE_URL}/`
+          },
+          {
+            '@type': 'ListItem',
+            'position': 2,
+            'name': 'Blog',
+            'item': `${SITE_URL}/blog`
+          }
+        ]
+      };
+    } else if (route.path === '/ai-tools') {
+      schemaMarkup = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+          {
+            '@type': 'ListItem',
+            'position': 1,
+            'name': 'Home',
+            'item': `${SITE_URL}/`
+          },
+          {
+            '@type': 'ListItem',
+            'position': 2,
+            'name': 'AI Tools',
+            'item': `${SITE_URL}/ai-tools`
+          }
+        ]
+      };
+    }
+
     const html = buildPageHTML(templateHTML, {
       title: route.title,
       description: route.description,
-      canonicalUrl: `${SITE_URL}${route.path}`
+      canonicalUrl: `${SITE_URL}${route.path}`,
+      ogImage: route.ogImage || `${SITE_URL}/logo.png`,
+      schemaMarkup
     });
     writeStaticFile(route.path, html);
   });
@@ -379,10 +551,36 @@ async function runPrerender() {
       const catTitle = `Top ${cat.name} AI Tools & Software in 2026 — AIFynest`;
       const catDesc = `Explore the best ${cat.name} AI tools, software platforms, and utilities. Compare features, pricing, and user reviews on AIFynest.`;
       
+      const schemaMarkup = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+          {
+            '@type': 'ListItem',
+            'position': 1,
+            'name': 'Home',
+            'item': `${SITE_URL}/`
+          },
+          {
+            '@type': 'ListItem',
+            'position': 2,
+            'name': 'Categories',
+            'item': `${SITE_URL}/categories`
+          },
+          {
+            '@type': 'ListItem',
+            'position': 3,
+            'name': cat.name,
+            'item': `${SITE_URL}/categories/${cat.slug}`
+          }
+        ]
+      };
+
       const html = buildPageHTML(templateHTML, {
         title: catTitle,
         description: catDesc,
-        canonicalUrl: `${SITE_URL}/ai-tools/${cat.slug}`
+        canonicalUrl: `${SITE_URL}/categories/${cat.slug}`,
+        schemaMarkup
       });
 
       writeStaticFile(`/ai-tools/${cat.slug}`, html);
@@ -422,6 +620,7 @@ async function runPrerender() {
             'price': '0',
             'priceCurrency': 'USD'
           },
+          ...(tool.websiteUrl ? { 'sameAs': tool.websiteUrl } : {}),
           ...(tool.rating > 0 && tool.reviewCount > 0
             ? {
                 'aggregateRating': {
@@ -442,7 +641,7 @@ async function runPrerender() {
               '@type': 'ListItem',
               'position': 1,
               'name': 'Home',
-              'item': SITE_URL
+              'item': `${SITE_URL}/`
             },
             {
               '@type': 'ListItem',
@@ -454,13 +653,35 @@ async function runPrerender() {
               '@type': 'ListItem',
               'position': 3,
               'name': (tool.categorySlug || 'software').toUpperCase(),
-              'item': `${SITE_URL}/ai-tools/${tool.categorySlug || 'software'}`
+              'item': `${SITE_URL}/categories/${tool.categorySlug || 'software'}`
             },
             {
               '@type': 'ListItem',
               'position': 4,
               'name': tool.name,
               'item': canonicalUrl
+            }
+          ]
+        },
+        {
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          'mainEntity': [
+            {
+              '@type': 'Question',
+              'name': `Is ${tool.name} free to use?`,
+              'acceptedAnswer': {
+                '@type': 'Answer',
+                'text': `${tool.name} is available under a ${tool.pricing || 'free'} model. Check the pricing section on this page to view details of the free, trial, and basic subscription pricing tiers.`
+              }
+            },
+            {
+              '@type': 'Question',
+              'name': 'Which operating systems and environments are supported?',
+              'acceptedAnswer': {
+                '@type': 'Answer',
+                'text': `You can access ${tool.name} on the following platforms: ${tool.platforms && tool.platforms.length > 0 ? tool.platforms.join(', ') : 'Web'}.`
+              }
             }
           ]
         }

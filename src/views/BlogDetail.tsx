@@ -32,11 +32,73 @@ export const BlogDetail: React.FC = () => {
     .filter((t) => t.status === 'approved' && post.content.toLowerCase().includes(t.name.toLowerCase()))
     .slice(0, 3);
 
-  const seoTitle = `${post.title} – Guides`;
+  const siteUrl = import.meta.env.VITE_SITE_URL || 'https://aifynest.com';
+  const postImageUrl = post.image.startsWith('http') ? post.image : `${siteUrl}${post.image}`;
+
+  const schemaMarkup = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      'headline': post.title,
+      'description': post.excerpt,
+      'author': {
+        '@type': 'Person',
+        'name': post.author || 'AIFynest Editorial Team'
+      },
+      'datePublished': post.date,
+      'dateModified': post.date,
+      'image': postImageUrl,
+      'mainEntityOfPage': {
+        '@type': 'WebPage',
+        '@id': `${siteUrl}/blog/${post.slug}`
+      },
+      'publisher': {
+        '@type': 'Organization',
+        'name': 'AIFynest',
+        'logo': {
+          '@type': 'ImageObject',
+          'url': `${siteUrl}/logo.png`
+        }
+      }
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      'itemListElement': [
+        {
+          '@type': 'ListItem',
+          'position': 1,
+          'name': 'Home',
+          'item': siteUrl
+        },
+        {
+          '@type': 'ListItem',
+          'position': 2,
+          'name': 'Blog',
+          'item': `${siteUrl}/blog`
+        },
+        {
+          '@type': 'ListItem',
+          'position': 3,
+          'name': post.title,
+          'item': `${siteUrl}/blog/${post.slug}`
+        }
+      ]
+    }
+  ];
+
+  const seoTitle = `${post.title} — AIFynest Blog`;
 
   return (
     <div className="container section" style={{ maxWidth: '900px' }}>
-      <SEOHead title={seoTitle} description={post.excerpt} ogType="article" ogImage={post.image} />
+      <SEOHead
+        title={seoTitle}
+        description={post.excerpt}
+        ogType="article"
+        ogImage={postImageUrl}
+        canonicalUrl={`${siteUrl}/blog/${post.slug}`}
+        schemaMarkup={schemaMarkup}
+      />
 
       {/* Breadcrumbs */}
       <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginBottom: '16px' }}>
