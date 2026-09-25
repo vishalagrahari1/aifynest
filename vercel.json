@@ -33,6 +33,17 @@
       "source": "/home",
       "destination": "/",
       "permanent": true
+    },
+    {
+      "has": [
+        {
+          "type": "host",
+          "value": "www.aifynest.com"
+        }
+      ],
+      "source": "/:path*",
+      "destination": "https://aifynest.com/:path*",
+      "permanent": true
     }
   ],
   "rewrites": [
