@@ -379,30 +379,18 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
             List on AIFynest. Get Found on Google. Get Discovered by LLMs.
           </p>
 
-          {/* Main Hero Description Paragraphs */}
+          {/* Main Hero Description Paragraph */}
           <p
             style={{
               fontSize: 'var(--text-base)',
               color: 'var(--text-secondary)',
               maxWidth: '750px',
-              margin: '0 auto 12px auto',
+              margin: '0 auto 24px auto',
               lineHeight: '1.6',
               fontWeight: 500,
             }}
           >
             AIFynest helps AI tools, SaaS products, and startups get discovered by the people and platforms looking for them.
-          </p>
-
-          <p
-            style={{
-              fontSize: 'var(--text-sm)',
-              color: 'var(--text-muted)',
-              maxWidth: '750px',
-              margin: '0 auto 24px auto',
-              lineHeight: '1.6',
-            }}
-          >
-            Create your product listing to increase visibility, build your SEO footprint, earn a quality backlink, and give search engines and AI-powered systems more opportunities to discover, understand, and surface your product.
           </p>
 
           {/* Interactive Search Bar wrapper */}
