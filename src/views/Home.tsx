@@ -385,52 +385,12 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
               fontSize: 'var(--text-base)',
               color: 'var(--text-secondary)',
               maxWidth: '750px',
-              margin: '0 auto 20px auto',
+              margin: '0 auto 24px auto',
               lineHeight: '1.6',
             }}
           >
             We manually submit your SaaS, AI tool, or startup to 220+ high-authority directories and discovery platforms to build quality backlinks, strengthen your SEO, increase online visibility, and help your product get discovered, mentioned, and cited across Google and AI-powered tools.
           </p>
-
-          {/* Key Guarantee Banner */}
-          <div
-            style={{
-              fontSize: 'var(--text-xs)',
-              fontWeight: 600,
-              color: 'var(--text-primary)',
-              backgroundColor: 'rgba(226, 96, 58, 0.08)',
-              border: '1px dashed rgba(226, 96, 58, 0.35)',
-              padding: '10px 20px',
-              borderRadius: 'var(--radius-md)',
-              display: 'inline-block',
-              marginBottom: '24px',
-              lineHeight: '1.5',
-            }}
-          >
-            ✨ No directory hunting. No tedious submissions. No doing it yourself. We handle the entire process.
-          </div>
-
-          {/* Main Action Button */}
-          <div style={{ marginBottom: '28px', display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
-            <Link
-              to="/submit-tool"
-              className="btn btn-primary btn-lg"
-              style={{
-                padding: '14px 34px',
-                fontSize: 'var(--text-base)',
-                fontWeight: 'bold',
-                borderRadius: 'var(--radius-lg)',
-                boxShadow: '0 6px 28px rgba(226, 96, 58, 0.45)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '10px',
-                textDecoration: 'none',
-              }}
-            >
-              <span>Get My Product Listed</span>
-              <ArrowRight size={20} />
-            </Link>
-          </div>
 
           {/* Interactive Search Bar wrapper */}
           <div ref={suggestionsRef} style={{ position: 'relative', maxWidth: '720px', margin: '0 auto' }}>
