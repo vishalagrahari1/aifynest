@@ -283,18 +283,18 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
       <div className="hero-glow" style={{ top: '-100px', left: '5%' }}></div>
       <div className="hero-glow" style={{ top: '150px', right: '5%', background: 'radial-gradient(circle, rgba(226, 96, 58, 0.05) 0%, rgba(226, 96, 58, 0.01) 60%, rgba(0, 0, 0, 0) 100%)' }}></div>
 
-      {/* Hero Search Section - Simple & Compact */}
+      {/* Hero Section */}
       <section
         style={{
           background: 'var(--gradient-hero)',
-          padding: '44px 0 36px 0',
+          padding: '52px 0 44px 0',
           borderBottom: '1px solid var(--border-color)',
           textAlign: 'center',
           position: 'relative',
           zIndex: 1,
         }}
       >
-        <div className="container" style={{ maxWidth: '780px' }}>
+        <div className="container" style={{ maxWidth: '840px' }}>
           {/* Enhanced Premium Trust Signal Badge */}
           <div 
             style={{ 
@@ -305,7 +305,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
               border: '1px solid rgba(226, 96, 58, 0.25)', 
               borderRadius: 'var(--radius-full)', 
               padding: '6px 16px', 
-              marginBottom: '20px',
+              marginBottom: '22px',
               boxShadow: '0 4px 16px rgba(226, 96, 58, 0.08)',
               transition: 'all 0.25s ease',
               cursor: 'default',
@@ -351,30 +351,86 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
             </span>
           </div>
 
+          {/* Main Hero Headline */}
           <h1
             style={{
-              fontSize: 'clamp(2rem, 4.5vw, 2.8rem)',
+              fontSize: 'clamp(2.1rem, 4.8vw, 3.1rem)',
               lineHeight: '1.15',
-              fontWeight: 'var(--font-bold)',
+              fontWeight: 800,
               letterSpacing: '-0.02em',
-              marginBottom: '10px',
+              marginBottom: '12px',
               color: 'var(--text-primary)',
             }}
           >
-            Discover the Best <span style={{ color: '#E2603A' }}>AI Tools</span>
+            Get Your SaaS & AI Tool <span style={{ color: '#E2603A' }}>Discovered Everywhere</span>
           </h1>
 
+          {/* Sub-headline */}
+          <p
+            style={{
+              fontSize: 'clamp(1.05rem, 2.3vw, 1.25rem)',
+              fontWeight: 700,
+              color: '#E2603A',
+              maxWidth: '740px',
+              margin: '0 auto 16px auto',
+              lineHeight: '1.35',
+            }}
+          >
+            Rank Higher on Google. Get Cited by AI. Put Your Product in Front of More Buyers.
+          </p>
+
+          {/* Main Hero Description */}
           <p
             style={{
               fontSize: 'var(--text-base)',
               color: 'var(--text-secondary)',
-              maxWidth: '560px',
+              maxWidth: '750px',
               margin: '0 auto 20px auto',
+              lineHeight: '1.6',
+            }}
+          >
+            We manually submit your SaaS, AI tool, or startup to 220+ high-authority directories and discovery platforms to build quality backlinks, strengthen your SEO, increase online visibility, and help your product get discovered, mentioned, and cited across Google and AI-powered tools.
+          </p>
+
+          {/* Key Guarantee Banner */}
+          <div
+            style={{
+              fontSize: 'var(--text-xs)',
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+              backgroundColor: 'rgba(226, 96, 58, 0.08)',
+              border: '1px dashed rgba(226, 96, 58, 0.35)',
+              padding: '10px 20px',
+              borderRadius: 'var(--radius-md)',
+              display: 'inline-block',
+              marginBottom: '24px',
               lineHeight: '1.5',
             }}
           >
-            Explore, compare, and review <strong>{tools && tools.length > 0 ? tools.filter(t => t.status === 'approved').length : 196}+ AI tools</strong> across <strong>{categories && categories.length > 0 ? categories.length : 12} categories</strong>.
-          </p>
+            ✨ No directory hunting. No tedious submissions. No doing it yourself. We handle the entire process.
+          </div>
+
+          {/* Main Action Button */}
+          <div style={{ marginBottom: '28px', display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
+            <Link
+              to="/submit-tool"
+              className="btn btn-primary btn-lg"
+              style={{
+                padding: '14px 34px',
+                fontSize: 'var(--text-base)',
+                fontWeight: 'bold',
+                borderRadius: 'var(--radius-lg)',
+                boxShadow: '0 6px 28px rgba(226, 96, 58, 0.45)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '10px',
+                textDecoration: 'none',
+              }}
+            >
+              <span>Get My Product Listed</span>
+              <ArrowRight size={20} />
+            </Link>
+          </div>
 
           {/* Interactive Search Bar wrapper */}
           <div ref={suggestionsRef} style={{ position: 'relative', maxWidth: '720px', margin: '0 auto' }}>
@@ -497,127 +553,31 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
             })()}
           </div>
 
-          {/* Builder Discovery Hero Banner Card */}
+          {/* Hero Bottom Feature Badges List */}
           <div
             style={{
-              marginTop: '32px',
-              padding: '32px 24px',
-              borderRadius: 'var(--radius-xl)',
-              background: 'linear-gradient(135deg, rgba(226, 96, 58, 0.1) 0%, rgba(124, 58, 237, 0.08) 50%, rgba(59, 130, 246, 0.06) 100%)',
-              border: '1px solid rgba(226, 96, 58, 0.3)',
-              boxShadow: '0 12px 40px rgba(0, 0, 0, 0.3)',
-              textAlign: 'center',
-              position: 'relative',
-              overflow: 'hidden',
+              fontSize: 'var(--text-xs)',
+              color: 'var(--text-muted)',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              flexWrap: 'wrap',
+              paddingTop: '18px',
+              borderTop: '1px solid var(--border-color)',
+              marginTop: '24px',
             }}
-            className="glass hero-builder-banner"
           >
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: 'rgba(226, 96, 58, 0.15)', color: '#E2603A', fontSize: '11px', fontWeight: 'bold', padding: '4px 14px', borderRadius: 'var(--radius-full)', marginBottom: '16px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-              <Sparkles size={13} />
-              FOR SAAS & AI TOOL FOUNDERS
-            </div>
-
-            <h2
-              style={{
-                fontSize: 'clamp(1.35rem, 3vw, 1.85rem)',
-                fontWeight: 800,
-                color: 'var(--text-primary)',
-                marginBottom: '8px',
-                lineHeight: '1.25',
-                letterSpacing: '-0.01em',
-              }}
-            >
-              Get Your SaaS & AI Tool Discovered Everywhere
-            </h2>
-
-            <p
-              style={{
-                fontSize: 'clamp(0.95rem, 2.2vw, 1.15rem)',
-                fontWeight: 700,
-                color: '#E2603A',
-                marginBottom: '14px',
-                lineHeight: '1.4',
-                maxWidth: '700px',
-                margin: '0 auto 14px auto',
-              }}
-            >
-              Rank Higher on Google. Get Cited by AI. Put Your Product in Front of More Buyers.
-            </p>
-
-            <p
-              style={{
-                fontSize: 'var(--text-sm)',
-                color: 'var(--text-secondary)',
-                maxWidth: '700px',
-                margin: '0 auto 18px auto',
-                lineHeight: '1.6',
-              }}
-            >
-              We manually submit your SaaS, AI tool, or startup to 220+ high-authority directories and discovery platforms to build quality backlinks, strengthen your SEO, increase online visibility, and help your product get discovered, mentioned, and cited across Google and AI-powered tools.
-            </p>
-
-            <div
-              style={{
-                fontSize: 'var(--text-xs)',
-                fontWeight: 600,
-                color: 'var(--text-primary)',
-                backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                border: '1px dashed rgba(226, 96, 58, 0.4)',
-                padding: '10px 18px',
-                borderRadius: 'var(--radius-md)',
-                display: 'inline-block',
-                marginBottom: '22px',
-                lineHeight: '1.5',
-              }}
-            >
-              ✨ No directory hunting. No tedious submissions. No doing it yourself. We handle the entire process.
-            </div>
-
-            <div style={{ marginBottom: '20px' }}>
-              <Link
-                to="/submit-tool"
-                className="btn btn-primary btn-lg"
-                style={{
-                  padding: '12px 30px',
-                  fontSize: 'var(--text-base)',
-                  fontWeight: 'bold',
-                  borderRadius: 'var(--radius-lg)',
-                  boxShadow: '0 6px 24px rgba(226, 96, 58, 0.4)',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  textDecoration: 'none',
-                }}
-              >
-                <span>Get My Product Listed</span>
-                <ArrowRight size={18} />
-              </Link>
-            </div>
-
-            <div
-              style={{
-                fontSize: '11px',
-                color: 'var(--text-muted)',
-                fontWeight: 500,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                flexWrap: 'wrap',
-                paddingTop: '14px',
-                borderTop: '1px solid var(--border-color)',
-              }}
-            >
-              <span>220+ High-Authority Directories</span>
-              <span>·</span>
-              <span>Manual Submissions</span>
-              <span>·</span>
-              <span>Quality Backlinks</span>
-              <span>·</span>
-              <span>Google SEO</span>
-              <span>·</span>
-              <span>AI Visibility</span>
-            </div>
+            <span>220+ High-Authority Directories</span>
+            <span>·</span>
+            <span>Manual Submissions</span>
+            <span>·</span>
+            <span>Quality Backlinks</span>
+            <span>·</span>
+            <span>Google SEO</span>
+            <span>·</span>
+            <span>AI Visibility</span>
           </div>
         </div>
       </section>
