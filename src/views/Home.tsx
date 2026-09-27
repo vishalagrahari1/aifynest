@@ -362,7 +362,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
               color: 'var(--text-primary)',
             }}
           >
-            Get Your SaaS & AI Tool <span style={{ color: '#E2603A' }}>Discovered Everywhere</span>
+            Get Your Product Discovered <span style={{ color: '#E2603A' }}>by Humans & AI</span>
           </h1>
 
           {/* Sub-headline */}
@@ -376,20 +376,33 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
               lineHeight: '1.35',
             }}
           >
-            Rank Higher on Google. Get Cited by AI. Put Your Product in Front of More Buyers.
+            List on AIFynest. Get Found on Google. Get Discovered by LLMs.
           </p>
 
-          {/* Main Hero Description */}
+          {/* Main Hero Description Paragraphs */}
           <p
             style={{
               fontSize: 'var(--text-base)',
               color: 'var(--text-secondary)',
               maxWidth: '750px',
+              margin: '0 auto 12px auto',
+              lineHeight: '1.6',
+              fontWeight: 500,
+            }}
+          >
+            AIFynest helps AI tools, SaaS products, and startups get discovered by the people and platforms looking for them.
+          </p>
+
+          <p
+            style={{
+              fontSize: 'var(--text-sm)',
+              color: 'var(--text-muted)',
+              maxWidth: '750px',
               margin: '0 auto 24px auto',
               lineHeight: '1.6',
             }}
           >
-            We manually submit your SaaS, AI tool, or startup to 220+ high-authority directories and discovery platforms to build quality backlinks, strengthen your SEO, increase online visibility, and help your product get discovered, mentioned, and cited across Google and AI-powered tools.
+            Create your product listing to increase visibility, build your SEO footprint, earn a quality backlink, and give search engines and AI-powered systems more opportunities to discover, understand, and surface your product.
           </p>
 
           {/* Interactive Search Bar wrapper */}
@@ -529,15 +542,13 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
               marginTop: '24px',
             }}
           >
-            <span>220+ High-Authority Directories</span>
+            <span>Get Listed</span>
             <span>·</span>
-            <span>Manual Submissions</span>
+            <span>Build Authority</span>
             <span>·</span>
-            <span>Quality Backlinks</span>
+            <span>Grow Visibility</span>
             <span>·</span>
-            <span>Google SEO</span>
-            <span>·</span>
-            <span>AI Visibility</span>
+            <span>Get Discovered by AI</span>
           </div>
         </div>
       </section>
