@@ -162,63 +162,32 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
   };
 
   // Find related tools using deterministic similarity scoring
-  const similarTools = tools
+  const rawSimilar = tools
     .filter((t) => t.id !== tool.id && t.status === 'approved')
     .map((t) => {
       let score = 0;
-      
-      // 1. Category (30%)
-      if (t.categorySlug === tool.categorySlug) {
-        score += 30;
-      }
-      
-      // 2. Tags (20%)
+      if (t.categorySlug === tool.categorySlug) score += 30;
       const commonTags = tool.tags.filter((tag) => t.tags.includes(tag));
-      if (tool.tags.length > 0) {
-        score += (commonTags.length / tool.tags.length) * 20;
-      }
-      
-      // 3. Features (20%)
+      if (tool.tags.length > 0) score += (commonTags.length / tool.tags.length) * 20;
       const commonFeatures = tool.features.filter((f1) => 
         t.features.some((f2) => f2.toLowerCase().includes(f1.toLowerCase()) || f1.toLowerCase().includes(f2.toLowerCase()))
       );
-      if (tool.features.length > 0) {
-        score += (commonFeatures.length / tool.features.length) * 20;
-      }
-      
-      // 4. Use Cases (15%)
-      const commonUseCases = tool.useCases.filter((uc1) => 
-        t.useCases.some((uc2) => uc2.toLowerCase().includes(uc1.toLowerCase()) || uc1.toLowerCase().includes(uc2.toLowerCase()))
-      );
-      if (tool.useCases.length > 0) {
-        score += (commonUseCases.length / tool.useCases.length) * 15;
-      }
-      
-      // 5. Pricing (10%)
-      if (t.pricing === tool.pricing) {
-        score += 10;
-      }
-      
-      // 6. Platform (5%)
-      const commonPlatforms = tool.platforms.filter((p) => t.platforms.includes(p));
-      if (tool.platforms.length > 0) {
-        score += (commonPlatforms.length / tool.platforms.length) * 5;
-      }
-      
+      if (tool.features.length > 0) score += (commonFeatures.length / tool.features.length) * 20;
+      if (t.pricing === tool.pricing) score += 10;
       return { tool: t, score };
     })
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 3)
-    .map((item) => item.tool);
+    .sort((a, b) => b.score - a.score);
 
-  // Find alternatives (budget-friendly options in same category)
+  const similarTools = rawSimilar.slice(0, 3).map((item) => item.tool);
+  const usedIds = new Set<string>([tool.id, ...similarTools.map((t) => t.id)]);
+
+  // Find alternatives (budget-friendly options in same category, NOT in similarTools)
   const alternatives = tools
-    .filter((t) => t.categorySlug === tool.categorySlug && t.id !== tool.id && t.status === 'approved')
+    .filter((t) => t.categorySlug === tool.categorySlug && !usedIds.has(t.id) && t.status === 'approved')
     .map((t) => {
       const pricingWeight = { 'free': 4, 'freemium': 3, 'free-trial': 2, 'paid': 1 };
       const currentWeight = pricingWeight[tool.pricing as keyof typeof pricingWeight] || 1;
       const tWeight = pricingWeight[t.pricing as keyof typeof pricingWeight] || 1;
-      
       const score = (tWeight > currentWeight ? 50 : 0) + t.rating * 5;
       return { tool: t, score };
     })
@@ -226,9 +195,11 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
     .slice(0, 3)
     .map((item) => item.tool);
 
-  // Find more popular tools in this category
+  alternatives.forEach((t) => usedIds.add(t.id));
+
+  // Find more popular tools in this category (NOT in similarTools or alternatives)
   const moreInCategory = tools
-    .filter((t) => t.categorySlug === tool.categorySlug && t.id !== tool.id && t.status === 'approved')
+    .filter((t) => t.categorySlug === tool.categorySlug && !usedIds.has(t.id) && t.status === 'approved')
     .sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount)
     .slice(0, 3);
 
@@ -1141,6 +1112,9 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
 
       {/* Style overrides for details and summaries */}
       <style>{`
+        .mobile-sticky-cta-bar {
+          display: none;
+        }
         @media (max-width: 768px) {
           .tool-header-grid, .tool-body-grid {
             grid-template-columns: 1fr !important;
