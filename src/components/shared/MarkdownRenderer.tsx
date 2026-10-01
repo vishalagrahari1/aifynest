@@ -140,6 +140,34 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
     const line = lines[i];
     const trimmed = line.trim();
 
+    // Image detection ![alt](url)
+    const imgMatch = trimmed.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+    if (imgMatch) {
+      flushAll();
+      const altText = imgMatch[1];
+      const imgSrc = imgMatch[2];
+      blocks.push(
+        <div key={`img-${blockKey++}`} style={{ margin: '24px 0', textAlign: 'center' }}>
+          <img
+            src={imgSrc}
+            alt={altText}
+            style={{
+              maxWidth: '100%',
+              height: 'auto',
+              maxHeight: '500px',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border-color)',
+              boxShadow: 'var(--shadow-sm)',
+              display: 'block',
+              margin: '0 auto',
+              objectFit: 'contain'
+            }}
+          />
+        </div>
+      );
+      continue;
+    }
+
     // Table row detection
     if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
       flushList();
