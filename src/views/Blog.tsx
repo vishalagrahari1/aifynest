@@ -46,6 +46,10 @@ export const Blog: React.FC = () => {
     fetchPayloadPosts();
   }, []);
 
+  React.useEffect(() => {
+    setPosts(defaultPosts);
+  }, [defaultPosts]);
+
   // Filter categories
   const categories = useMemo(() => {
     const cats = new Set<string>(['All']);

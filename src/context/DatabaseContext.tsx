@@ -210,7 +210,7 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       try {
         const parsed: BlogPost[] = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const cleanParsed = parsed.filter(b => b.slug !== '10-best-ai-tools-for-business-2026');
+          const cleanParsed = parsed.filter(b => b && b.slug && !b.slug.includes('10-best-ai-tools-for-business') && !b.title?.toLowerCase().includes('10 best ai tools for business'));
           const initialMap = new Map(initialBlogPosts.map(b => [b.slug, b]));
           const updatedParsed = cleanParsed.map(b => {
             const seed = initialMap.get(b.slug);
@@ -602,7 +602,7 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           try {
             const parsed = JSON.parse(cached);
             if (Array.isArray(parsed) && parsed.length > 0) {
-              const cleanParsed = parsed.filter((b: BlogPost) => b.slug !== '10-best-ai-tools-for-business-2026');
+              const cleanParsed = parsed.filter((b: BlogPost) => b && b.slug && !b.slug.includes('10-best-ai-tools-for-business') && !b.title?.toLowerCase().includes('10 best ai tools for business'));
               const existingSlugs = new Set(cleanParsed.map((b: BlogPost) => b.slug));
               const missingInitial = initialBlogPosts.filter(b => !existingSlugs.has(b.slug));
               const merged = [...missingInitial, ...cleanParsed];
