@@ -210,8 +210,9 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       try {
         const parsed: BlogPost[] = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
+          const cleanParsed = parsed.filter(b => b.slug !== '10-best-ai-tools-for-business-2026');
           const initialMap = new Map(initialBlogPosts.map(b => [b.slug, b]));
-          const updatedParsed = parsed.map(b => {
+          const updatedParsed = cleanParsed.map(b => {
             const seed = initialMap.get(b.slug);
             return seed ? { ...b, ...seed } : b;
           });
@@ -601,14 +602,12 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           try {
             const parsed = JSON.parse(cached);
             if (Array.isArray(parsed) && parsed.length > 0) {
-              const existingSlugs = new Set(parsed.map((b: BlogPost) => b.slug));
+              const cleanParsed = parsed.filter((b: BlogPost) => b.slug !== '10-best-ai-tools-for-business-2026');
+              const existingSlugs = new Set(cleanParsed.map((b: BlogPost) => b.slug));
               const missingInitial = initialBlogPosts.filter(b => !existingSlugs.has(b.slug));
-              if (missingInitial.length > 0) {
-                const merged = [...missingInitial, ...parsed];
-                localStorage.setItem('ai_blog_posts', JSON.stringify(merged));
-                return merged;
-              }
-              return parsed;
+              const merged = [...missingInitial, ...cleanParsed];
+              localStorage.setItem('ai_blog_posts', JSON.stringify(merged));
+              return merged;
             }
           } catch (e) {}
         }
