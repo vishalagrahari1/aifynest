@@ -1509,7 +1509,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                 </div>
                 
                 <div style={{ textAlign: 'center', flex: 1 }}>
-                  <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=100&h=100&fit=crop" style={{ width: '52px', height: '52px', borderRadius: '12px', marginBottom: '8px', border: '1px solid var(--border-color)', objectFit: 'cover' }} alt="Claude" />
+                  <img src="/images/claude.png" style={{ width: '52px', height: '52px', borderRadius: '12px', marginBottom: '8px', border: '1px solid var(--border-color)', objectFit: 'cover' }} alt="Claude" />
                   <div style={{ fontWeight: 'bold', fontSize: '13px', color: 'var(--text-primary)' }}>Claude AI</div>
                   <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Anthropic</span>
                 </div>

@@ -405,7 +405,7 @@ export const initialTools: Tool[] = [
   "cons": [
     "Usage limits on high-demand periods"
   ],
-  "logoUrl": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=128&h=128&fit=crop",
+  "logoUrl": "/images/claude.png",
   "screenshotUrls": [],
   "rating": 4.9,
   "reviewCount": 160,
