@@ -101,6 +101,16 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://aifynest.com/blog/10-best-ai-tools-for-business-2026</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aifynest.com/10-best-ai-tools-for-business-2026</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://aifynest.com/blog/10-best-ai-study-tools-for-students-2026</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
@@ -956,17 +966,17 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/ideogram</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://aifynest.com/tools/taplio</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://aifynest.com/tools/adobe-firefly</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://aifynest.com/tools/ideogram</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
