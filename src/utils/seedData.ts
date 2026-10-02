@@ -641,7 +641,7 @@ export const initialTools: Tool[] = [
   "categorySlug": "image-generation",
   "subCategory": "Graphic Design AI",
   "pricing": "paid",
-  "pricingUrl": "https://www.canva.com/pricing/",
+  "pricingUrl": "https://www.canva.com/",
   "websiteUrl": "https://www.canva.com/",
   "platforms": [
     "Web",
