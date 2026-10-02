@@ -27,6 +27,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   // Helper to fetch profile row from database
+  const ADMIN_EMAILS = ['mevishal1130@gmail.com', 'aifynestofficial@gmail.com'];
+  const isMasterAdminEmail = (email?: string | null) => email ? ADMIN_EMAILS.includes(email.toLowerCase().trim()) : false;
+
   const fetchProfileAndSet = async (authUser: any) => {
     try {
       const { data: profile, error } = await supabase
@@ -35,7 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('id', authUser.id)
         .single();
       
-      const isMasterAdmin = authUser.email?.toLowerCase() === 'aifynestofficial@gmail.com';
+      const isMasterAdmin = isMasterAdminEmail(authUser.email);
       if (profile && !error) {
         setUser({
           id: profile.id,
@@ -164,7 +167,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               id: data.user.id,
               name: data.user.user_metadata?.name || 'User',
               email: data.user.email || '',
-              role: data.user.email?.toLowerCase() === 'aifynestofficial@gmail.com' ? 'admin' : (data.user.user_metadata?.role || 'user'),
+              role: isMasterAdminEmail(data.user.email) ? 'admin' : (data.user.user_metadata?.role || 'user'),
               interests: [],
               emailConfirmedAt: null,
             });
@@ -333,8 +336,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const isAdmin = () => user?.role === 'admin' && user?.email.toLowerCase() === 'aifynestofficial@gmail.com';
-  const isOwner = () => user?.role === 'owner' || (user?.role === 'admin' && user?.email.toLowerCase() === 'aifynestofficial@gmail.com');
+  const isAdmin = () => user?.role === 'admin' || (user !== null && isMasterAdminEmail(user.email));
+  const isOwner = () => user?.role === 'owner' || (user !== null && (user.role === 'admin' || isMasterAdminEmail(user.email)));
   const isAuthenticated = () => user !== null;
 
   return (

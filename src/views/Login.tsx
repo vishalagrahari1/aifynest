@@ -40,7 +40,8 @@ export const Login: React.FC<LoginProps> = ({ onToast }) => {
 
     if (res.success) {
       onToast('Logged in successfully! Welcome back to AIFynest.', 'success');
-      if (email.toLowerCase().trim() === 'aifynestofficial@gmail.com') {
+      const adminEmails = ['mevishal1130@gmail.com', 'aifynestofficial@gmail.com'];
+      if (adminEmails.includes(email.toLowerCase().trim())) {
         navigate('/admin');
       } else {
         navigate('/dashboard');

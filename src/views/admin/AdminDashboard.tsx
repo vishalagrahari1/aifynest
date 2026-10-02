@@ -133,13 +133,16 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
     return <Navigate to="/login" replace />;
   }
 
-  if (user.role !== 'admin' || user.email.toLowerCase() !== 'aifynestofficial@gmail.com') {
+  const ADMIN_EMAILS = ['mevishal1130@gmail.com', 'aifynestofficial@gmail.com'];
+  const isAuthorizedAdmin = user.role === 'admin' || ADMIN_EMAILS.includes(user.email.toLowerCase());
+
+  if (!isAuthorizedAdmin) {
     return (
       <div className="container section text-center" style={{ maxWidth: '480px' }}>
         <Shield size={48} style={{ color: 'var(--color-danger)', margin: '0 auto 16px auto' }} />
         <h2>Access Restricted</h2>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
-          You do not have administrative permissions required to access the moderator console. Only authorized administrators (aifynestofficial@gmail.com) can log in to the admin panel.
+          You do not have administrative permissions required to access the moderator console. Only authorized administrators can log in to the admin panel.
         </p>
         <Link to="/login" className="btn btn-primary">
           Log In as Admin

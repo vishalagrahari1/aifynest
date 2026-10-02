@@ -7635,7 +7635,8 @@ export const initialCollections: Collection[] = [
 
 // Preloaded user profiles
 export const seedUsers: User[] = [
-  { id: 'admin-id', name: 'System Admin', email: 'aifynestofficial@gmail.com', role: 'admin', interests: [], emailConfirmedAt: new Date().toISOString() },
+  { id: 'admin-id-main', name: 'Vishal Admin', email: 'mevishal1130@gmail.com', role: 'admin', password: 'Me_VishalAdmin@3098', interests: [], emailConfirmedAt: new Date().toISOString() },
+  { id: 'admin-id', name: 'System Admin', email: 'aifynestofficial@gmail.com', role: 'admin', password: 'Me_VishalAdmin@3098', interests: [], emailConfirmedAt: new Date().toISOString() },
   { id: 'owner-id', name: 'Synthesia Owner', email: 'owner@synthesia.io', role: 'owner', interests: [], emailConfirmedAt: new Date().toISOString() },
   { id: 'user-id', name: 'John Doe', email: 'john@gmail.com', role: 'user', interests: ['writing', 'coding'], emailConfirmedAt: new Date().toISOString() }
 ];
