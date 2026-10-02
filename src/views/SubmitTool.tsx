@@ -28,35 +28,35 @@ const LISTING_TIERS: ListingPlanTier[] = [
   {
     id: 'popular_spot',
     name: 'Popular Tools Spot',
-    price: 69,
-    description: 'Guaranteed high-visibility placement in the Popular Tools grid on the Homepage for 90 days.',
+    price: 19,
+    description: 'Guaranteed placement in Popular Tools & Trending section for 90 days.',
   },
   {
     id: 'featured_spot',
     name: 'Featured Tools Spot',
-    price: 99,
-    description: 'Guaranteed high-visibility placement in the Featured Tools grid on the Homepage for 90 days.',
+    price: 29,
+    description: 'Guaranteed placement in Featured Tools & Trending section for 90 days.',
   },
   {
     id: 'growth_pack',
     name: 'Growth Featured Pack',
-    price: 149,
+    price: 59,
     badge: 'RECOMMENDED',
-    description: 'Promote your tool across Popular Tools and Featured section for 3 months.',
+    description: 'Promote your tool across Popular Tools, Featured section, and Trending section for 3 months.',
   },
   {
     id: 'featured_article',
     name: 'Featured + Article Package',
     price: 199,
     badge: '🔥 BEST VALUE',
-    description: 'Get your AI tool listed in the Featured section for 90 days + dedicated editorial article published on the site.',
+    description: 'Get your AI tool listed in Featured & Trending sections for 90 days + dedicated editorial article.',
   },
   {
     id: 'annual_pass',
     name: 'Annual Pass',
     price: 299,
     badge: 'ENTERPRISE',
-    description: 'Keep your AI tool continuously promoted in Popular & Featured sections all year with a dedicated editorial article.',
+    description: 'Keep your AI tool continuously promoted in Popular, Featured & Trending sections all year with an editorial article.',
   },
 ];
 

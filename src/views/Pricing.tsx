@@ -26,16 +26,16 @@ export const Pricing: React.FC = () => {
     {
       id: 'popular_spot',
       name: 'Popular Tools Spot',
-      price: 69,
+      price: 19,
       duration: '90 Days',
       badge: null,
       category: 'featured',
-      description: 'Guaranteed high-visibility placement in the Popular Tools grid on the Homepage.',
+      description: 'Guaranteed placement in Popular Tools & Trending section for 90 days.',
       features: [
         'Homepage Popular Tools grid placement',
+        'Featured in Trending Tools section',
         '90 Days guaranteed promotion',
         'Direct outbound traffic booster',
-        'Click & impression analytics feed',
         'Standard 48-hour review turnaround',
       ],
       planParam: 'popular_spot',
@@ -43,13 +43,14 @@ export const Pricing: React.FC = () => {
     {
       id: 'featured_spot',
       name: 'Featured Tools Spot',
-      price: 99,
+      price: 29,
       duration: '90 Days',
       badge: null,
       category: 'featured',
-      description: 'Guaranteed high-visibility placement in the Featured Tools grid on the Homepage.',
+      description: 'Guaranteed placement in Featured Tools & Trending section for 90 days.',
       features: [
         'Homepage Featured Tools grid placement',
+        'Featured in Trending Tools section',
         '90 Days guaranteed promo',
         'Priority category positioning',
         'Verified Blue Checkmark badge',
@@ -60,13 +61,14 @@ export const Pricing: React.FC = () => {
     {
       id: 'growth_pack',
       name: 'Growth Featured Pack',
-      price: 149,
+      price: 59,
       duration: '90 Days',
       badge: 'RECOMMENDED',
       category: 'featured',
-      description: 'Promote your tool across Popular Tools and Featured section for 3 months.',
+      description: 'Promote your tool across Popular, Featured, and Trending sections for 3 months.',
       features: [
         'Popular Tools + Featured Hero combo',
+        'Featured in Trending Tools section',
         '90 Days active placement',
         'Dual section Homepage exposure',
         'Verified Blue Checkmark badge',
@@ -81,9 +83,9 @@ export const Pricing: React.FC = () => {
       duration: 'Lifetime Article',
       badge: '🔥 BEST VALUE',
       category: 'enterprise',
-      description: 'Get your AI tool listed in Featured for 90 days PLUS a dedicated editorial article published on the site.',
+      description: 'Get your AI tool listed in Featured & Trending sections for 90 days PLUS a dedicated editorial article.',
       features: [
-        'Featured Section placement for 90 days',
+        'Featured Section & Trending placement',
         'Dedicated Editorial Article published on site',
         'Permanent blog backlinks & SEO indexing',
         'Verified Blue Checkmark badge',
@@ -99,10 +101,10 @@ export const Pricing: React.FC = () => {
       duration: '365 Days',
       badge: 'ENTERPRISE',
       category: 'enterprise',
-      description: 'Keep your AI tool continuously promoted in Popular & Featured sections all year with a dedicated editorial article.',
+      description: 'Keep your AI tool continuously promoted in Popular, Featured & Trending sections all year with an editorial article.',
       features: [
         '365 Days continuous promotion',
-        'Promoted in Popular & Featured all year',
+        'Promoted in Popular, Featured & Trending all year',
         'Dedicated Editorial Article published on site',
         'Verified Blue Checkmark badge',
         'Priority support & analytics dashboard',
@@ -348,9 +350,9 @@ export const Pricing: React.FC = () => {
               <thead>
                 <tr style={{ borderBottom: '2px solid var(--border)' }}>
                   <th style={{ padding: '12px 16px', textAlign: 'left', color: 'var(--text-h)' }}>Feature / Benefit</th>
-                  <th style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--text-h)' }}>Popular ($69)</th>
-                  <th style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--text-h)' }}>Featured ($99)</th>
-                  <th style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>Growth ($149)</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--text-h)' }}>Popular ($19)</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--text-h)' }}>Featured ($29)</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>Growth ($59)</th>
                   <th style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>Article ($199)</th>
                   <th style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>Annual ($299)</th>
                 </tr>
@@ -371,6 +373,14 @@ export const Pricing: React.FC = () => {
                   <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>Dual (Popular + Featured)</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center' }}>Featured Grid</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>Dual (Popular + Featured)</td>
+                </tr>
+                <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                  <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>Trending Section Listing</td>
+                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓ Included</td>
+                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓ Included</td>
+                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓ Included</td>
+                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓ Included</td>
+                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓ Included</td>
                 </tr>
                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
                   <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>Verified Checkmark Badge</td>

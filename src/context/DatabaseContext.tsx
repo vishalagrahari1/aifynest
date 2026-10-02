@@ -1671,6 +1671,10 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const sortedTools = [...tools]
       .filter((t) => t.status === 'approved')
       .sort((a, b) => {
+        const promoA = a.isSponsored || a.isFeatured ? 1 : 0;
+        const promoB = b.isSponsored || b.isFeatured ? 1 : 0;
+        if (promoB !== promoA) return promoB - promoA;
+
         const scoreA = scores.find((s) => s.toolId === a.id)?.score || 0;
         const scoreB = scores.find((s) => s.toolId === b.id)?.score || 0;
         return scoreB - scoreA;

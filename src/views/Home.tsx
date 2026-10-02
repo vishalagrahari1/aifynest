@@ -1256,7 +1256,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                   padding: '6px 14px'
                 }}
               >
-                <span>+ Get Featured in Popular Tools ($39)</span>
+                <span>+ Get Featured in Popular Tools ($19)</span>
               </Link>
               <Link to="/trending" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--text-sm)', fontWeight: 'var(--font-semibold)' }}>
                 <span>View All ({tools.filter(t => t.status === 'approved').length})</span>

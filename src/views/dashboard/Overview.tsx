@@ -1604,10 +1604,11 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {[
-              { id: 'plan_starter', name: 'Popular Tools Spot', duration: '30 Days', price: '$39' },
-              { id: 'plan_growth', name: 'Growth Featured Pack', duration: '90 Days', price: '$69' },
-              { id: 'plan_featured_article', name: 'Featured + Article Package', duration: 'Lifetime Article', price: '$129 (BEST VALUE)' },
-              { id: 'plan_annual', name: 'Annual Pass', duration: '365 Days', price: '$199' },
+              { id: 'popular_spot', name: 'Popular Tools Spot', duration: '90 Days', price: '$19' },
+              { id: 'featured_spot', name: 'Featured Tools Spot', duration: '90 Days', price: '$29' },
+              { id: 'growth_pack', name: 'Growth Featured Pack', duration: '90 Days', price: '$59' },
+              { id: 'featured_article', name: 'Featured + Article Package', duration: 'Lifetime Article', price: '$199 (BEST VALUE)' },
+              { id: 'annual_pass', name: 'Annual Pass', duration: '365 Days', price: '$299' },
             ].map((p) => (
               <div key={p.id} style={{ padding: '12px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
