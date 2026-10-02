@@ -25,19 +25,11 @@ const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://izjpavrrcbglrdvrq
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
 const SITE_URL = process.env.VITE_SITE_URL || 'https://aifynest.com';
 
-function writeSitemap(categories, tools) {
+function writeSitemap(categories, tools, blogPosts = []) {
   const staticUrls = [
     '',
     '/ai-tools',
     '/blog',
-    '/blog/best-image-generation-tools',
-    '/best-image-generation-tools',
-    '/blog/best-ai-writing-tools-2026',
-    '/best-ai-writing-tools-2026',
-    '/blog/best-ai-video-editing-tools-2026',
-    '/best-ai-video-editing-tools-2026',
-    '/blog/best-ai-tools-dropshipping-2026',
-    '/best-ai-tools-dropshipping-2026',
     '/about',
     '/contact',
     '/terms',
@@ -56,6 +48,15 @@ function writeSitemap(categories, tools) {
     '/claim',
     '/login'
   ];
+
+  if (blogPosts && blogPosts.length > 0) {
+    blogPosts.forEach((post) => {
+      if (post.slug) {
+        staticUrls.push(`/blog/${post.slug}`);
+        staticUrls.push(`/${post.slug}`);
+      }
+    });
+  }
 
   let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
   xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
@@ -96,70 +97,68 @@ function writeSitemap(categories, tools) {
 
   const outputPath = path.join(__dirname, 'public', 'sitemap.xml');
   fs.writeFileSync(outputPath, xml, 'utf8');
-  console.log(`Sitemap successfully written to ${outputPath} (${tools ? tools.length : 0} approved tools indexed).`);
+  console.log(`Sitemap successfully written to ${outputPath} (${tools ? tools.length : 0} approved tools, ${blogPosts ? blogPosts.length : 0} blog posts indexed).`);
 }
 
 async function generate() {
   console.log('Generating sitemap for site domain:', SITE_URL);
   
-  if (!SUPABASE_SERVICE_KEY) {
-    console.warn('⚠️ WARNING: SUPABASE_SERVICE_ROLE_KEY is missing from environment. Static sitemap generated without database listings.');
-    writeSitemap([], []);
-    return;
-  }
+  let allTools = [];
+  let categories = [];
+  let blogPosts = [];
 
-  try {
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
-    
-    // 1. Fetch approved tools
-    const { data: dbTools, error: tErr } = await supabase
-      .from('tools')
-      .select('slug, status')
-      .eq('status', 'approved');
-    
-    if (tErr) throw tErr;
-
-    let allTools = dbTools ? [...dbTools] : [];
-
-    // Fallback: Transpile seedData.ts to ensure ALL seed tools are indexed in sitemap
+  if (SUPABASE_SERVICE_KEY) {
     try {
-      const seedPath = path.join(__dirname, 'src', 'utils', 'seedData.ts');
-      if (fs.existsSync(seedPath)) {
-        const ts = require('typescript');
-        const code = fs.readFileSync(seedPath, 'utf8');
-        const js = ts.transpileModule(code, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
-        const m = { exports: {} };
-        const fn = new Function('module', 'exports', 'require', js);
-        fn(m, m.exports, require);
+      const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+      
+      const { data: dbTools } = await supabase.from('tools').select('slug, status').eq('status', 'approved');
+      if (dbTools) allTools = [...dbTools];
 
-        const seedTools = m.exports.initialTools || [];
-        const existingSlugs = new Set(allTools.map(t => (t.slug || '').replace(/-[0-9]+$/, '')));
+      const { data: dbCat } = await supabase.from('categories').select('slug');
+      if (dbCat) categories = dbCat;
 
-        seedTools.forEach(st => {
-          const cleanSlug = (st.slug || '').replace(/-[0-9]+$/, '');
-          if (cleanSlug && !existingSlugs.has(cleanSlug)) {
-            allTools.push({ slug: cleanSlug, status: 'approved' });
-            existingSlugs.add(cleanSlug);
-          }
-        });
-      }
-    } catch (e) {
-      console.warn('Error merging seed fallback in sitemap:', e);
+      const { data: dbPosts } = await supabase.from('blog_posts').select('slug');
+      if (dbPosts) blogPosts = dbPosts;
+    } catch (err) {
+      console.warn('Error fetching data from Supabase for sitemap:', err.message);
     }
-
-    // 2. Fetch categories
-    const { data: categories, error: cErr } = await supabase
-      .from('categories')
-      .select('slug');
-    
-    if (cErr) throw cErr;
-
-    writeSitemap(categories, allTools);
-  } catch (err) {
-    console.error('Error fetching data from Supabase for sitemap:', err.message);
-    console.warn('Falling back to static-only sitemap generation.');
-    writeSitemap([], []);
   }
+
+  // Fallback: Transpile seedData.ts for seed tools and blog posts
+  try {
+    const seedPath = path.join(__dirname, 'src', 'utils', 'seedData.ts');
+    if (fs.existsSync(seedPath)) {
+      const ts = require('typescript');
+      const code = fs.readFileSync(seedPath, 'utf8');
+      const js = ts.transpileModule(code, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
+      const m = { exports: {} };
+      const fn = new Function('module', 'exports', 'require', js);
+      fn(m, m.exports, require);
+
+      const seedTools = m.exports.initialTools || [];
+      const existingToolSlugs = new Set(allTools.map(t => (t.slug || '').replace(/-[0-9]+$/, '')));
+      seedTools.forEach(st => {
+        const cleanSlug = (st.slug || '').replace(/-[0-9]+$/, '');
+        if (cleanSlug && !existingToolSlugs.has(cleanSlug)) {
+          allTools.push({ slug: cleanSlug, status: 'approved' });
+          existingToolSlugs.add(cleanSlug);
+        }
+      });
+
+      const seedPosts = m.exports.initialBlogPosts || [];
+      const existingPostSlugs = new Set(blogPosts.map(b => b.slug));
+      seedPosts.forEach(sp => {
+        if (sp.slug && !existingPostSlugs.has(sp.slug)) {
+          blogPosts.push({ slug: sp.slug });
+          existingPostSlugs.add(sp.slug);
+        }
+      });
+    }
+  } catch (e) {
+    console.warn('Error merging seed fallback in sitemap:', e);
+  }
+
+  writeSitemap(categories, allTools, blogPosts);
 }
 
 generate();

@@ -184,6 +184,45 @@ async function runPrerender() {
     console.warn('Error processing seed fallback in prerender:', e);
   }
 
+  // 1.5 Fetch blog posts dynamically
+  let blogPosts = [];
+  try {
+    const { data: dbPosts } = await supabase.from('blog_posts').select('*');
+    if (dbPosts && dbPosts.length > 0) {
+      blogPosts = dbPosts.map(p => ({
+        slug: p.slug,
+        title: p.title,
+        excerpt: p.excerpt || p.description,
+        image: p.featured_image || p.image
+      }));
+    }
+  } catch (e) {}
+
+  try {
+    const seedPath = path.join(__dirname, 'src', 'utils', 'seedData.ts');
+    if (fs.existsSync(seedPath)) {
+      const ts = require('typescript');
+      const code = fs.readFileSync(seedPath, 'utf8');
+      const js = ts.transpileModule(code, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
+      const m = { exports: {} };
+      const fn = new Function('module', 'exports', 'require', js);
+      fn(m, m.exports, require);
+
+      const seedPosts = m.exports.initialBlogPosts || [];
+      const existingSlugs = new Set(blogPosts.map(b => b.slug));
+
+      seedPosts.forEach(sp => {
+        if (sp.slug && !existingSlugs.has(sp.slug)) {
+          blogPosts.push(sp);
+          existingSlugs.add(sp.slug);
+        }
+      });
+      console.log(`📦 Loaded ${blogPosts.length} blog posts into prerender queue.`);
+    }
+  } catch (e) {
+    console.warn('Error processing blog seed fallback in prerender:', e);
+  }
+
   // 2. Fetch categories
   let categories = [];
   try {
@@ -193,7 +232,7 @@ async function runPrerender() {
     }
   } catch (e) {}
 
-  console.log(`Loaded ${tools ? tools.length : 0} tools and ${categories ? categories.length : 0} categories.`);
+  console.log(`Loaded ${tools ? tools.length : 0} tools, ${blogPosts ? blogPosts.length : 0} blog posts, and ${categories ? categories.length : 0} categories.`);
 
   // A. Static Pages
   const staticRoutes = [
@@ -206,51 +245,37 @@ async function runPrerender() {
       path: '/blog',
       title: 'AI Insights & Guides Blog — AIFynest',
       description: 'Explore in-depth articles, AI tool roundups, tutorials, and technology insights on AIFynest.'
-    },
-    {
-      path: '/best-image-generation-tools',
-      title: 'Best AI Image Generation Tools in 2026 — AIFynest',
-      description: 'Discover and compare top AI image generation tools like Midjourney, DALL-E 3, Stable Diffusion, and Leonardo AI.'
-    },
-    {
-      path: '/blog/best-image-generation-tools',
-      title: 'Best AI Image Generation Tools in 2026 — AIFynest Blog',
-      description: 'Discover and compare top AI image generation tools like Midjourney, DALL-E 3, Stable Diffusion, and Leonardo AI.'
-    },
-    {
-      path: '/best-ai-writing-tools-2026',
-      title: 'Best AI Writing Tools & Assistants in 2026 — AIFynest',
-      description: 'Compare the top AI writing assistants, copywriting tools, and content generators including ChatGPT, Jasper, and Copy.ai.'
-    },
-    {
-      path: '/blog/best-ai-writing-tools-2026',
-      title: 'Best AI Writing Tools & Assistants in 2026 — AIFynest Blog',
-      description: 'Compare the top AI writing assistants, copywriting tools, and content generators including ChatGPT, Jasper, and Copy.ai.'
-    },
-    {
-      path: '/best-ai-video-editing-tools-2026',
-      title: 'Best AI Video Editing Tools in 2026 — AIFynest',
-      description: 'Looking for the best AI video editing tools in 2026? Compare 8 top AI video editors for YouTube, Shorts, social media, podcasts, and professional video production.',
-      ogImage: 'https://aifynest.com/images/best-ai-video-editing-tools-2026.jpg'
-    },
-    {
-      path: '/blog/best-ai-video-editing-tools-2026',
-      title: 'Best AI Video Editing Tools in 2026 — AIFynest Blog',
-      description: 'Looking for the best AI video editing tools in 2026? Compare 8 top AI video editors for YouTube, Shorts, social media, podcasts, and professional video production.',
-      ogImage: 'https://aifynest.com/images/best-ai-video-editing-tools-2026.jpg'
-    },
-    {
-      path: '/best-ai-tools-dropshipping-2026',
-      title: 'Best AI Tools for Dropshipping 2026 — AIFynest',
-      description: 'Discover the best AI tools for dropshipping in 2026. Learn how to automate product research, supplier sourcing, product descriptions, marketing, ad creatives, and customer support.',
-      ogImage: 'https://aifynest.com/images/best-ai-tools-dropshipping-2026.jpg'
-    },
-    {
-      path: '/blog/best-ai-tools-dropshipping-2026',
-      title: 'Best AI Tools for Dropshipping 2026 — AIFynest Blog',
-      description: 'Discover the best AI tools for dropshipping in 2026. Learn how to automate product research, supplier sourcing, product descriptions, marketing, ad creatives, and customer support.',
-      ogImage: 'https://aifynest.com/images/best-ai-tools-dropshipping-2026.jpg'
-    },
+    }
+  ];
+
+  // Dynamically add all blog post routes (/blog/:slug and /:slug)
+  if (blogPosts && blogPosts.length > 0) {
+    blogPosts.forEach(post => {
+      if (!post.slug) return;
+      const title = post.title.includes('AIFynest') ? post.title : `${post.title} — AIFynest Blog`;
+      const description = post.excerpt || post.title;
+      let ogImage = post.image || 'https://aifynest.com/logo.png';
+      if (ogImage.startsWith('/')) {
+        ogImage = `${SITE_URL}${ogImage}`;
+      }
+
+      staticRoutes.push({
+        path: `/blog/${post.slug}`,
+        title,
+        description,
+        ogImage
+      });
+
+      staticRoutes.push({
+        path: `/${post.slug}`,
+        title,
+        description,
+        ogImage
+      });
+    });
+  }
+
+  staticRoutes.push(
     {
       path: '/about',
       title: 'About Us — AIFynest',
@@ -346,7 +371,7 @@ async function runPrerender() {
       title: 'Sign Up — AIFynest Account',
       description: 'Create an account on AIFynest to review AI software, submit applications, and bookmark favorites.'
     }
-  ];
+  );
 
   // 0. Update Root Homepage (dist/index.html) with Organization, WebSite, and visible FAQPage schemas
   const rootHomeHtml = buildPageHTML(templateHTML, {

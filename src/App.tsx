@@ -215,6 +215,8 @@ const AppContent: React.FC<{
           <Route path="/best-ai-writing-tools-2026" element={<Navigate to="/blog/best-ai-writing-tools-2026" replace />} />
           <Route path="/best-ai-video-editing-tools-2026" element={<Navigate to="/blog/best-ai-video-editing-tools-2026" replace />} />
           <Route path="/best-ai-tools-dropshipping-2026" element={<Navigate to="/blog/best-ai-tools-dropshipping-2026" replace />} />
+          <Route path="/10-best-ai-study-tools-for-students-2026" element={<Navigate to="/blog/10-best-ai-study-tools-for-students-2026" replace />} />
+          <Route path="/how-to-use-ai-coding-assistants" element={<Navigate to="/blog/how-to-use-ai-coding-assistants" replace />} />
 
           {/* Policy & Legal routes */}
           <Route path="/about" element={<About />} />
