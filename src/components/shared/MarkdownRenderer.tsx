@@ -281,12 +281,38 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
 function renderInline(text: string): React.ReactNode {
   if (!text) return null;
 
-  // Regex pattern for bold, italic, inline code, and links
-  const pattern = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|\[[^\]]+\]\([^)]+\))/g;
+  // Regex pattern for bold, italic, inline code, images, and links
+  const pattern = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|!\[[^\]]*\]\([^)]+\)|\[[^\]]+\]\([^)]+\))/g;
   const parts = text.split(pattern);
 
   return parts.map((part, idx) => {
     if (!part) return null;
+
+    // Image ![alt](url)
+    const imgMatchInline = part.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+    if (imgMatchInline) {
+      const altText = imgMatchInline[1];
+      const imgSrc = imgMatchInline[2];
+      return (
+        <span key={idx} style={{ display: 'block', margin: '24px 0', textAlign: 'center' }}>
+          <img
+            src={imgSrc}
+            alt={altText}
+            style={{
+              maxWidth: '100%',
+              height: 'auto',
+              maxHeight: '520px',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border-color)',
+              boxShadow: 'var(--shadow-sm)',
+              display: 'block',
+              margin: '0 auto',
+              objectFit: 'contain'
+            }}
+          />
+        </span>
+      );
+    }
 
     // Bold **text**
     if (part.startsWith('**') && part.endsWith('**')) {
