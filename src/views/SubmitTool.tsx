@@ -29,20 +29,20 @@ const LISTING_TIERS: ListingPlanTier[] = [
     id: 'popular_spot',
     name: 'Popular Tools Spot',
     price: 19,
-    description: 'Guaranteed placement in Popular Tools & Trending section for 90 days.',
+    description: 'Guaranteed placement in Popular Tools & Trending section + Citation in LLMs & AI Search.',
   },
   {
     id: 'featured_spot',
     name: 'Featured Tools Spot',
     price: 29,
-    description: 'Guaranteed placement in Featured Tools & Trending section for 90 days.',
+    description: 'Guaranteed placement in Featured Tools & Trending section + Citation in LLMs & AI Search.',
   },
   {
     id: 'growth_pack',
     name: 'Growth Featured Pack',
     price: 59,
     badge: 'RECOMMENDED',
-    description: 'Promote your tool across Popular Tools, Featured section, and Trending section for 3 months.',
+    description: 'Promote your tool across Popular Tools & Featured section + Citation in LLMs & AI Search.',
   },
   {
     id: 'guest_post',

@@ -34,6 +34,7 @@ export const Pricing: React.FC = () => {
       features: [
         'Homepage Popular Tools grid placement',
         'Featured in Trending Tools section',
+        'Helps your product get cited in LLMs & AI Search',
         '90 Days guaranteed promotion',
         'Direct outbound traffic booster',
         'Standard 48-hour review turnaround',
@@ -51,6 +52,7 @@ export const Pricing: React.FC = () => {
       features: [
         'Homepage Featured Tools grid placement',
         'Featured in Trending Tools section',
+        'Helps your product get cited in LLMs & AI Search',
         '90 Days guaranteed promo',
         'Priority category positioning',
         'Verified Blue Checkmark badge',
@@ -69,6 +71,7 @@ export const Pricing: React.FC = () => {
       features: [
         'Popular Tools + Featured Hero combo',
         'Featured in Trending Tools section',
+        'Helps your product get cited in LLMs & AI Search',
         '90 Days active placement',
         'Dual section Homepage exposure',
         'Verified Blue Checkmark badge',
@@ -508,9 +511,9 @@ export const Pricing: React.FC = () => {
                 </tr>
                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
                   <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>LLM & AI Search Engine Citation</td>
-                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--text-secondary)' }}>Standard Index</td>
-                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓ Real-time Indexing</td>
-                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓ Real-time Indexing</td>
+                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓ LLM Search Indexing</td>
+                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓ Real-time LLM Citation</td>
+                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓ Real-time LLM Citation</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)', fontWeight: 'bold' }}>✓ Priority LLM Citation</td>
                 </tr>
                 <tr>

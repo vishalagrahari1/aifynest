@@ -14,7 +14,13 @@ export const Advertise: React.FC = () => {
       price: '$19',
       description: 'Guaranteed placement in Popular Tools & Trending section for 90 days.',
       badge: null,
-      features: ['Homepage Popular Tools grid placement', 'Listed in Trending Tools section', '90 Days guaranteed promotion', 'Direct outbound traffic booster'],
+      features: [
+        'Homepage Popular Tools grid placement',
+        'Listed in Trending Tools section',
+        'Helps your product get cited in LLMs & AI Search',
+        '90 Days guaranteed promotion',
+        'Direct outbound traffic booster',
+      ],
     },
     {
       id: 'featured_spot',
@@ -23,7 +29,13 @@ export const Advertise: React.FC = () => {
       price: '$29',
       description: 'Guaranteed placement in Featured Tools & Trending section for 90 days.',
       badge: null,
-      features: ['Homepage Featured Tools grid placement', 'Listed in Trending Tools section', '90 Days guaranteed promo', 'Priority category positioning'],
+      features: [
+        'Homepage Featured Tools grid placement',
+        'Listed in Trending Tools section',
+        'Helps your product get cited in LLMs & AI Search',
+        '90 Days guaranteed promo',
+        'Priority category positioning',
+      ],
     },
     {
       id: 'growth_pack',
@@ -32,7 +44,13 @@ export const Advertise: React.FC = () => {
       price: '$59',
       description: 'Promote your tool across Popular Tools, Featured section, and Trending section for 3 months.',
       badge: 'RECOMMENDED',
-      features: ['Popular Tools + Featured Hero combo', 'Listed in Trending Tools section', '90 Days active placement', 'Verified Blue Checkmark badge'],
+      features: [
+        'Popular Tools + Featured Hero combo',
+        'Listed in Trending Tools section',
+        'Helps your product get cited in LLMs & AI Search',
+        '90 Days active placement',
+        'Verified Blue Checkmark badge',
+      ],
     },
     {
       id: 'guest_post',
@@ -41,7 +59,12 @@ export const Advertise: React.FC = () => {
       price: '$99',
       description: 'Dedicated guest post editorial article published on site + Featured placement + Citation in LLMs & AI Search Engines.',
       badge: '🔥 BEST VALUE',
-      features: ['Dedicated Guest Post Article published on site', 'Featured Section & Trending placement', 'Helps your product get cited in LLMs & AI Search', 'Permanent dofollow SEO backlink'],
+      features: [
+        'Dedicated Guest Post Article published on site',
+        'Featured Section & Trending placement',
+        'Helps your product get cited in LLMs & AI Search',
+        'Permanent dofollow SEO backlink',
+      ],
     },
   ];
 
