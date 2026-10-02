@@ -1607,8 +1607,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({ onToast }) => {
               { id: 'popular_spot', name: 'Popular Tools Spot', duration: '90 Days', price: '$19' },
               { id: 'featured_spot', name: 'Featured Tools Spot', duration: '90 Days', price: '$29' },
               { id: 'growth_pack', name: 'Growth Featured Pack', duration: '90 Days', price: '$59' },
-              { id: 'featured_article', name: 'Featured + Article Package', duration: 'Lifetime Article', price: '$199 (BEST VALUE)' },
-              { id: 'annual_pass', name: 'Annual Pass', duration: '365 Days', price: '$299' },
+              { id: 'guest_post', name: 'Guest Post Article Package', duration: 'Lifetime Article', price: '$99 (BEST VALUE)' },
             ].map((p) => (
               <div key={p.id} style={{ padding: '12px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>

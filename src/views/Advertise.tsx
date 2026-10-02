@@ -35,22 +35,13 @@ export const Advertise: React.FC = () => {
       features: ['Popular Tools + Featured Hero combo', 'Listed in Trending Tools section', '90 Days active placement', 'Verified Blue Checkmark badge'],
     },
     {
-      id: 'featured_article',
-      name: 'Featured + Article Package',
+      id: 'guest_post',
+      name: 'Guest Post Article Package',
       duration: 'Lifetime Article',
-      price: '$199',
-      description: 'Get your AI tool listed in the Featured section for 90 days and get a dedicated editorial article published on the site.',
+      price: '$99',
+      description: 'Dedicated guest post editorial article published on site + Featured placement + Citation in LLMs & AI Search Engines.',
       badge: '🔥 BEST VALUE',
-      features: ['Featured Section placement for 90 days', 'Dedicated Editorial Article published on site', 'Permanent blog backlinks & SEO indexing'],
-    },
-    {
-      id: 'annual_pass',
-      name: 'Annual Pass',
-      duration: '365 Days',
-      price: '$299',
-      description: 'Keep your AI tool continuously promoted in Popular & Featured sections all year with a dedicated editorial article published on the site.',
-      badge: 'ENTERPRISE',
-      features: ['365 Days continuous promotion', 'Promoted in Popular & Featured all year', 'Dedicated Editorial Article published on site'],
+      features: ['Dedicated Guest Post Article published on site', 'Featured Section & Trending placement', 'Helps your product get cited in LLMs & AI Search', 'Permanent dofollow SEO backlink'],
     },
   ];
 
@@ -58,7 +49,7 @@ export const Advertise: React.FC = () => {
     <div className="container section">
       <SEOHead
         title="Sponsor Your AI Tool — AIFynest"
-        description="Get premium visibility for your AI tool with a simple fixed-duration sponsorship plan. Choose 90 Days or 365 Days of promotion."
+        description="Get premium visibility for your AI tool with a simple fixed-duration sponsorship plan. Choose Popular, Featured, Growth, or Guest Post packages."
       />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
@@ -79,18 +70,18 @@ export const Advertise: React.FC = () => {
             }}
           >
             <Sparkles size={14} />
-            <span>Sponsorship Program</span>
+            <span>Sponsorship & Promotion Program</span>
           </div>
           <h1 style={{ margin: 0, fontSize: 'var(--text-3xl)', fontWeight: 'var(--font-bold)' }}>
             Sponsor Your AI Tool
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', margin: '12px 0 0 0', lineHeight: '1.6' }}>
-            Get maximum traffic and visibility for your AI tool with our official sponsorship packages.
+            Accelerate traffic, gain dofollow backlinks, and get cited in LLMs & AI search engines with our official promotional plans.
           </p>
         </div>
 
-        {/* 5 Official Sponsorship Pricing Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }} className="plans-grid">
+        {/* 4 Official Sponsorship Pricing Cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }} className="plans-grid">
           {plans.map((plan) => (
             <div
               key={plan.id}
@@ -163,10 +154,10 @@ export const Advertise: React.FC = () => {
         >
           <div>
             <h4 style={{ margin: '0 0 4px 0', fontSize: 'var(--text-base)', fontWeight: 'bold', color: 'var(--text-primary)' }}>
-              📝 Looking for Guest Post Articles?
+              📝 Looking for Guest Post Articles ($99)?
             </h4>
             <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
-              For custom guest post requests, sponsored article publishing, or editorial guidelines, contact our official team:
+              Publish a dedicated editorial review for your AI tool, complete with dofollow backlinks and LLM search engine indexing.
             </p>
           </div>
           <a
@@ -181,35 +172,35 @@ export const Advertise: React.FC = () => {
         {/* Why Sponsor Your Tool */}
         <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '32px', maxWidth: '840px', margin: '0 auto', width: '100%' }}>
           <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 'bold', margin: '0 0 20px 0', textAlign: 'center' }}>
-            Why Sponsor Your Tool?
+            Why Sponsor & List Your Tool on AIFynest?
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }} className="why-grid">
             <div style={{ display: 'flex', gap: '12px' }}>
               <Check size={18} style={{ color: 'var(--color-success)', flexShrink: 0, marginTop: '2px' }} />
               <div>
-                <strong style={{ fontSize: 'var(--text-sm)', display: 'block', marginBottom: '2px' }}>Fixed Pricing</strong>
-                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>Pay once for your selected sponsorship period.</span>
+                <strong style={{ fontSize: 'var(--text-sm)', display: 'block', marginBottom: '2px' }}>Cited in LLMs & AI Search</strong>
+                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>Get indexed by ChatGPT, Perplexity, Claude, SearchGPT, and Gemini.</span>
               </div>
             </div>
             <div style={{ display: 'flex', gap: '12px' }}>
               <Check size={18} style={{ color: 'var(--color-success)', flexShrink: 0, marginTop: '2px' }} />
               <div>
-                <strong style={{ fontSize: 'var(--text-sm)', display: 'block', marginBottom: '2px' }}>Premium Visibility</strong>
-                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>Give your AI tool additional promotional visibility across AIFynest.</span>
+                <strong style={{ fontSize: 'var(--text-sm)', display: 'block', marginBottom: '2px' }}>High Targeted Visibility</strong>
+                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>Reach thousands of active creators, software engineers, and tech buyers daily.</span>
               </div>
             </div>
             <div style={{ display: 'flex', gap: '12px' }}>
               <Check size={18} style={{ color: 'var(--color-success)', flexShrink: 0, marginTop: '2px' }} />
               <div>
-                <strong style={{ fontSize: 'var(--text-sm)', display: 'block', marginBottom: '2px' }}>No Per-Click Fees</strong>
-                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>You are not charged every time someone clicks your tool.</span>
+                <strong style={{ fontSize: 'var(--text-sm)', display: 'block', marginBottom: '2px' }}>Dofollow SEO Backlinks</strong>
+                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>Pass domain authority directly to your product website to rank higher.</span>
               </div>
             </div>
             <div style={{ display: 'flex', gap: '12px' }}>
               <Check size={18} style={{ color: 'var(--color-success)', flexShrink: 0, marginTop: '2px' }} />
               <div>
-                <strong style={{ fontSize: 'var(--text-sm)', display: 'block', marginBottom: '2px' }}>Simple & Transparent</strong>
-                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>Choose your plan, pay securely via Cashfree, and start gaining traffic immediately.</span>
+                <strong style={{ fontSize: 'var(--text-sm)', display: 'block', marginBottom: '2px' }}>24-Hour Express Listing</strong>
+                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>Priority editorial review queue gets your tool published live in under 24 hours.</span>
               </div>
             </div>
           </div>

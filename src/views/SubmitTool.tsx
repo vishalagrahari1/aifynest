@@ -45,18 +45,11 @@ const LISTING_TIERS: ListingPlanTier[] = [
     description: 'Promote your tool across Popular Tools, Featured section, and Trending section for 3 months.',
   },
   {
-    id: 'featured_article',
-    name: 'Featured + Article Package',
-    price: 199,
+    id: 'guest_post',
+    name: 'Guest Post Article Package',
+    price: 99,
     badge: '🔥 BEST VALUE',
-    description: 'Get your AI tool listed in Featured & Trending sections for 90 days + dedicated editorial article.',
-  },
-  {
-    id: 'annual_pass',
-    name: 'Annual Pass',
-    price: 299,
-    badge: 'ENTERPRISE',
-    description: 'Keep your AI tool continuously promoted in Popular, Featured & Trending sections all year with an editorial article.',
+    description: 'Dedicated guest post editorial article published on site + Featured placement + Citation in LLMs & AI Search.',
   },
 ];
 

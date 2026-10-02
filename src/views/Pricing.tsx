@@ -77,40 +77,22 @@ export const Pricing: React.FC = () => {
       planParam: 'growth_pack',
     },
     {
-      id: 'featured_article',
-      name: 'Featured + Article Package',
-      price: 199,
-      duration: 'Lifetime Article',
+      id: 'guest_post',
+      name: 'Guest Post Article Package',
+      price: 99,
+      duration: 'Lifetime Guest Post',
       badge: '🔥 BEST VALUE',
       category: 'enterprise',
-      description: 'Get your AI tool listed in Featured & Trending sections for 90 days PLUS a dedicated editorial article.',
+      description: 'Dedicated guest post editorial article published on site + Featured placement + Citation in LLMs & AI Search.',
       features: [
+        'Dedicated Guest Post Article published on site',
         'Featured Section & Trending placement',
-        'Dedicated Editorial Article published on site',
-        'Permanent blog backlinks & SEO indexing',
+        'Helps your product get cited in LLMs & AI Search',
+        'Permanent dofollow SEO backlink & indexation',
         'Verified Blue Checkmark badge',
-        'Priority search & analytics feed',
         'Included in weekly newsletter blast',
       ],
-      planParam: 'featured_article',
-    },
-    {
-      id: 'annual_pass',
-      name: 'Annual Pass',
-      price: 299,
-      duration: '365 Days',
-      badge: 'ENTERPRISE',
-      category: 'enterprise',
-      description: 'Keep your AI tool continuously promoted in Popular, Featured & Trending sections all year with an editorial article.',
-      features: [
-        '365 Days continuous promotion',
-        'Promoted in Popular, Featured & Trending all year',
-        'Dedicated Editorial Article published on site',
-        'Verified Blue Checkmark badge',
-        'Priority support & analytics dashboard',
-        'LLM & AI Search Indexing Optimization',
-      ],
-      planParam: 'annual_pass',
+      planParam: 'guest_post',
     },
   ];
 
@@ -204,7 +186,7 @@ export const Pricing: React.FC = () => {
                 transition: 'all 0.2s ease',
               }}
             >
-              All Plans (5)
+              All Plans (4)
             </button>
             <button
               onClick={() => setActiveTab('featured')}
@@ -236,18 +218,18 @@ export const Pricing: React.FC = () => {
                 transition: 'all 0.2s ease',
               }}
             >
-              Article & Annual Pass
+              Guest Post Article ($99)
             </button>
           </div>
         </div>
 
-        {/* 5 Official Pricing Cards Grid */}
+        {/* 4 Official Pricing Cards Grid */}
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '24px',
-            maxWidth: '1200px',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '20px',
+            maxWidth: '1240px',
             margin: '0 auto',
             width: '100%',
           }}
@@ -328,6 +310,131 @@ export const Pricing: React.FC = () => {
           ))}
         </div>
 
+        {/* Benefits of Listing Section */}
+        <div
+          style={{
+            maxWidth: '1200px',
+            margin: '20px auto 0 auto',
+            width: '100%',
+            backgroundColor: 'var(--code-bg)',
+            border: '1px solid var(--border)',
+            borderRadius: '16px',
+            padding: '36px 28px',
+            textAlign: 'left',
+          }}
+        >
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <span
+              style={{
+                backgroundColor: 'var(--accent-bg)',
+                color: 'var(--accent)',
+                padding: '4px 14px',
+                borderRadius: '20px',
+                fontSize: '11px',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}
+            >
+              Why List Your Product?
+            </span>
+            <h2 style={{ fontSize: '24px', fontWeight: 'bold', margin: '12px 0 6px 0', color: 'var(--text-h)' }}>
+              Benefits of Listing on AIFynest
+            </h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: 0 }}>
+              Unlock high-intent buyer traffic, permanent authority backlinks, and AI model indexing.
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat( auto-fit, minmax(250px, 1fr) )',
+              gap: '20px',
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: 'var(--bg)',
+                border: '1px solid var(--border)',
+                borderRadius: '12px',
+                padding: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+              }}
+            >
+              <div style={{ fontSize: '28px' }}>🤖</div>
+              <h3 style={{ fontSize: '16px', fontWeight: 'bold', margin: 0, color: 'var(--text-h)' }}>
+                Help You Get Cited in LLMs
+              </h3>
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.5' }}>
+                AI Search Engines like ChatGPT, Perplexity, Claude, SearchGPT, and Gemini scrape and index AIFynest directory listings and articles. Listing here ensures LLMs recommend your product when users prompt for AI tools.
+              </p>
+            </div>
+
+            <div
+              style={{
+                backgroundColor: 'var(--bg)',
+                border: '1px solid var(--border)',
+                borderRadius: '12px',
+                padding: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+              }}
+            >
+              <div style={{ fontSize: '28px' }}>🚀</div>
+              <h3 style={{ fontSize: '16px', fontWeight: 'bold', margin: 0, color: 'var(--text-h)' }}>
+                High Targeted Buyer Visibility
+              </h3>
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.5' }}>
+                Reach thousands of active creators, software engineers, marketing leaders, and founders actively searching for top-tier AI software solutions every single day.
+              </p>
+            </div>
+
+            <div
+              style={{
+                backgroundColor: 'var(--bg)',
+                border: '1px solid var(--border)',
+                borderRadius: '12px',
+                padding: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+              }}
+            >
+              <div style={{ fontSize: '28px' }}>🔗</div>
+              <h3 style={{ fontSize: '16px', fontWeight: 'bold', margin: 0, color: 'var(--text-h)' }}>
+                Dofollow SEO Backlink Authority
+              </h3>
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.5' }}>
+                Gain permanent, clean dofollow links pointing directly to your website. Boost your domain authority (DA/DR) and rank higher on Google search results pages.
+              </p>
+            </div>
+
+            <div
+              style={{
+                backgroundColor: 'var(--bg)',
+                border: '1px solid var(--border)',
+                borderRadius: '12px',
+                padding: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+              }}
+            >
+              <div style={{ fontSize: '28px' }}>⚡</div>
+              <h3 style={{ fontSize: '16px', fontWeight: 'bold', margin: 0, color: 'var(--text-h)' }}>
+                24-Hour Express Review Queue
+              </h3>
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.5' }}>
+                Skip long submission waiting lists. All paid packages receive priority editor review and publish live on the homepage and directory within 24 hours.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Package Feature Comparison Matrix */}
         <div
           style={{
@@ -353,8 +460,7 @@ export const Pricing: React.FC = () => {
                   <th style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--text-h)' }}>Popular ($19)</th>
                   <th style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--text-h)' }}>Featured ($29)</th>
                   <th style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>Growth ($59)</th>
-                  <th style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>Article ($199)</th>
-                  <th style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>Annual ($299)</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>Guest Post ($99)</th>
                 </tr>
               </thead>
               <tbody>
@@ -363,20 +469,17 @@ export const Pricing: React.FC = () => {
                   <td style={{ padding: '12px 16px', textAlign: 'center' }}>90 Days</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center' }}>90 Days</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center' }}>90 Days</td>
-                  <td style={{ padding: '12px 16px', textAlign: 'center' }}>Permanent Article</td>
-                  <td style={{ padding: '12px 16px', textAlign: 'center', fontWeight: 'bold' }}>365 Days</td>
+                  <td style={{ padding: '12px 16px', textAlign: 'center', fontWeight: 'bold', color: 'var(--accent)' }}>Permanent Guest Post</td>
                 </tr>
                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
                   <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>Homepage Section Placement</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center' }}>Popular Grid</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center' }}>Featured Grid</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>Dual (Popular + Featured)</td>
-                  <td style={{ padding: '12px 16px', textAlign: 'center' }}>Featured Grid</td>
-                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>Dual (Popular + Featured)</td>
+                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>Featured Grid + Blog</td>
                 </tr>
                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
                   <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>Trending Section Listing</td>
-                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓ Included</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓ Included</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓ Included</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓ Included</td>
@@ -388,29 +491,32 @@ export const Pricing: React.FC = () => {
                   <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓</td>
-                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓</td>
                 </tr>
                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
                   <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>Dofollow SEO Backlink</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--text-secondary)' }}>—</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓ Included</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓ Included</td>
-                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓ Included</td>
-                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓ Included</td>
+                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓ Permanent Dofollow</td>
                 </tr>
                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
                   <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>Dedicated Editorial Article</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--text-secondary)' }}>—</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--text-secondary)' }}>—</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--text-secondary)' }}>—</td>
-                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)', fontWeight: 'bold' }}>✓ Full Article</td>
-                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)', fontWeight: 'bold' }}>✓ Full Article</td>
+                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)', fontWeight: 'bold' }}>✓ Full Guest Post</td>
+                </tr>
+                <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                  <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>LLM & AI Search Engine Citation</td>
+                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--text-secondary)' }}>Standard Index</td>
+                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓ Real-time Indexing</td>
+                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>✓ Real-time Indexing</td>
+                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)', fontWeight: 'bold' }}>✓ Priority LLM Citation</td>
                 </tr>
                 <tr>
                   <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>Express Turnaround Time</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center' }}>48 Hours</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center' }}>24 Hours</td>
-                  <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>24 Hours Priority</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>24 Hours Priority</td>
                   <td style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--accent)' }}>24 Hours Priority</td>
                 </tr>
