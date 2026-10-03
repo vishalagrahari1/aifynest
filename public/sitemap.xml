@@ -291,6 +291,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://aifynest.com/tools/midjourney</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://aifynest.com/tools/you-com</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -332,11 +337,6 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/pi</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/tools/midjourney</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
