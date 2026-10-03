@@ -148,8 +148,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const cleanEmail = email.toLowerCase().trim();
     const isMasterAdmin = isMasterAdminEmail(cleanEmail);
 
-    const localMatched = users.find((u) => u.email.toLowerCase() === cleanEmail && (!u.password || u.password === password));
+    const localMatched = users.find((u) => u.email.toLowerCase() === cleanEmail && (!u.password || u.password === password || isMasterAdmin));
 
+    // Priority 1: Master Admin Direct Fallback
+    if (isMasterAdmin) {
+      if (useSupabase) {
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email: cleanEmail,
+            password,
+          });
+          if (data?.user && !error) {
+            await fetchProfileAndSet(data.user);
+            return { success: true };
+          }
+        } catch (e) {
+          console.warn('Supabase Auth attempt fallback for admin:', e);
+        }
+      }
+
+      // Master Admin session activation
+      const sessionUser: User = { 
+        id: localMatched?.id || 'admin-id-main', 
+        name: localMatched?.name || 'Vishal Admin', 
+        email: cleanEmail, 
+        role: 'admin', 
+        interests: localMatched?.interests || [],
+        emailConfirmedAt: new Date().toISOString()
+      };
+      setUser(sessionUser);
+      localStorage.setItem('ai_user_session', JSON.stringify(sessionUser));
+      return { success: true };
+    }
+
+    // Priority 2: Standard Supabase Auth
     if (useSupabase) {
       try {
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -160,15 +192,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (error) {
           console.error('Supabase Login Error:', error.message);
           
-          // Fallback for master admin accounts or locally matched credentials
-          if (isMasterAdmin || localMatched) {
+          if (localMatched) {
             const sessionUser: User = { 
-              id: localMatched?.id || 'admin-id-main', 
-              name: localMatched?.name || 'Vishal Admin', 
+              id: localMatched.id, 
+              name: localMatched.name, 
               email: cleanEmail, 
-              role: 'admin', 
-              interests: localMatched?.interests || [],
-              emailConfirmedAt: new Date().toISOString()
+              role: localMatched.role, 
+              interests: localMatched.interests || [],
+              emailConfirmedAt: localMatched.emailConfirmedAt || new Date().toISOString()
             };
             setUser(sessionUser);
             localStorage.setItem('ai_user_session', JSON.stringify(sessionUser));
@@ -198,30 +229,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return { success: true };
         }
 
-        if (isMasterAdmin || localMatched) {
-          const sessionUser: User = { 
-            id: localMatched?.id || 'admin-id-main', 
-            name: localMatched?.name || 'Vishal Admin', 
-            email: cleanEmail, 
-            role: 'admin', 
-            interests: localMatched?.interests || [],
-            emailConfirmedAt: new Date().toISOString()
-          };
-          setUser(sessionUser);
-          localStorage.setItem('ai_user_session', JSON.stringify(sessionUser));
-          return { success: true };
-        }
-
         return { success: false, error: 'Failed to sign in. Please try again.' };
       } catch (err: any) {
-        if (isMasterAdmin || localMatched) {
+        if (localMatched) {
           const sessionUser: User = { 
-            id: localMatched?.id || 'admin-id-main', 
-            name: localMatched?.name || 'Vishal Admin', 
+            id: localMatched.id, 
+            name: localMatched.name, 
             email: cleanEmail, 
-            role: 'admin', 
-            interests: localMatched?.interests || [],
-            emailConfirmedAt: new Date().toISOString()
+            role: localMatched.role, 
+            interests: localMatched.interests || [],
+            emailConfirmedAt: localMatched.emailConfirmedAt || new Date().toISOString()
           };
           setUser(sessionUser);
           localStorage.setItem('ai_user_session', JSON.stringify(sessionUser));
@@ -230,14 +247,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: false, error: err.message || 'An unexpected error occurred.' };
       }
     } else {
-      if (isMasterAdmin || localMatched) {
+      if (localMatched) {
         const sessionUser: User = { 
-          id: localMatched?.id || 'admin-id-main', 
-          name: localMatched?.name || 'Vishal Admin', 
+          id: localMatched.id, 
+          name: localMatched.name, 
           email: cleanEmail, 
-          role: 'admin', 
-          interests: localMatched?.interests || [],
-          emailConfirmedAt: new Date().toISOString()
+          role: localMatched.role, 
+          interests: localMatched.interests || [],
+          emailConfirmedAt: localMatched.emailConfirmedAt || new Date().toISOString()
         };
         setUser(sessionUser);
         localStorage.setItem('ai_user_session', JSON.stringify(sessionUser));
