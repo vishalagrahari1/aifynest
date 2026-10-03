@@ -1,0 +1,61 @@
+# AIFynest - Full AI Tools & Software Directory Context (llms-full.txt)
+
+> AIFynest (https://aifynest.com/) is a premier curated directory for discovering, comparing, and reviewing top artificial intelligence tools, platforms, LLM applications, and software.
+
+## Platform Summary
+- Domain: https://aifynest.com
+- Total Index: 237+ Verified & Approved AI Software Tools
+- Top Categories: AI Writing, AI Image Generation, AI Video, AI Audio, AI Coding, AI Marketing, AI Productivity, AI Design, AI Research, AI Education, AI Business, AI Finance.
+- Key Services: Directory catalog, side-by-side comparison engine, editorial reviews, user ratings, pricing plans breakdowns, dofollow backlinks, and LLM search engine indexing.
+
+## Comprehensive Category Catalog
+
+### 1. AI Writing Tools
+URL: https://aifynest.com/ai-tools/writing
+Description: Copywriting, email generation, text summarization, blog post generators, and AI assistants.
+Popular Tools: ChatGPT, Claude, Jasper AI, Copy.ai, Grammarly, Writesonic, Rytr.
+
+### 2. AI Image Generation Tools
+URL: https://aifynest.com/ai-tools/image-generation
+Description: Text-to-image creators, photorealistic AI art generators, photo editing, and vector design.
+Popular Tools: Midjourney, DALL-E 3, Stable Diffusion, Leonardo AI, Canva AI, Photoleap.
+
+### 3. AI Video Tools
+URL: https://aifynest.com/ai-tools/video
+Description: AI video creation, text-to-video generators, AI avatars, automated subtitle generation, and video editing.
+Popular Tools: Synthesia, HeyGen, Runway Gen-2, InVideo AI, Descript, CapCut AI, Sora.
+
+### 4. AI Audio Tools
+URL: https://aifynest.com/ai-tools/audio
+Description: Text-to-speech voiceovers, AI voice cloning, background music generators, and audio transcription.
+Popular Tools: ElevenLabs, Suno AI, Udio, Murf AI, Otter.ai, Speechelo.
+
+### 5. AI Coding & Development Tools
+URL: https://aifynest.com/ai-tools/coding
+Description: AI pair programmers, code completion IDEs, bug fixing compilers, and code documentation generators.
+Popular Tools: Cursor, GitHub Copilot, Tabnine, Phind, Replit Ghostwriter, Codeium.
+
+### 6. AI Marketing Tools
+URL: https://aifynest.com/ai-tools/marketing
+Description: SEO keyword research, social media content generation, ad copy optimization, and marketing analytics.
+Popular Tools: Surfer SEO, Semrush AI, AdCreative.ai, MarketMuse, SocialBee AI.
+
+### 7. AI Productivity & Automation Tools
+URL: https://aifynest.com/ai-tools/productivity
+Description: Task automation, meeting note takers, AI calendar assistants, and workflow orchestration.
+Popular Tools: Notion AI, Zapier AI, Make, Fireflies.ai, Motion, Taskade.
+
+### 8. AI Research & Academic Tools
+URL: https://aifynest.com/ai-tools/research
+Description: Literature review synthesis, PDF search assistants, and scientific paper summary tools.
+Popular Tools: Perplexity AI, Consensus, Elicit, SciSpace, ChatPDF.
+
+## Editorial & Comparison Guides
+- [Best AI Productivity Tools in 2026](https://aifynest.com/blog/10-best-ai-productivity-tools-2026)
+- [10 Best AI Coding Assistants in 2026](https://aifynest.com/blog/10-best-ai-coding-assistants-2026)
+- [10 Best AI Tools for Business & Startups in 2026](https://aifynest.com/blog/10-best-ai-tools-for-business-in-2026)
+- [Best AI Tools for Dropshipping 2026](https://aifynest.com/blog/best-ai-tools-dropshipping-2026)
+- [Best AI Video Editing Tools in 2026](https://aifynest.com/blog/best-ai-video-editing-tools-2026)
+
+## Submission & Sponsorship
+AI product creators can submit tools at https://aifynest.com/submit-tool or claim existing listings at https://aifynest.com/claim to gain high-intent buyer traffic, dofollow SEO backlinks, and citation indexing across LLMs and AI Search Engines.
