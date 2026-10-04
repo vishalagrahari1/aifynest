@@ -280,6 +280,97 @@ export const initialCategories: Category[] = [
 // Initial preloaded Tools
 export const initialTools: Tool[] = [
 {
+  "id": "tool-photiu-ai",
+  "name": "Photiu AI",
+  "slug": "photiu-ai",
+  "tagline": "Remove Background, Upscale Images & Erase Objects with AI",
+  "description": "Photiu.ai brings together powerful AI photo editing tools to remove backgrounds, erase unwanted objects, upscale image resolution up to 4K, and generate visuals instantly.\n\nDesigned for e-commerce sellers, marketers, content creators, and photographers, Photiu.ai offers a comprehensive web-based suite of smart photo tools. Whether you need crystal-clear product cutouts for Shopify, high-definition 4K upscaling for print, or magic object eraser for distracting elements, Photiu handles image processing in seconds with minimal effort.\n\nWith features like AI background removal, automatic subject cutout, image enhancer, and text-to-image generator, Photiu simplifies visual asset creation without requiring complex design skills or expensive software.",
+  "categorySlug": "image-generation",
+  "subCategory": "Photo Editing",
+  "pricing": "freemium",
+  "pricingUrl": "https://www.photiu.ai/#pricing",
+  "websiteUrl": "https://www.photiu.ai/",
+  "platforms": [
+    "Web"
+  ],
+  "pricingPlans": [
+    {
+      "name": "Free Plan",
+      "price": "$0 / month",
+      "features": [
+        "Free credits on sign up",
+        "AI Background Remover",
+        "Basic Image Upscaler"
+      ],
+      "billingPeriod": "free"
+    },
+    {
+      "name": "Pro Plan",
+      "price": "$9.90 / month",
+      "features": [
+        "Unlimited HD Background Removal",
+        "4K Image Upscale",
+        "Batch Processing",
+        "Magic Object Eraser"
+      ],
+      "billingPeriod": "monthly"
+    }
+  ],
+  "features": [
+    "AI Background Remover",
+    "4K AI Image Upscaler",
+    "Magic Eraser & Object Removal",
+    "AI Image Generator",
+    "Batch Image Processing",
+    "Face & Portrait Enhancement"
+  ],
+  "useCases": [
+    "E-commerce product photos",
+    "Social media graphics & ads",
+    "Real estate photo cleanup",
+    "Portrait and avatar enhancement"
+  ],
+  "pros": [
+    "Fast one-click background removal",
+    "High quality 4K image upscaling",
+    "Easy to use web interface",
+    "Generous free credits for new users"
+  ],
+  "cons": [
+    "Advanced batch operations require paid plan",
+    "Internet connection required for web app"
+  ],
+  "logoUrl": "https://img.photiu.ai/pimgs/images/logo.png",
+  "screenshotUrls": [
+    "https://img.photiu.ai/pimgs/header_banner.webp",
+    "https://img.photiu.ai/pimgs/images/home_entrance/remove_bg.webp",
+    "https://img.photiu.ai/pimgs/images/home_entrance/image_upscale.webp"
+  ],
+  "rating": 4.8,
+  "reviewCount": 42,
+  "isVerified": true,
+  "isFeatured": true,
+  "isSponsored": false,
+  "status": "approved",
+  "ownerId": null,
+  "claimStatus": "unclaimed",
+  "lastUpdated": "2026-10-04",
+  "tags": [
+    "background remover",
+    "image upscaler",
+    "object eraser",
+    "photo editing",
+    "ai photo editor",
+    "image generator"
+  ],
+  "approvedAt": "2026-10-04T10:00:00.000Z",
+  "approvedBy": "admin",
+  "seoTitle": "Photiu AI Review 2026: AI Background Removal, Upscaler & Magic Eraser",
+  "metaDescription": "Photiu AI review, pricing, and features. Remove image backgrounds, upscale photos to 4K resolution, and erase unwanted objects using Photiu.ai.",
+  "h1Title": "Photiu AI - All-in-One AI Photo Editor & Background Remover",
+  "canonicalUrl": "https://aifynest.com/tools/photiu-ai"
+},
+{
   "id": "tool-microsoft-365-copilot",
   "name": "Microsoft 365 Copilot",
   "slug": "microsoft-365-copilot",
