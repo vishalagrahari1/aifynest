@@ -573,8 +573,9 @@ async function runPrerender() {
   // B. Category Pages
   if (categories && categories.length > 0) {
     categories.forEach(cat => {
-      const catTitle = `Top ${cat.name} AI Tools & Software in 2026 — AIFynest`;
-      const catDesc = `Explore the best ${cat.name} AI tools, software platforms, and utilities. Compare features, pricing, and user reviews on AIFynest.`;
+      const catDisplayName = cat.name.startsWith('AI ') ? cat.name : `AI ${cat.name}`;
+      const catTitle = `Top ${catDisplayName} Tools & Software in 2026 — AIFynest`;
+      const catDesc = `Explore the best ${catDisplayName} tools, software platforms, and utilities. Compare features, pricing, and user reviews on AIFynest.`;
       
       const schemaMarkup = {
         '@context': 'https://schema.org',

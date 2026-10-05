@@ -376,7 +376,8 @@ export const Directory: React.FC<DirectoryProps> = ({
 
   // Dynamic Page Title descriptions
   const currentCategory = categories.find((c) => c.slug === filters.category);
-  const pageTitle = seoTitleOverride ? seoTitleOverride : currentCategory ? `Best AI ${currentCategory.name} Tools` : 'AI Tools Directory';
+  const catDisplayName = currentCategory ? (currentCategory.name.startsWith('AI ') ? currentCategory.name : `AI ${currentCategory.name}`) : '';
+  const pageTitle = seoTitleOverride ? seoTitleOverride : currentCategory ? `Best ${catDisplayName} Tools` : 'AI Tools Directory';
   const pageDescription = seoDescOverride
     ? seoDescOverride
     : currentCategory

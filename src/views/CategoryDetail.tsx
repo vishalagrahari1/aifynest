@@ -47,7 +47,8 @@ export const CategoryDetail: React.FC<CategoryDetailProps> = ({
   const otherCategories = categories.filter((c) => c.slug !== category.slug).slice(0, 5);
 
   const siteUrl = import.meta.env.VITE_SITE_URL || 'https://aifynest.com';
-  const seoTitle = `Best AI ${category.name} Tools in 2026 – Reviews & Pricing`;
+  const categoryDisplayName = category.name.startsWith('AI ') ? category.name : `AI ${category.name}`;
+  const seoTitle = `Best ${categoryDisplayName} Tools in 2026 – Reviews & Pricing`;
   const seoDesc = `Discover the top-rated artificial intelligence software and platforms in ${category.name}. Read detailed reviews, view screen captures, compare costs, and choose the right AI tool.`;
 
   const schemaMarkup = {
@@ -113,7 +114,7 @@ export const CategoryDetail: React.FC<CategoryDetailProps> = ({
         </div>
         <div style={{ flex: 1, minWidth: '280px' }}>
           <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', margin: '0 0 8px 0' }}>
-            Best AI {category.name} Tools
+            Best {categoryDisplayName} Tools
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', lineHeight: '1.5', margin: 0 }}>
             {category.description}
