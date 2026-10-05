@@ -16,9 +16,9 @@ export function useSEO({
   description,
   canonicalUrl,
   ogType = 'website',
-  ogImage = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&h=630&fit=crop', // default social image
+  ogImage = 'https://aifynest.com/logo.png', // branded default social image
   schemaMarkup,
-  robots = 'index, follow',
+  robots = 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
 }: SEOMetadata) {
   useEffect(() => {
     // 1. Title
@@ -39,22 +39,25 @@ export function useSEO({
     const siteUrl = import.meta.env.VITE_SITE_URL || 'https://aifynest.com';
     const computedCanonical = canonicalUrl || `${siteUrl}${window.location.pathname}`;
 
-    // 2. Description
+    // 2. Description & Author
     setMetaTag('name', 'description', description);
+    setMetaTag('name', 'author', 'AIFynest Editorial Team');
 
     // 3. Open Graph Metadata
     setMetaTag('property', 'og:title', formattedTitle);
     setMetaTag('property', 'og:description', description);
     setMetaTag('property', 'og:type', ogType);
-    setMetaTag('property', 'og:image', ogImage);
+    setMetaTag('property', 'og:image', ogImage.startsWith('/') ? `${siteUrl}${ogImage}` : ogImage);
     setMetaTag('property', 'og:url', computedCanonical);
     setMetaTag('property', 'og:site_name', 'AIFynest Directory');
 
-    // 4. Twitter / X Cards
+    // 4. Twitter / X Cards & Publisher Handles
     setMetaTag('name', 'twitter:card', 'summary_large_image');
+    setMetaTag('name', 'twitter:site', '@aifynest');
+    setMetaTag('name', 'twitter:creator', '@aifynest');
     setMetaTag('name', 'twitter:title', formattedTitle);
     setMetaTag('name', 'twitter:description', description);
-    setMetaTag('name', 'twitter:image', ogImage);
+    setMetaTag('name', 'twitter:image', ogImage.startsWith('/') ? `${siteUrl}${ogImage}` : ogImage);
 
     // 5. Canonical Link
     let canonical = document.querySelector('link[rel="canonical"]');

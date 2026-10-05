@@ -44,6 +44,26 @@ function cleanMetaDescription(str) {
   return (lastSpace > 100 ? cut.slice(0, lastSpace) : cut) + '...';
 }
 
+function getCategoryDisplayName(slug) {
+  const map = {
+    'writing': 'AI Writing',
+    'image-generation': 'AI Image Generation',
+    'video': 'AI Video',
+    'audio': 'AI Audio',
+    'coding': 'AI Coding',
+    'marketing': 'AI Marketing',
+    'productivity': 'AI Productivity',
+    'design': 'AI Design',
+    'research': 'AI Research',
+    'education': 'AI Education',
+    'business': 'AI Business',
+    'finance': 'AI Finance'
+  };
+  if (map[slug]) return map[slug];
+  const cleaned = (slug || 'software').replace(/-/g, ' ');
+  return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+}
+
 function buildPageHTML(templateHTML, options) {
   const {
     title,
@@ -678,7 +698,7 @@ async function runPrerender() {
             {
               '@type': 'ListItem',
               'position': 3,
-              'name': (tool.categorySlug || 'software').toUpperCase(),
+              'name': getCategoryDisplayName(tool.categorySlug),
               'item': `${SITE_URL}/categories/${tool.categorySlug || 'software'}`
             },
             {

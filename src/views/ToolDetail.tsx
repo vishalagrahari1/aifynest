@@ -22,7 +22,7 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
   onCompareToggle,
 }) => {
   const { slug } = useParams<{ slug: string }>();
-  const { tools, reviews, addReview, collections, toggleFavoriteTool, trackEvent, submitReport } = useDatabase();
+  const { tools, categories, reviews, addReview, collections, toggleFavoriteTool, trackEvent, submitReport } = useDatabase();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -252,7 +252,10 @@ export const ToolDetail: React.FC<ToolDetailProps> = ({
         {
           '@type': 'ListItem',
           'position': 3,
-          'name': tool.categorySlug.toUpperCase(),
+          'name': (() => {
+            const catObj = categories.find(c => c.slug === tool.categorySlug);
+            return catObj ? catObj.name : tool.categorySlug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+          })(),
           'item': `${siteUrl}/categories/${tool.categorySlug}`,
         },
         {
