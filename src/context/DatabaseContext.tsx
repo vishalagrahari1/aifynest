@@ -219,7 +219,7 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           const initialMap = new Map(initialBlogPosts.map(b => [b.slug, b]));
           const updatedParsed = cleanParsed.map(b => {
             const seed = initialMap.get(b.slug);
-            return seed ? { ...b, ...seed } : b;
+            return seed ? { ...seed, ...b } : b;
           });
           const existingSlugs = new Set(updatedParsed.map((b: BlogPost) => b.slug));
           const missingInitial = initialBlogPosts.filter(b => !existingSlugs.has(b.slug));
