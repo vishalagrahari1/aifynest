@@ -93,25 +93,49 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
   const [blogContentInput, setBlogContentInput] = useState('');
   const [blogEditorMode, setBlogEditorMode] = useState<'split' | 'edit' | 'preview'>('split');
   const [blogMetaOpen, setBlogMetaOpen] = useState<boolean>(true);
+  const [savedCursorPos, setSavedCursorPos] = useState<{ start: number; end: number } | null>(null);
+  const [isInsertImageModalOpen, setIsInsertImageModalOpen] = useState(false);
+  const [insertImageUrlInput, setInsertImageUrlInput] = useState('');
+  const [insertImageAltInput, setInsertImageAltInput] = useState('');
+
+  const updateCursorPosition = () => {
+    const textarea = document.getElementById('blog-content-textarea') as HTMLTextAreaElement;
+    if (textarea) {
+      setSavedCursorPos({ start: textarea.selectionStart, end: textarea.selectionEnd });
+    }
+  };
 
   const insertMarkdownSnippet = (snippet: string, wrapper = '') => {
     const textarea = document.getElementById('blog-content-textarea') as HTMLTextAreaElement;
-    if (!textarea) {
-      setBlogContentInput(prev => prev + '\n' + snippet);
-      return;
+    let start = 0;
+    let end = 0;
+
+    if (savedCursorPos && savedCursorPos.start <= blogContentInput.length) {
+      start = savedCursorPos.start;
+      end = savedCursorPos.end;
+    } else if (textarea) {
+      start = textarea.selectionStart;
+      end = textarea.selectionEnd;
+    } else {
+      start = blogContentInput.length;
+      end = blogContentInput.length;
     }
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const text = textarea.value;
+
+    const text = blogContentInput;
     const selected = text.substring(start, end);
+
     let replacement = '';
     if (wrapper) {
       replacement = `${wrapper}${selected || 'text'}${wrapper}`;
     } else {
       replacement = snippet;
     }
+
     const newText = text.substring(0, start) + replacement + text.substring(end);
     setBlogContentInput(newText);
+
+    const newPos = start + replacement.length;
+    setSavedCursorPos({ start: newPos, end: newPos });
 
     // Recalculate read time
     const words = newText.trim().split(/\s+/).filter(Boolean).length;
@@ -119,8 +143,11 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
     setBlogReadTimeInput(`${estMinutes} min read`);
 
     setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(start + replacement.length, start + replacement.length);
+      const el = document.getElementById('blog-content-textarea') as HTMLTextAreaElement;
+      if (el) {
+        el.focus();
+        el.setSelectionRange(newPos, newPos);
+      }
     }, 50);
   };
 
@@ -3707,20 +3734,31 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                 <span style={{ fontSize: '10px', fontWeight: 'bold', color: 'var(--text-muted)', marginRight: '6px' }}>
                   QUICK FORMATTING:
                 </span>
-                <button type="button" onClick={() => insertMarkdownSnippet('# ')} className="btn btn-outline btn-xs"># H1</button>
-                <button type="button" onClick={() => insertMarkdownSnippet('## ')} className="btn btn-outline btn-xs">## H2</button>
-                <button type="button" onClick={() => insertMarkdownSnippet('### ')} className="btn btn-outline btn-xs">### H3</button>
+                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('# ')} className="btn btn-outline btn-xs"># H1</button>
+                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('## ')} className="btn btn-outline btn-xs">## H2</button>
+                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('### ')} className="btn btn-outline btn-xs">### H3</button>
                 <span style={{ opacity: 0.3 }}>|</span>
-                <button type="button" onClick={() => insertMarkdownSnippet('', '**')} className="btn btn-outline btn-xs" style={{ fontWeight: 'bold' }}>B</button>
-                <button type="button" onClick={() => insertMarkdownSnippet('', '*')} className="btn btn-outline btn-xs" style={{ fontStyle: 'italic' }}>I</button>
-                <button type="button" onClick={() => insertMarkdownSnippet('', '`')} className="btn btn-outline btn-xs" style={{ fontFamily: 'monospace' }}>Code</button>
+                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('', '**')} className="btn btn-outline btn-xs" style={{ fontWeight: 'bold' }}>B</button>
+                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('', '*')} className="btn btn-outline btn-xs" style={{ fontStyle: 'italic' }}>I</button>
+                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('', '`')} className="btn btn-outline btn-xs" style={{ fontFamily: 'monospace' }}>Code</button>
                 <span style={{ opacity: 0.3 }}>|</span>
-                <button type="button" onClick={() => insertMarkdownSnippet('[Link Title](https://example.com)')} className="btn btn-outline btn-xs">🔗 Link</button>
-                <button type="button" onClick={() => insertMarkdownSnippet('![Image Alt](/images/filename.jpg)')} className="btn btn-outline btn-xs">🖼️ Image</button>
-                <button type="button" onClick={() => insertMarkdownSnippet('| Feature | Detail 1 | Detail 2 |\n|---|---|---|\n| Item 1 | Value A | Value B |')} className="btn btn-outline btn-xs">📊 Table</button>
-                <button type="button" onClick={() => insertMarkdownSnippet('> Quote text here...')} className="btn btn-outline btn-xs">💬 Quote</button>
-                <button type="button" onClick={() => insertMarkdownSnippet('\n---\n')} className="btn btn-outline btn-xs">--- Line</button>
-                <button type="button" onClick={() => insertMarkdownSnippet('## Frequently Asked Questions\n\n### What is ...?\n\nAnswer paragraph here...')} className="btn btn-outline btn-xs" style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}>❓ Add FAQ Block</button>
+                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('[Link Title](https://example.com)')} className="btn btn-outline btn-xs">🔗 Link</button>
+                <button
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    updateCursorPosition();
+                    setIsInsertImageModalOpen(true);
+                  }}
+                  className="btn btn-primary btn-xs"
+                  style={{ fontWeight: 'bold', background: 'linear-gradient(135deg, var(--color-primary), #a855f7)', border: 'none' }}
+                >
+                  🖼️ Add Image at Cursor
+                </button>
+                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('| Feature | Detail 1 | Detail 2 |\n|---|---|---|\n| Item 1 | Value A | Value B |\n')} className="btn btn-outline btn-xs">📊 Table</button>
+                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('> Quote text here...\n')} className="btn btn-outline btn-xs">💬 Quote</button>
+                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('\n---\n')} className="btn btn-outline btn-xs">--- Line</button>
+                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('## Frequently Asked Questions\n\n### What is ...?\n\nAnswer paragraph here...\n')} className="btn btn-outline btn-xs" style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}>❓ Add FAQ Block</button>
               </div>
             )}
 
@@ -3731,13 +3769,18 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                 <div style={{ display: 'flex', flexDirection: 'column', height: '100%', borderRight: blogEditorMode === 'split' ? '1px solid var(--border-color)' : 'none', backgroundColor: '#0d1117' }}>
                   <div style={{ padding: '6px 16px', fontSize: '10px', fontWeight: 'bold', color: '#8b949e', backgroundColor: '#161b22', borderBottom: '1px solid #30363d', display: 'flex', justifyContent: 'space-between' }}>
                     <span>MARKDOWN EDITOR</span>
-                    <span>UTF-8 • Markdown Supported</span>
+                    <span>Cursor: {savedCursorPos ? `Pos ${savedCursorPos.start}` : 'Active'} • UTF-8 Supported</span>
                   </div>
                   <textarea
                     id="blog-content-textarea"
                     value={blogContentInput}
+                    onSelect={updateCursorPosition}
+                    onClick={updateCursorPosition}
+                    onKeyUp={updateCursorPosition}
+                    onFocus={updateCursorPosition}
                     onChange={(e) => {
                       setBlogContentInput(e.target.value);
+                      updateCursorPosition();
                       const words = e.target.value.trim().split(/\s+/).filter(Boolean).length;
                       const estMinutes = Math.max(1, Math.ceil(words / 220));
                       setBlogReadTimeInput(`${estMinutes} min read`);
@@ -3808,6 +3851,126 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
           </div>
         </div>
       )}
+
+      {/* DEDICATED INSERT IMAGE AT CURSOR MODAL */}
+      <Modal
+        isOpen={isInsertImageModalOpen}
+        title="🖼️ Insert Image into Article"
+        onClose={() => setIsInsertImageModalOpen(false)}
+      >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!insertImageUrlInput.trim()) {
+              onToast('Please enter an image URL', 'error');
+              return;
+            }
+            const altText = insertImageAltInput.trim() || 'Article Image';
+            const imgMarkdown = `\n\n![${altText}](${insertImageUrlInput.trim()})\n\n`;
+            insertMarkdownSnippet(imgMarkdown);
+            onToast('Image inserted into article!', 'success');
+            setInsertImageUrlInput('');
+            setInsertImageAltInput('');
+            setIsInsertImageModalOpen(false);
+          }}
+          style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: '460px', maxWidth: '600px' }}
+        >
+          <div style={{ backgroundColor: 'var(--bg-tertiary)', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '12px' }}>
+            📍 Inserting at Cursor Position: <strong>Pos {savedCursorPos?.start ?? 0}</strong>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Image Direct URL *</label>
+            <input
+              type="text"
+              className="form-input"
+              placeholder="e.g. https://img.photiu.ai/pimgs/header_banner.webp or /images/upscale.jpg"
+              value={insertImageUrlInput}
+              onChange={(e) => setInsertImageUrlInput(e.target.value)}
+              required
+              autoFocus
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Alt Text / Caption (for SEO & Accessibility)</label>
+            <input
+              type="text"
+              className="form-input"
+              placeholder="e.g. Photiu AI Image Upscaler Interface"
+              value={insertImageAltInput}
+              onChange={(e) => setInsertImageAltInput(e.target.value)}
+            />
+          </div>
+
+          {/* Quick Preset Buttons */}
+          <div>
+            <label style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>
+              QUICK SAMPLE / RECENT IMAGES:
+            </label>
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                className="btn btn-outline btn-xs"
+                onClick={() => {
+                  setInsertImageUrlInput('https://img.photiu.ai/pimgs/header_banner.webp');
+                  setInsertImageAltInput('Photiu AI Photo Editor Banner');
+                }}
+              >
+                📸 Photiu Banner
+              </button>
+              <button
+                type="button"
+                className="btn btn-outline btn-xs"
+                onClick={() => {
+                  setInsertImageUrlInput('https://img.photiu.ai/pimgs/images/home_entrance/image_upscale.webp');
+                  setInsertImageAltInput('AI Image Upscaler 4K');
+                }}
+              >
+                🔍 AI 4K Upscaler
+              </button>
+              <button
+                type="button"
+                className="btn btn-outline btn-xs"
+                onClick={() => {
+                  setInsertImageUrlInput('/images/best-ai-image-upscale-tools-2026.jpg');
+                  setInsertImageAltInput('Best AI Image Upscale Tools 2026');
+                }}
+              >
+                🖼️ Image Upscale Cover
+              </button>
+            </div>
+          </div>
+
+          {/* Live Thumbnail Preview */}
+          {insertImageUrlInput.trim() && (
+            <div style={{ marginTop: '4px' }}>
+              <label style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>
+                IMAGE PREVIEW:
+              </label>
+              <div style={{ padding: '8px', backgroundColor: 'var(--bg-primary)', borderRadius: '8px', border: '1px solid var(--border-color)', textAlign: 'center' }}>
+                <img
+                  src={insertImageUrlInput.trim()}
+                  alt="Preview"
+                  style={{ maxHeight: '180px', maxWidth: '100%', objectFit: 'contain', borderRadius: '6px' }}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '8px' }}>
+            <button type="button" onClick={() => setIsInsertImageModalOpen(false)} className="btn btn-outline">
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary" style={{ background: 'linear-gradient(135deg, var(--color-primary), #a855f7)', border: 'none', fontWeight: 'bold' }}>
+              🚀 Insert Image at Cursor
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Styled definitions */}
       <style>{`
