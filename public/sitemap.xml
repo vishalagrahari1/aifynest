@@ -101,6 +101,16 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://aifynest.com/blog/best-ai-image-upscale-tools-2026</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aifynest.com/best-ai-image-upscale-tools-2026</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://aifynest.com/blog/10-best-ai-productivity-tools-2026</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
@@ -281,11 +291,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/notion-ai</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://aifynest.com/tools/julius-ai</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -327,6 +332,16 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/jasper</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://aifynest.com/tools/synthesia</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://aifynest.com/tools/notion-ai</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -517,11 +532,6 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/pdf-ai</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/tools/synthesia</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
