@@ -3484,13 +3484,12 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(10, 12, 18, 0.92)',
-            backdropFilter: 'blur(16px)',
+            backgroundColor: '#ffffff',
             zIndex: 99999,
             display: 'flex',
             flexDirection: 'column',
             animation: 'fade-in-overlay 0.2s ease-out',
-            color: 'var(--text-primary)',
+            color: '#0f172a',
           }}
         >
           {/* STUDIO TOP HEADER CONTROL BAR */}
@@ -3500,8 +3499,8 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
               alignItems: 'center',
               justifyContent: 'space-between',
               padding: '12px 24px',
-              backgroundColor: 'rgba(20, 24, 36, 0.98)',
-              borderBottom: '1px solid var(--border-color)',
+              backgroundColor: '#ffffff',
+              borderBottom: '1px solid #e2e8f0',
               gap: '16px',
             }}
           >
@@ -3517,19 +3516,20 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: '18px',
-                  boxShadow: '0 0 16px rgba(168, 85, 247, 0.3)',
+                  boxShadow: '0 2px 10px rgba(124, 58, 237, 0.2)',
+                  color: '#ffffff',
                 }}
               >
                 ✍️
               </div>
               <div>
-                <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 'bold', letterSpacing: '-0.01em' }}>
+                <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 'bold', color: '#0f172a', letterSpacing: '-0.01em' }}>
                   {editingBlogSlug ? `Editing: "${blogTitleInput || 'Untitled Article'}"` : `New Article Studio`}
                 </h3>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>
-                  <span>Slug: <code style={{ color: 'var(--color-primary-light)' }}>/blog/{blogSlugInput || 'slug-placeholder'}</code></span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: '#64748b' }}>
+                  <span>Slug: <code style={{ color: 'var(--color-primary)' }}>/blog/{blogSlugInput || 'slug-placeholder'}</code></span>
                   <span>•</span>
-                  <span style={{ color: 'var(--color-success)', fontWeight: 'bold' }}>● Ready to Publish</span>
+                  <span style={{ color: '#16a34a', fontWeight: 'bold' }}>● Ready to Publish</span>
                 </div>
               </div>
             </div>
@@ -3542,11 +3542,12 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                   display: 'flex',
                   alignItems: 'center',
                   gap: '12px',
-                  backgroundColor: 'var(--bg-tertiary)',
+                  backgroundColor: '#f1f5f9',
                   padding: '6px 14px',
                   borderRadius: '20px',
                   fontSize: '11px',
-                  border: '1px solid var(--border-color)',
+                  border: '1px solid #cbd5e1',
+                  color: '#334155',
                 }}
               >
                 <span>📝 <strong>{blogContentInput.trim().split(/\s+/).filter(Boolean).length}</strong> words</span>
@@ -3560,10 +3561,10 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
               <div
                 style={{
                   display: 'flex',
-                  backgroundColor: 'var(--bg-primary)',
+                  backgroundColor: '#f1f5f9',
                   padding: '3px',
                   borderRadius: '8px',
-                  border: '1px solid var(--border-color)',
+                  border: '1px solid #cbd5e1',
                 }}
               >
                 <button
@@ -3574,7 +3575,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                     fontSize: '11px',
                     fontWeight: blogEditorMode === 'split' ? 'bold' : 'normal',
                     backgroundColor: blogEditorMode === 'split' ? 'var(--color-primary)' : 'transparent',
-                    color: blogEditorMode === 'split' ? '#fff' : 'var(--text-secondary)',
+                    color: blogEditorMode === 'split' ? '#fff' : '#475569',
                     border: 'none',
                     borderRadius: '6px',
                     cursor: 'pointer',
@@ -3591,7 +3592,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                     fontSize: '11px',
                     fontWeight: blogEditorMode === 'edit' ? 'bold' : 'normal',
                     backgroundColor: blogEditorMode === 'edit' ? 'var(--color-primary)' : 'transparent',
-                    color: blogEditorMode === 'edit' ? '#fff' : 'var(--text-secondary)',
+                    color: blogEditorMode === 'edit' ? '#fff' : '#475569',
                     border: 'none',
                     borderRadius: '6px',
                     cursor: 'pointer',
@@ -3608,7 +3609,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                     fontSize: '11px',
                     fontWeight: blogEditorMode === 'preview' ? 'bold' : 'normal',
                     backgroundColor: blogEditorMode === 'preview' ? 'var(--color-primary)' : 'transparent',
-                    color: blogEditorMode === 'preview' ? '#fff' : 'var(--text-secondary)',
+                    color: blogEditorMode === 'preview' ? '#fff' : '#475569',
                     border: 'none',
                     borderRadius: '6px',
                     cursor: 'pointer',
@@ -3624,7 +3625,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                 type="button"
                 onClick={() => setBlogMetaOpen(!blogMetaOpen)}
                 className="btn btn-outline btn-xs"
-                style={{ fontSize: '11px', height: '30px' }}
+                style={{ fontSize: '11px', height: '30px', backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}
               >
                 {blogMetaOpen ? '⚙️ Hide Metadata' : '⚙️ SEO & Settings'}
               </button>
@@ -3636,7 +3637,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                 type="button"
                 onClick={() => setIsBlogModalOpen(false)}
                 className="btn btn-outline btn-sm"
-                style={{ opacity: 0.8 }}
+                style={{ opacity: 0.9, backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}
               >
                 Close Studio
               </button>
@@ -3689,14 +3690,15 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
           {blogMetaOpen && (
             <div
               style={{
-                backgroundColor: 'rgba(15, 18, 28, 0.98)',
-                borderBottom: '1px solid var(--border-color)',
+                backgroundColor: '#f8fafc',
+                borderBottom: '1px solid #e2e8f0',
                 padding: '16px 24px',
                 display: 'grid',
                 gridTemplateColumns: '2fr 1fr 1fr 1fr',
                 gap: '16px',
                 alignItems: 'start',
                 animation: 'fade-in-overlay 0.15s ease-out',
+                color: '#0f172a',
               }}
             >
               {/* Title & Slug */}
@@ -3825,30 +3827,29 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                   alignItems: 'center',
                   gap: '6px',
                   padding: '8px 24px',
-                  backgroundColor: 'var(--bg-card)',
-                  borderBottom: '1px solid var(--border-color)',
+                  backgroundColor: '#ffffff',
+                  borderBottom: '1px solid #e2e8f0',
                   flexWrap: 'wrap',
                 }}
               >
-                <span style={{ fontSize: '10px', fontWeight: 'bold', color: 'var(--text-muted)', marginRight: '6px' }}>
+                <span style={{ fontSize: '10px', fontWeight: 'bold', color: '#64748b', marginRight: '6px' }}>
                   QUICK FORMATTING:
                 </span>
-                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('# ')} className="btn btn-outline btn-xs"># H1</button>
-                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('## ')} className="btn btn-outline btn-xs">## H2</button>
-                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('### ')} className="btn btn-outline btn-xs">### H3</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('# ')} className="btn btn-outline btn-xs" style={{ backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}># H1</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('## ')} className="btn btn-outline btn-xs" style={{ backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}>## H2</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('### ')} className="btn btn-outline btn-xs" style={{ backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}>### H3</button>
                 <span style={{ opacity: 0.3 }}>|</span>
-                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('', '**')} className="btn btn-outline btn-xs" style={{ fontWeight: 'bold' }}>B</button>
-                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('', '*')} className="btn btn-outline btn-xs" style={{ fontStyle: 'italic' }}>I</button>
-                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('', '`')} className="btn btn-outline btn-xs" style={{ fontFamily: 'monospace' }}>Code</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('', '**')} className="btn btn-outline btn-xs" style={{ fontWeight: 'bold', backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}>B</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('', '*')} className="btn btn-outline btn-xs" style={{ fontStyle: 'italic', backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}>I</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('', '`')} className="btn btn-outline btn-xs" style={{ fontFamily: 'monospace', backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}>Code</button>
                 <span style={{ opacity: 0.3 }}>|</span>
-                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('[Link Title](https://example.com)')} className="btn btn-outline btn-xs">🔗 Link</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('[Link Title](https://example.com)')} className="btn btn-outline btn-xs" style={{ backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}>🔗 Link</button>
                 <button
                   type="button"
                   onClick={() => {
                     updateCursorPosition();
                     setShowInlineImagePanel(!showInlineImagePanel);
                     setShowInlineTablePanel(false);
-                    setIsInsertImageModalOpen(true);
                   }}
                   className="btn btn-primary btn-xs"
                   style={{ fontWeight: 'bold', background: 'linear-gradient(135deg, var(--color-primary), #a855f7)', border: 'none' }}
@@ -3861,44 +3862,46 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                     updateCursorPosition();
                     setShowInlineTablePanel(!showInlineTablePanel);
                     setShowInlineImagePanel(false);
-                    setIsTableModalOpen(true);
                   }}
                   className="btn btn-outline btn-xs"
-                  style={{ borderColor: '#3b82f6', color: '#60a5fa', fontWeight: 'bold' }}
+                  style={{ borderColor: '#2563eb', color: '#2563eb', fontWeight: 'bold', backgroundColor: '#eff6ff' }}
                 >
-                  📊 Easy Table Builder & Converter
+                  📊 Easy Table Converter
                 </button>
-                <button type="button" onClick={() => insertMarkdownSnippet('> Quote text here...\n')} className="btn btn-outline btn-xs">💬 Quote</button>
-                <button type="button" onClick={() => insertMarkdownSnippet('\n---\n')} className="btn btn-outline btn-xs">--- Line</button>
-                <button type="button" onClick={() => insertMarkdownSnippet('## Frequently Asked Questions\n\n### What is ...?\n\nAnswer paragraph here...\n')} className="btn btn-outline btn-xs" style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}>❓ Add FAQ Block</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('> Quote text here...\n')} className="btn btn-outline btn-xs" style={{ backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}>💬 Quote</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('\n---\n')} className="btn btn-outline btn-xs" style={{ backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}>--- Line</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('## Frequently Asked Questions\n\n### What is ...?\n\nAnswer paragraph here...\n')} className="btn btn-outline btn-xs" style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)', backgroundColor: '#f5f3ff' }}>❓ Add FAQ Block</button>
               </div>
             )}
 
             {/* EXPANDABLE INLINE TABLE PASTE & CONVERTER PANEL */}
             {showInlineTablePanel && (
-              <div style={{ backgroundColor: '#161b22', padding: '14px 24px', borderBottom: '2px solid #3b82f6', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ backgroundColor: '#f8fafc', padding: '14px 24px', borderBottom: '2px solid #2563eb', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#60a5fa' }}>
-                    📋 EASY TABLE PASTE & CONVERTER (INLINE STUDIO TOOL)
+                  <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#1e40af' }}>
+                    📋 EASY TABLE PASTE & CONVERTER
                   </span>
-                  <button type="button" onClick={() => setShowInlineTablePanel(false)} className="btn btn-outline btn-xs">✕ Close Panel</button>
+                  <button type="button" onClick={() => setShowInlineTablePanel(false)} className="btn btn-outline btn-xs" style={{ backgroundColor: '#ffffff', color: '#475569' }}>✕ Close</button>
                 </div>
+                <p style={{ fontSize: '12px', color: '#475569', margin: 0 }}>
+                  Paste raw unformatted text copied from <strong>Excel, Google Sheets, ChatGPT, or Word</strong> below. Click <strong>Insert Table</strong> to add it to your article!
+                </p>
                 <textarea
                   className="form-input"
-                  rows={4}
-                  placeholder="Paste raw table text from Excel, Google Sheets, ChatGPT, or web here...\nExample:\nFeature\tAdobe Super\tRemini\tTopaz\nPhoto Upscaling\tExcellent\tExcellent\tGood"
+                  rows={5}
+                  placeholder="Paste raw table text here...\nExample:\nFeature\tAdobe Super\tRemini\tTopaz\nPhoto Upscaling\tExcellent\tExcellent\tGood"
                   value={tablePasteRawText}
                   onChange={(e) => setTablePasteRawText(e.target.value)}
-                  style={{ fontFamily: 'monospace', fontSize: '12px', backgroundColor: '#0d1117', color: '#c9d1d9' }}
+                  style={{ fontFamily: 'monospace', fontSize: '13px', backgroundColor: '#ffffff', color: '#0f172a', border: '1px solid #cbd5e1', padding: '10px', borderRadius: '6px' }}
                 />
                 <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', alignItems: 'center' }}>
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                    Auto-detects tabs, pipes, commas & spaces!
+                  <span style={{ fontSize: '11px', color: '#64748b' }}>
+                    Auto-detects tabs, pipes (|), commas & spaces
                   </span>
                   <button
                     type="button"
                     className="btn btn-primary btn-sm"
-                    style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', border: 'none', fontWeight: 'bold' }}
+                    style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)', border: 'none', fontWeight: 'bold' }}
                     onClick={() => {
                       if (!tablePasteRawText.trim()) {
                         onToast('Please paste raw table text inside the box first.', 'error');
@@ -3911,7 +3914,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                       setShowInlineTablePanel(false);
                     }}
                   >
-                    ⚡ Convert & Insert Table at Cursor Position
+                    ⚡ Convert & Insert Table at Cursor
                   </button>
                 </div>
               </div>
@@ -3919,16 +3922,16 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
 
             {/* EXPANDABLE INLINE IMAGE UPLOADER PANEL */}
             {showInlineImagePanel && (
-              <div style={{ backgroundColor: '#161b22', padding: '14px 24px', borderBottom: '2px solid #a855f7', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ backgroundColor: '#f8fafc', padding: '14px 24px', borderBottom: '2px solid #a855f7', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#c084fc' }}>
-                    🖼️ INLINE IMAGE UPLOADER & LINK INSERTER
+                  <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#7e22ce' }}>
+                    🖼️ EASY IMAGE UPLOADER & LINK INSERTER
                   </span>
-                  <button type="button" onClick={() => setShowInlineImagePanel(false)} className="btn btn-outline btn-xs">✕ Close Panel</button>
+                  <button type="button" onClick={() => setShowInlineImagePanel(false)} className="btn btn-outline btn-xs" style={{ backgroundColor: '#ffffff', color: '#475569' }}>✕ Close</button>
                 </div>
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <label className="btn btn-outline btn-sm" style={{ cursor: 'pointer', fontWeight: 'bold' }}>
-                    📁 Select Image File from Device
+                  <label className="btn btn-outline btn-sm" style={{ cursor: 'pointer', fontWeight: 'bold', backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}>
+                    📁 Choose Image File from Device
                     <input
                       type="file"
                       accept="image/*"
@@ -3944,7 +3947,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                     placeholder="or paste direct URL e.g. https://img.photiu.ai/pimgs/banner.webp"
                     value={insertImageUrlInput}
                     onChange={(e) => setInsertImageUrlInput(e.target.value)}
-                    style={{ flex: 1, minWidth: '220px', fontSize: '12px' }}
+                    style={{ flex: 1, minWidth: '220px', fontSize: '12px', backgroundColor: '#ffffff', color: '#0f172a', border: '1px solid #cbd5e1' }}
                   />
                   <input
                     type="text"
@@ -3952,7 +3955,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                     placeholder="Alt text / Caption"
                     value={insertImageAltInput}
                     onChange={(e) => setInsertImageAltInput(e.target.value)}
-                    style={{ width: '180px', fontSize: '12px' }}
+                    style={{ width: '180px', fontSize: '12px', backgroundColor: '#ffffff', color: '#0f172a', border: '1px solid #cbd5e1' }}
                   />
                   <button
                     type="button"
@@ -3982,9 +3985,9 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
             <div style={{ flex: 1, display: 'grid', gridTemplateColumns: blogEditorMode === 'split' ? '1fr 1fr' : '1fr', height: '100%', overflow: 'hidden' }}>
               {/* LEFT: MARKDOWN TEXT EDITOR */}
               {(blogEditorMode === 'split' || blogEditorMode === 'edit') && (
-                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', borderRight: blogEditorMode === 'split' ? '1px solid var(--border-color)' : 'none', backgroundColor: '#0d1117' }}>
-                  <div style={{ padding: '6px 16px', fontSize: '10px', fontWeight: 'bold', color: '#8b949e', backgroundColor: '#161b22', borderBottom: '1px solid #30363d', display: 'flex', justifyContent: 'space-between' }}>
-                    <span>MARKDOWN EDITOR</span>
+                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', borderRight: blogEditorMode === 'split' ? '1px solid #e2e8f0' : 'none', backgroundColor: '#ffffff' }}>
+                  <div style={{ padding: '8px 16px', fontSize: '11px', fontWeight: 'bold', color: '#475569', backgroundColor: '#f1f5f9', borderBottom: '1px solid #cbd5e1', display: 'flex', justifyContent: 'space-between' }}>
+                    <span>📝 MARKDOWN ARTICLE EDITOR</span>
                     <span>Cursor: {savedCursorPos ? `Pos ${savedCursorPos.start}` : 'Active'} • 📁 Drag & Drop Images Supported</span>
                   </div>
                   <textarea
@@ -4008,16 +4011,16 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                       const estMinutes = Math.max(1, Math.ceil(words / 220));
                       setBlogReadTimeInput(`${estMinutes} min read`);
                     }}
-                    placeholder="# Article Title&#10;&#10;Write your article here using Markdown..."
+                    placeholder="# Article Title&#10;&#10;Write your article content here..."
                     style={{
                       flex: 1,
                       width: '100%',
-                      padding: '20px',
-                      backgroundColor: '#0d1117',
-                      color: '#c9d1d9',
-                      fontSize: '14px',
-                      fontFamily: '"Fira Code", "Consolas", "Courier New", monospace',
-                      lineHeight: '1.6',
+                      padding: '24px',
+                      backgroundColor: '#ffffff',
+                      color: '#0f172a',
+                      fontSize: '15px',
+                      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                      lineHeight: '1.7',
                       border: 'none',
                       outline: 'none',
                       resize: 'none',
@@ -4029,9 +4032,9 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
 
               {/* RIGHT: LIVE REAL-TIME PREVIEW */}
               {(blogEditorMode === 'split' || blogEditorMode === 'preview') && (
-                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: 'var(--bg-primary)', overflow: 'hidden' }}>
-                  <div style={{ padding: '6px 16px', fontSize: '10px', fontWeight: 'bold', color: 'var(--color-primary)', backgroundColor: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>👁️ LIVE PREVIEW — EXACT PUBLIC RENDER</span>
+                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#ffffff', overflow: 'hidden' }}>
+                  <div style={{ padding: '8px 16px', fontSize: '11px', fontWeight: 'bold', color: 'var(--color-primary)', backgroundColor: '#f1f5f9', borderBottom: '1px solid #cbd5e1', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>👁️ LIVE PREVIEW — PUBLIC DISPLAY</span>
                     <span>https://aifynest.com/blog/{blogSlugInput || 'slug'}</span>
                   </div>
 
