@@ -8,6 +8,7 @@ import { Modal } from '../../components/shared/Modal';
 import { StarRating } from '../../components/shared/StarRating';
 import { DataQualityAudit } from './DataQualityAudit';
 import { getToolLogoUrl, handleLogoError } from '../../utils/toolHelpers';
+import { MarkdownRenderer } from '../../components/shared/MarkdownRenderer';
 import {
   Shield,
   Layout,
@@ -90,6 +91,38 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
   const [blogImageInput, setBlogImageInput] = useState('');
   const [blogExcerptInput, setBlogExcerptInput] = useState('');
   const [blogContentInput, setBlogContentInput] = useState('');
+  const [blogEditorMode, setBlogEditorMode] = useState<'split' | 'edit' | 'preview'>('split');
+  const [blogMetaOpen, setBlogMetaOpen] = useState<boolean>(true);
+
+  const insertMarkdownSnippet = (snippet: string, wrapper = '') => {
+    const textarea = document.getElementById('blog-content-textarea') as HTMLTextAreaElement;
+    if (!textarea) {
+      setBlogContentInput(prev => prev + '\n' + snippet);
+      return;
+    }
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const selected = text.substring(start, end);
+    let replacement = '';
+    if (wrapper) {
+      replacement = `${wrapper}${selected || 'text'}${wrapper}`;
+    } else {
+      replacement = snippet;
+    }
+    const newText = text.substring(0, start) + replacement + text.substring(end);
+    setBlogContentInput(newText);
+
+    // Recalculate read time
+    const words = newText.trim().split(/\s+/).filter(Boolean).length;
+    const estMinutes = Math.max(1, Math.ceil(words / 220));
+    setBlogReadTimeInput(`${estMinutes} min read`);
+
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + replacement.length, start + replacement.length);
+    }, 50);
+  };
 
   // Filters for Pending Review tab
   const [pendingSearch, setPendingSearch] = useState('');
@@ -3327,131 +3360,454 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
           </form>
         </Modal>
 
-      {/* PUBLISH & EDIT ARTICLE MODAL */}
-      <Modal
-        isOpen={isBlogModalOpen}
-        title={editingBlogSlug ? "✏️ Edit Blog Article" : "📰 Write & Publish New Article"}
-        onClose={() => setIsBlogModalOpen(false)}
-      >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (!blogTitleInput.trim() || !blogSlugInput.trim() || !blogContentInput.trim()) {
-              onToast('Title, Slug, and Article Content are required.', 'error');
-              return;
-            }
-            const cleanSlug = blogSlugInput.toLowerCase().trim().replace(/[^a-z0-9-]+/g, '-');
-            const postData: any = {
-              slug: cleanSlug,
-              title: blogTitleInput.trim(),
-              category: blogCategoryInput,
-              author: blogAuthorInput.trim() || 'AIFynest Editorial Team',
-              readTime: blogReadTimeInput.trim() || '8 min read',
-              image: blogImageInput.trim() || '/images/best-ai-image-upscale-tools-2026.jpg',
-              excerpt: blogExcerptInput.trim() || blogTitleInput.trim(),
-              content: blogContentInput,
-              date: new Date().toISOString().split('T')[0]
-            };
-
-            if (editingBlogSlug) {
-              updateBlogPost(editingBlogSlug, postData);
-              onToast(`Article "${postData.title}" updated successfully!`, 'success');
-            } else {
-              addBlogPost(postData);
-              onToast(`Article "${postData.title}" published successfully!`, 'success');
-            }
-            setIsBlogModalOpen(false);
+      {/* STATE-OF-THE-ART ARTICLE PUBLISHING STUDIO SUITE */}
+      {isBlogModalOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(10, 12, 18, 0.92)',
+            backdropFilter: 'blur(16px)',
+            zIndex: 99999,
+            display: 'flex',
+            flexDirection: 'column',
+            animation: 'fade-in-overlay 0.2s ease-out',
+            color: 'var(--text-primary)',
           }}
-          style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: '600px', maxWidth: '800px', width: '100%', maxHeight: '80vh', overflowY: 'auto', padding: '10px 4px' }}
         >
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '12px' }}>
-            <div className="form-group">
-              <label className="form-label">Article Title *</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="e.g., Best AI Image Upscale Tools in 2026"
-                value={blogTitleInput}
-                onChange={(e) => {
-                  setBlogTitleInput(e.target.value);
-                  if (!editingBlogSlug) {
-                    setBlogSlugInput(e.target.value.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''));
-                  }
+          {/* STUDIO TOP HEADER CONTROL BAR */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '12px 24px',
+              backgroundColor: 'rgba(20, 24, 36, 0.98)',
+              borderBottom: '1px solid var(--border-color)',
+              gap: '16px',
+            }}
+          >
+            {/* Left Title & Status */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  background: 'linear-gradient(135deg, var(--color-primary), #a855f7)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '18px',
+                  boxShadow: '0 0 16px rgba(168, 85, 247, 0.3)',
                 }}
-                required
-              />
+              >
+                ✍️
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 'bold', letterSpacing: '-0.01em' }}>
+                  {editingBlogSlug ? `Editing: "${blogTitleInput || 'Untitled Article'}"` : `New Article Studio`}
+                </h3>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>
+                  <span>Slug: <code style={{ color: 'var(--color-primary-light)' }}>/blog/{blogSlugInput || 'slug-placeholder'}</code></span>
+                  <span>•</span>
+                  <span style={{ color: 'var(--color-success)', fontWeight: 'bold' }}>● Ready to Publish</span>
+                </div>
+              </div>
             </div>
-            <div className="form-group">
-              <label className="form-label">URL Slug *</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="e.g., best-ai-image-upscale-tools-2026"
-                value={blogSlugInput}
-                onChange={(e) => setBlogSlugInput(e.target.value)}
-                required
-              />
+
+            {/* Middle Stats & View Toggles */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              {/* Word & Read Time Counter Pill */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  backgroundColor: 'var(--bg-tertiary)',
+                  padding: '6px 14px',
+                  borderRadius: '20px',
+                  fontSize: '11px',
+                  border: '1px solid var(--border-color)',
+                }}
+              >
+                <span>📝 <strong>{blogContentInput.trim().split(/\s+/).filter(Boolean).length}</strong> words</span>
+                <span style={{ opacity: 0.4 }}>|</span>
+                <span>⏱️ <strong>{Math.max(1, Math.ceil(blogContentInput.trim().split(/\s+/).filter(Boolean).length / 220))} min read</strong></span>
+                <span style={{ opacity: 0.4 }}>|</span>
+                <span>📊 <strong>{blogContentInput.length}</strong> chars</span>
+              </div>
+
+              {/* View Selector Tabs */}
+              <div
+                style={{
+                  display: 'flex',
+                  backgroundColor: 'var(--bg-primary)',
+                  padding: '3px',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border-color)',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setBlogEditorMode('split')}
+                  style={{
+                    padding: '5px 12px',
+                    fontSize: '11px',
+                    fontWeight: blogEditorMode === 'split' ? 'bold' : 'normal',
+                    backgroundColor: blogEditorMode === 'split' ? 'var(--color-primary)' : 'transparent',
+                    color: blogEditorMode === 'split' ? '#fff' : 'var(--text-secondary)',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  ↔️ Split View
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setBlogEditorMode('edit')}
+                  style={{
+                    padding: '5px 12px',
+                    fontSize: '11px',
+                    fontWeight: blogEditorMode === 'edit' ? 'bold' : 'normal',
+                    backgroundColor: blogEditorMode === 'edit' ? 'var(--color-primary)' : 'transparent',
+                    color: blogEditorMode === 'edit' ? '#fff' : 'var(--text-secondary)',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  📝 Editor Only
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setBlogEditorMode('preview')}
+                  style={{
+                    padding: '5px 12px',
+                    fontSize: '11px',
+                    fontWeight: blogEditorMode === 'preview' ? 'bold' : 'normal',
+                    backgroundColor: blogEditorMode === 'preview' ? 'var(--color-primary)' : 'transparent',
+                    color: blogEditorMode === 'preview' ? '#fff' : 'var(--text-secondary)',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  👁️ Live Preview
+                </button>
+              </div>
+
+              {/* Toggle Metadata Panel Button */}
+              <button
+                type="button"
+                onClick={() => setBlogMetaOpen(!blogMetaOpen)}
+                className="btn btn-outline btn-xs"
+                style={{ fontSize: '11px', height: '30px' }}
+              >
+                {blogMetaOpen ? '⚙️ Hide Metadata' : '⚙️ SEO & Settings'}
+              </button>
+            </div>
+
+            {/* Right Action Buttons */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={() => setIsBlogModalOpen(false)}
+                className="btn btn-outline btn-sm"
+                style={{ opacity: 0.8 }}
+              >
+                Close Studio
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!blogTitleInput.trim() || !blogSlugInput.trim() || !blogContentInput.trim()) {
+                    onToast('Title, Slug, and Article Content are required.', 'error');
+                    return;
+                  }
+                  const cleanSlug = blogSlugInput.toLowerCase().trim().replace(/[^a-z0-9-]+/g, '-');
+                  const estMinutes = Math.max(1, Math.ceil(blogContentInput.trim().split(/\s+/).filter(Boolean).length / 220));
+                  const postData: any = {
+                    slug: cleanSlug,
+                    title: blogTitleInput.trim(),
+                    category: blogCategoryInput,
+                    author: blogAuthorInput.trim() || 'AIFynest Editorial Team',
+                    readTime: blogReadTimeInput.trim() || `${estMinutes} min read`,
+                    image: blogImageInput.trim() || '/images/best-ai-image-upscale-tools-2026.jpg',
+                    excerpt: blogExcerptInput.trim() || blogTitleInput.trim(),
+                    content: blogContentInput,
+                    date: new Date().toISOString().split('T')[0]
+                  };
+
+                  if (editingBlogSlug) {
+                    updateBlogPost(editingBlogSlug, postData);
+                    onToast(`Article "${postData.title}" updated successfully!`, 'success');
+                  } else {
+                    addBlogPost(postData);
+                    onToast(`Article "${postData.title}" published live!`, 'success');
+                  }
+                  setIsBlogModalOpen(false);
+                }}
+                className="btn btn-primary btn-sm pulse-glow"
+                style={{
+                  background: 'linear-gradient(135deg, var(--color-primary), #a855f7)',
+                  border: 'none',
+                  fontWeight: 'bold',
+                  padding: '8px 18px',
+                  boxShadow: '0 4px 16px rgba(124, 58, 237, 0.4)',
+                }}
+              >
+                🚀 {editingBlogSlug ? 'Save Article Changes' : 'Publish Article Live'}
+              </button>
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
-            <div className="form-group">
-              <label className="form-label">Category</label>
-              <select className="form-input" value={blogCategoryInput} onChange={(e) => setBlogCategoryInput(e.target.value)}>
-                <option value="AI Image Generation">AI Image Generation</option>
-                <option value="AI Productivity">AI Productivity</option>
-                <option value="AI Writing">AI Writing</option>
-                <option value="AI Coding">AI Coding</option>
-                <option value="AI Video">AI Video</option>
-                <option value="AI Business">AI Business</option>
-                <option value="AI Study & Education">AI Study & Education</option>
-              </select>
+          {/* TOP METADATA CONFIG DRAWER */}
+          {blogMetaOpen && (
+            <div
+              style={{
+                backgroundColor: 'rgba(15, 18, 28, 0.98)',
+                borderBottom: '1px solid var(--border-color)',
+                padding: '16px 24px',
+                display: 'grid',
+                gridTemplateColumns: '2fr 1fr 1fr 1fr',
+                gap: '16px',
+                alignItems: 'start',
+                animation: 'fade-in-overlay 0.15s ease-out',
+              }}
+            >
+              {/* Title & Slug */}
+              <div>
+                <label style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '4px', display: 'block' }}>
+                  ARTICLE TITLE & AUTOMATIC URL SLUG *
+                </label>
+                <input
+                  type="text"
+                  className="form-input btn-sm"
+                  placeholder="Article Title (e.g. Best AI Image Upscale Tools in 2026)"
+                  value={blogTitleInput}
+                  onChange={(e) => {
+                    setBlogTitleInput(e.target.value);
+                    if (!editingBlogSlug) {
+                      setBlogSlugInput(e.target.value.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''));
+                    }
+                  }}
+                  style={{ fontWeight: 'bold', fontSize: '13px', marginBottom: '6px' }}
+                />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>URL:</span>
+                  <input
+                    type="text"
+                    className="form-input btn-xs"
+                    value={blogSlugInput}
+                    onChange={(e) => setBlogSlugInput(e.target.value)}
+                    style={{ fontSize: '11px', fontFamily: 'monospace' }}
+                  />
+                </div>
+              </div>
+
+              {/* Category & Author */}
+              <div>
+                <label style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '4px', display: 'block' }}>
+                  CATEGORY & AUTHOR
+                </label>
+                <select
+                  className="form-input btn-sm"
+                  value={blogCategoryInput}
+                  onChange={(e) => setBlogCategoryInput(e.target.value)}
+                  style={{ marginBottom: '6px', fontWeight: '600' }}
+                >
+                  <option value="AI Image Generation">AI Image Generation</option>
+                  <option value="AI Productivity">AI Productivity</option>
+                  <option value="AI Writing">AI Writing</option>
+                  <option value="AI Coding">AI Coding</option>
+                  <option value="AI Video">AI Video</option>
+                  <option value="AI Business">AI Business</option>
+                  <option value="AI Study & Education">AI Study & Education</option>
+                </select>
+                <input
+                  type="text"
+                  className="form-input btn-xs"
+                  placeholder="Author Name"
+                  value={blogAuthorInput}
+                  onChange={(e) => setBlogAuthorInput(e.target.value)}
+                />
+              </div>
+
+              {/* Image URL & Thumbnail */}
+              <div>
+                <label style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '4px', display: 'block' }}>
+                  COVER IMAGE URL & PREVIEW
+                </label>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <input
+                    type="text"
+                    className="form-input btn-sm"
+                    placeholder="/images/banner.jpg"
+                    value={blogImageInput}
+                    onChange={(e) => setBlogImageInput(e.target.value)}
+                    style={{ flex: 1, fontSize: '11px' }}
+                  />
+                  {blogImageInput && (
+                    <img
+                      src={blogImageInput}
+                      alt="Cover"
+                      style={{ width: '36px', height: '32px', borderRadius: '4px', objectFit: 'cover', border: '1px solid var(--border-color)' }}
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                    />
+                  )}
+                </div>
+              </div>
+
+              {/* Meta Description / Excerpt */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <label style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)' }}>
+                    SEO EXCERPT / META DESCRIPTION
+                  </label>
+                  <span style={{ fontSize: '10px', color: blogExcerptInput.length > 160 ? 'var(--color-warning)' : 'var(--text-muted)' }}>
+                    {blogExcerptInput.length} / 160
+                  </span>
+                </div>
+                <textarea
+                  className="form-input btn-sm"
+                  rows={2}
+                  placeholder="Meta description for search engines..."
+                  value={blogExcerptInput}
+                  onChange={(e) => setBlogExcerptInput(e.target.value)}
+                  style={{ fontSize: '11px', resize: 'none' }}
+                />
+              </div>
             </div>
-            <div className="form-group">
-              <label className="form-label">Author Name</label>
-              <input type="text" className="form-input" value={blogAuthorInput} onChange={(e) => setBlogAuthorInput(e.target.value)} />
+          )}
+
+          {/* MAIN WRITING WORKSPACE */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            {/* FORMATTING TOOLBAR */}
+            {(blogEditorMode === 'split' || blogEditorMode === 'edit') && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 24px',
+                  backgroundColor: 'var(--bg-card)',
+                  borderBottom: '1px solid var(--border-color)',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <span style={{ fontSize: '10px', fontWeight: 'bold', color: 'var(--text-muted)', marginRight: '6px' }}>
+                  QUICK FORMATTING:
+                </span>
+                <button type="button" onClick={() => insertMarkdownSnippet('# ')} className="btn btn-outline btn-xs"># H1</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('## ')} className="btn btn-outline btn-xs">## H2</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('### ')} className="btn btn-outline btn-xs">### H3</button>
+                <span style={{ opacity: 0.3 }}>|</span>
+                <button type="button" onClick={() => insertMarkdownSnippet('', '**')} className="btn btn-outline btn-xs" style={{ fontWeight: 'bold' }}>B</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('', '*')} className="btn btn-outline btn-xs" style={{ fontStyle: 'italic' }}>I</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('', '`')} className="btn btn-outline btn-xs" style={{ fontFamily: 'monospace' }}>Code</button>
+                <span style={{ opacity: 0.3 }}>|</span>
+                <button type="button" onClick={() => insertMarkdownSnippet('[Link Title](https://example.com)')} className="btn btn-outline btn-xs">🔗 Link</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('![Image Alt](/images/filename.jpg)')} className="btn btn-outline btn-xs">🖼️ Image</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('| Feature | Detail 1 | Detail 2 |\n|---|---|---|\n| Item 1 | Value A | Value B |')} className="btn btn-outline btn-xs">📊 Table</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('> Quote text here...')} className="btn btn-outline btn-xs">💬 Quote</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('\n---\n')} className="btn btn-outline btn-xs">--- Line</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('## Frequently Asked Questions\n\n### What is ...?\n\nAnswer paragraph here...')} className="btn btn-outline btn-xs" style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}>❓ Add FAQ Block</button>
+              </div>
+            )}
+
+            {/* SPLIT / SINGLE VIEW WORKSPACE PANELS */}
+            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: blogEditorMode === 'split' ? '1fr 1fr' : '1fr', height: '100%', overflow: 'hidden' }}>
+              {/* LEFT: MARKDOWN TEXT EDITOR */}
+              {(blogEditorMode === 'split' || blogEditorMode === 'edit') && (
+                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', borderRight: blogEditorMode === 'split' ? '1px solid var(--border-color)' : 'none', backgroundColor: '#0d1117' }}>
+                  <div style={{ padding: '6px 16px', fontSize: '10px', fontWeight: 'bold', color: '#8b949e', backgroundColor: '#161b22', borderBottom: '1px solid #30363d', display: 'flex', justifyContent: 'space-between' }}>
+                    <span>MARKDOWN EDITOR</span>
+                    <span>UTF-8 • Markdown Supported</span>
+                  </div>
+                  <textarea
+                    id="blog-content-textarea"
+                    value={blogContentInput}
+                    onChange={(e) => {
+                      setBlogContentInput(e.target.value);
+                      const words = e.target.value.trim().split(/\s+/).filter(Boolean).length;
+                      const estMinutes = Math.max(1, Math.ceil(words / 220));
+                      setBlogReadTimeInput(`${estMinutes} min read`);
+                    }}
+                    placeholder="# Article Title&#10;&#10;Write your article here using Markdown..."
+                    style={{
+                      flex: 1,
+                      width: '100%',
+                      padding: '20px',
+                      backgroundColor: '#0d1117',
+                      color: '#c9d1d9',
+                      fontSize: '14px',
+                      fontFamily: '"Fira Code", "Consolas", "Courier New", monospace',
+                      lineHeight: '1.6',
+                      border: 'none',
+                      outline: 'none',
+                      resize: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* RIGHT: LIVE REAL-TIME PREVIEW */}
+              {(blogEditorMode === 'split' || blogEditorMode === 'preview') && (
+                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: 'var(--bg-primary)', overflow: 'hidden' }}>
+                  <div style={{ padding: '6px 16px', fontSize: '10px', fontWeight: 'bold', color: 'var(--color-primary)', backgroundColor: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>👁️ LIVE PREVIEW — EXACT PUBLIC RENDER</span>
+                    <span>https://aifynest.com/blog/{blogSlugInput || 'slug'}</span>
+                  </div>
+
+                  <div style={{ flex: 1, padding: '32px', overflowY: 'auto' }}>
+                    {/* Rendered Header Mockup */}
+                    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+                      <span className="badge badge-featured" style={{ marginBottom: '12px', display: 'inline-block' }}>
+                        {blogCategoryInput}
+                      </span>
+                      <h1 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '14px', lineHeight: '1.3', color: 'var(--text-primary)' }}>
+                        {blogTitleInput || 'Untitled Article Title'}
+                      </h1>
+
+                      <div style={{ display: 'flex', gap: '12px', alignItems: 'center', fontSize: '12px', color: 'var(--text-muted)', marginBottom: '20px' }}>
+                        <span>By {blogAuthorInput || 'AIFynest Editorial Team'}</span>
+                        <span>•</span>
+                        <span>{new Date().toISOString().split('T')[0]}</span>
+                        <span>•</span>
+                        <span>{Math.max(1, Math.ceil(blogContentInput.trim().split(/\s+/).filter(Boolean).length / 220))} min read</span>
+                      </div>
+
+                      {blogImageInput && (
+                        <img
+                          src={blogImageInput}
+                          alt={blogTitleInput}
+                          style={{ width: '100%', maxHeight: '360px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', marginBottom: '28px', border: '1px solid var(--border-color)' }}
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                        />
+                      )}
+
+                      {/* Rendered Body */}
+                      <article style={{ color: 'var(--text-primary)', fontSize: '15px', lineHeight: '1.8' }}>
+                        <MarkdownRenderer content={blogContentInput || '*Start typing in the Markdown editor to see live rendering...*'} />
+                      </article>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="form-group">
-              <label className="form-label">Estimated Read Time</label>
-              <input type="text" className="form-input" placeholder="e.g., 10 min read" value={blogReadTimeInput} onChange={(e) => setBlogReadTimeInput(e.target.value)} />
-            </div>
           </div>
-
-          <div className="form-group">
-            <label className="form-label">Featured Image URL</label>
-            <input type="text" className="form-input" placeholder="/images/best-ai-image-upscale-tools-2026.jpg or image URL" value={blogImageInput} onChange={(e) => setBlogImageInput(e.target.value)} />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Meta Description / Excerpt</label>
-            <textarea
-              className="form-input"
-              rows={2}
-              placeholder="Brief summary for Google search meta description & blog cards..."
-              value={blogExcerptInput}
-              onChange={(e) => setBlogExcerptInput(e.target.value)}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Article Content (Markdown Format) *</label>
-            <textarea
-              className="form-input"
-              rows={12}
-              style={{ fontFamily: 'monospace', fontSize: '13px', lineHeight: '1.5' }}
-              placeholder="# [H1] Article Title&#10;&#10;Introduction paragraph...&#10;&#10;## [H2] Section Heading&#10;&#10;![Alt text](/images/filename.jpg)"
-              value={blogContentInput}
-              onChange={(e) => setBlogContentInput(e.target.value)}
-              required
-            />
-          </div>
-
-          <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '12px' }}>
-            <button type="button" onClick={() => setIsBlogModalOpen(false)} className="btn btn-outline">Cancel</button>
-            <button type="submit" className="btn btn-primary">{editingBlogSlug ? "Save Article Changes" : "Publish Article Now"}</button>
-          </div>
-        </form>
-      </Modal>
+        </div>
+      )}
 
       {/* Styled definitions */}
       <style>{`
