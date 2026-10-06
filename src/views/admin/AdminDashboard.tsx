@@ -129,25 +129,38 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
       onToast('Please select a valid image file (PNG, JPG, WEBP, GIF, SVG)', 'error');
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const dataUrl = e.target?.result as string;
-      if (!dataUrl) return;
-      const cleanAlt = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
-      if (target === 'modal') {
-        setInsertImageUrlInput(dataUrl);
-        if (!insertImageAltInput.trim()) setInsertImageAltInput(cleanAlt);
-        onToast(`Image "${file.name}" loaded for preview!`, 'success');
-      } else if (target === 'cover') {
-        setBlogImageInput(dataUrl);
-        onToast(`Cover image set to "${file.name}"!`, 'success');
-      } else if (target === 'editor') {
-        const markdownImg = `\n\n![${cleanAlt}](${dataUrl})\n\n`;
-        insertMarkdownSnippet(markdownImg);
-        onToast(`Image "${file.name}" uploaded and inserted into article!`, 'success');
-      }
-    };
-    reader.readAsDataURL(file);
+    
+    // Create short clean Blob Object URL (only ~50 chars) instead of 500,000 chars of base64 text!
+    const cleanUrl = URL.createObjectURL(file);
+    const cleanAlt = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+
+    if (target === 'modal') {
+      setInsertImageUrlInput(cleanUrl);
+      if (!insertImageAltInput.trim()) setInsertImageAltInput(cleanAlt);
+      onToast(`Image "${file.name}" loaded cleanly!`, 'success');
+    } else if (target === 'cover') {
+      setBlogImageInput(cleanUrl);
+      onToast(`Cover image set to "${file.name}"!`, 'success');
+    } else if (target === 'editor') {
+      const markdownImg = `\n\n![${cleanAlt}](${cleanUrl})\n\n`;
+      insertMarkdownSnippet(markdownImg);
+      onToast(`Image "${file.name}" inserted cleanly into article!`, 'success');
+    }
+  };
+
+  // Helper to remove any accidental massive base64 image strings from article content
+  const cleanBase64FromArticleText = (text: string): string => {
+    if (!text.includes('data:image/')) return text;
+    // Replace Markdown data:image base64 URLs with clean placeholder image links
+    let count = 0;
+    const cleaned = text.replace(/!\[(.*?)\]\(data:image\/[^;]+;base64,[^)]+\)/gi, (_, alt) => {
+      count++;
+      const caption = alt.trim() || `Article Image ${count}`;
+      return `![${caption}](/images/sample-tool-1.png)`;
+    }).replace(/data:image\/[^;]+;base64,[A-Za-z0-9+/=]+/gi, () => {
+      return '/images/sample-tool-1.png';
+    });
+    return cleaned;
   };
 
   const parseRawTableToMarkdown = (raw: string): string => {
@@ -3886,6 +3899,29 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                     >
                       🖼️ Upload Image
                     </button>
+                    {blogContentInput.includes('data:image/') && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const cleaned = cleanBase64FromArticleText(blogContentInput);
+                          setBlogContentInput(cleaned);
+                          onToast('Cleaned massive base64 image code from article text!', 'success');
+                        }}
+                        style={{
+                          backgroundColor: '#fef2f2',
+                          color: '#dc2626',
+                          border: '1px solid #fca5a5',
+                          borderRadius: '4px',
+                          padding: '4px 10px',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                        }}
+                        title="Remove massive base64 image text and replace with clean image links"
+                      >
+                        🧹 Clean Base64 Text
+                      </button>
+                    )}
                     <button type="button" onClick={() => insertMarkdownSnippet('> Quote text here...\n')} style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: '4px 8px', color: '#0f172a' }}>💬</button>
                     <button type="button" onClick={() => insertMarkdownSnippet('## Frequently Asked Questions\n\n### What is ...?\n\nAnswer paragraph here...\n')} style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: '4px 8px', color: '#0f172a' }}>❓ FAQ</button>
                   </div>
@@ -3980,6 +4016,37 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                       onClick={updateCursorPosition}
                       onKeyUp={updateCursorPosition}
                       onFocus={updateCursorPosition}
+                      onPaste={(e) => {
+                        // 1. Check if user pasted an image file directly from clipboard
+                        const items = e.clipboardData?.items;
+                        if (items) {
+                          for (let i = 0; i < items.length; i++) {
+                            if (items[i].type.startsWith('image/')) {
+                              const file = items[i].getAsFile();
+                              if (file) {
+                                e.preventDefault();
+                                handleLocalImageUpload(file, 'editor');
+                                return;
+                              }
+                            }
+                          }
+                        }
+                        // 2. Check if pasted text contains raw base64 data URLs
+                        const pastedText = e.clipboardData?.getData('text') || '';
+                        if (pastedText.includes('data:image/')) {
+                          e.preventDefault();
+                          const cleanedText = cleanBase64FromArticleText(pastedText);
+                          insertMarkdownSnippet(cleanedText);
+                          onToast('Pasted content inserted cleanly without base64 image bloat!', 'success');
+                        }
+                      }}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={(e) => {
+                        if (e.dataTransfer.files?.[0] && e.dataTransfer.files[0].type.startsWith('image/')) {
+                          e.preventDefault();
+                          handleLocalImageUpload(e.dataTransfer.files[0], 'editor');
+                        }
+                      }}
                       onChange={(e) => {
                         setBlogContentInput(e.target.value);
                         updateCursorPosition();
