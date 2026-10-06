@@ -1954,6 +1954,7 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         author: post.author,
         read_time: post.readTime,
         image: post.image,
+        status: post.status || 'published',
         date: post.date || new Date().toISOString()
       }).then(() => fetchDatabaseState());
     }
@@ -1972,6 +1973,7 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         ...(updatedFields.author ? { author: updatedFields.author } : {}),
         ...(updatedFields.readTime ? { read_time: updatedFields.readTime } : {}),
         ...(updatedFields.image ? { image: updatedFields.image } : {}),
+        ...(updatedFields.status ? { status: updatedFields.status } : {}),
       }).eq('slug', slug).then(() => fetchDatabaseState());
     }
   };

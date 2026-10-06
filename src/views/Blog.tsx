@@ -47,7 +47,7 @@ export const Blog: React.FC = () => {
   }, []);
 
   React.useEffect(() => {
-    setPosts(defaultPosts);
+    setPosts(defaultPosts.filter((p: any) => p.status !== 'draft'));
   }, [defaultPosts]);
 
   // Filter categories

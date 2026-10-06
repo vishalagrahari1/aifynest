@@ -81,8 +81,10 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
   // Blog management states
   const [blogSearch, setBlogSearch] = useState('');
   const [blogCatFilter, setBlogCatFilter] = useState('all');
+  const [blogStatusFilter, setBlogStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
   const [isBlogModalOpen, setIsBlogModalOpen] = useState(false);
   const [editingBlogSlug, setEditingBlogSlug] = useState<string | null>(null);
+  const [blogStatusInput, setBlogStatusInput] = useState<'draft' | 'published'>('published');
   const [blogTitleInput, setBlogTitleInput] = useState('');
   const [blogSlugInput, setBlogSlugInput] = useState('');
   const [blogCategoryInput, setBlogCategoryInput] = useState('AI Image Generation');
@@ -91,7 +93,6 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
   const [blogImageInput, setBlogImageInput] = useState('');
   const [blogExcerptInput, setBlogExcerptInput] = useState('');
   const [blogContentInput, setBlogContentInput] = useState('');
-  const [blogEditorMode, setBlogEditorMode] = useState<'split' | 'edit' | 'preview'>('split');
   const [savedCursorPos, setSavedCursorPos] = useState<{ start: number; end: number } | null>(null);
   const [studioActiveTab, setStudioActiveTab] = useState<'content' | 'meta' | 'seo'>('content');
   const [isSlugLocked, setIsSlugLocked] = useState<boolean>(true);
@@ -1950,13 +1951,14 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                     setBlogImageInput('');
                     setBlogExcerptInput('');
                     setBlogContentInput('');
+                    setBlogStatusInput('draft');
                     setIsBlogModalOpen(true);
                   }}
                   className="btn btn-primary btn-sm"
                   style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
                 >
                   <Plus size={16} />
-                  <span>Write & Publish Article</span>
+                  <span>Write & Create Article</span>
                 </button>
               </div>
 
@@ -1983,6 +1985,15 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                   <option value="AI Business">AI Business</option>
                   <option value="AI Study & Education">AI Study & Education</option>
                 </select>
+                <select
+                  value={blogStatusFilter}
+                  onChange={(e) => setBlogStatusFilter(e.target.value as any)}
+                  style={{ padding: '8px 14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: 'var(--text-xs)', fontWeight: '600' }}
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="published">Published Only</option>
+                  <option value="draft">Drafts Only</option>
+                </select>
                 <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
                   Total Articles: <strong>{blogPosts ? blogPosts.length : 0}</strong>
                 </span>
@@ -1995,6 +2006,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                     <tr>
                       <th style={{ width: '70px' }}>Banner</th>
                       <th>Article Title & Slug</th>
+                      <th>Status</th>
                       <th>Category</th>
                       <th>Author</th>
                       <th>Date</th>
@@ -2007,7 +2019,8 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                       .filter((b) => {
                         const matchQuery = !blogSearch.trim() || b.title.toLowerCase().includes(blogSearch.toLowerCase()) || b.slug.toLowerCase().includes(blogSearch.toLowerCase());
                         const matchCat = blogCatFilter === 'all' || b.category === blogCatFilter;
-                        return matchQuery && matchCat;
+                        const matchStatus = blogStatusFilter === 'all' || (blogStatusFilter === 'draft' ? b.status === 'draft' : b.status !== 'draft');
+                        return matchQuery && matchCat && matchStatus;
                       })
                       .map((post) => (
                         <tr key={post.slug}>
@@ -2022,6 +2035,25 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                           <td>
                             <div style={{ fontWeight: 'bold', fontSize: 'var(--text-xs)', color: 'var(--text-primary)' }}>{post.title}</div>
                             <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>/blog/{post.slug}</span>
+                          </td>
+                          <td>
+                            <span
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                padding: '3px 9px',
+                                borderRadius: '12px',
+                                fontSize: '10px',
+                                fontWeight: '700',
+                                textTransform: 'uppercase',
+                                backgroundColor: post.status === 'draft' ? '#fef3c7' : '#dcfce7',
+                                color: post.status === 'draft' ? '#b45309' : '#15803d',
+                                border: `1px solid ${post.status === 'draft' ? '#fde68a' : '#bbf7d0'}`,
+                              }}
+                            >
+                              {post.status === 'draft' ? '📝 Draft' : '🟢 Published'}
+                            </span>
                           </td>
                           <td>
                             <span className="badge badge-featured" style={{ fontSize: '10px' }}>{post.category || 'General'}</span>
@@ -2045,6 +2077,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                                   setBlogImageInput(post.image || '');
                                   setBlogExcerptInput(post.excerpt || '');
                                   setBlogContentInput(post.content || '');
+                                  setBlogStatusInput(post.status === 'draft' ? 'draft' : 'published');
                                   setIsBlogModalOpen(true);
                                 }}
                                 className="btn btn-outline btn-xs"
@@ -3509,82 +3542,118 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
             {/* Left Status Indicators */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '24px', color: '#64748b' }}>
               <div>
-                Status: <strong style={{ color: '#0f172a' }}>{editingBlogSlug ? 'Published' : 'Draft'}</strong>
+                Status:{' '}
+                <strong style={{ color: blogStatusInput === 'draft' ? '#d97706' : '#15803d' }}>
+                  {blogStatusInput === 'draft' ? '📝 Draft' : '🟢 Published'}
+                </strong>
               </div>
               <div>
-                Last Modified: <strong style={{ color: '#0f172a' }}>October 6th 2026, 1:01 PM</strong>
-              </div>
-              <div>
-                Created: <strong style={{ color: '#0f172a' }}>October 6th 2026, 1:01 PM</strong>
+                Last Modified: <strong style={{ color: '#0f172a' }}>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</strong>
               </div>
             </div>
 
-            {/* Right Action Dropdown & Menu */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ display: 'flex', borderRadius: '6px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (!blogTitleInput.trim() || !blogSlugInput.trim() || !blogContentInput.trim()) {
-                      onToast('Title, Slug, and Article Content are required.', 'error');
-                      return;
-                    }
-                    const cleanSlug = blogSlugInput.toLowerCase().trim().replace(/[^a-z0-9-]+/g, '-');
-                    const estMinutes = Math.max(1, Math.ceil(blogContentInput.trim().split(/\s+/).filter(Boolean).length / 220));
-                    const postData: any = {
-                      slug: cleanSlug,
-                      title: blogTitleInput.trim(),
-                      category: blogCategoryInput,
-                      author: blogAuthorInput.trim() || 'AIFynest Editorial Team',
-                      readTime: blogReadTimeInput.trim() || `${estMinutes} min read`,
-                      image: blogImageInput.trim() || '/images/best-ai-image-upscale-tools-2026.jpg',
-                      excerpt: blogExcerptInput.trim() || blogTitleInput.trim(),
-                      content: blogContentInput,
-                      date: new Date().toISOString().split('T')[0]
-                    };
+            {/* Right Action Buttons */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!blogTitleInput.trim() || !blogSlugInput.trim() || !blogContentInput.trim()) {
+                    onToast('Title, Slug, and Article Content are required.', 'error');
+                    return;
+                  }
+                  const cleanSlug = blogSlugInput.toLowerCase().trim().replace(/[^a-z0-9-]+/g, '-');
+                  const estMinutes = Math.max(1, Math.ceil(blogContentInput.trim().split(/\s+/).filter(Boolean).length / 220));
+                  const postData: any = {
+                    slug: cleanSlug,
+                    title: blogTitleInput.trim(),
+                    category: blogCategoryInput,
+                    author: blogAuthorInput.trim() || 'AIFynest Editorial Team',
+                    readTime: blogReadTimeInput.trim() || `${estMinutes} min read`,
+                    image: blogImageInput.trim() || '/images/best-ai-image-upscale-tools-2026.jpg',
+                    excerpt: blogExcerptInput.trim() || blogTitleInput.trim(),
+                    content: blogContentInput,
+                    status: 'draft',
+                    date: new Date().toISOString().split('T')[0]
+                  };
 
-                    if (editingBlogSlug) {
-                      updateBlogPost(editingBlogSlug, postData);
-                      onToast(`Article "${postData.title}" updated successfully!`, 'success');
-                    } else {
-                      addBlogPost(postData);
-                      onToast(`Article "${postData.title}" published live!`, 'success');
-                    }
-                    setIsBlogModalOpen(false);
-                  }}
-                  style={{
-                    backgroundColor: '#1e293b',
-                    color: '#ffffff',
-                    border: 'none',
-                    padding: '8px 18px',
-                    fontWeight: '600',
-                    fontSize: '13px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                  }}
-                >
-                  Publish changes
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setBlogEditorMode(blogEditorMode === 'split' ? 'edit' : 'split')}
-                  style={{
-                    backgroundColor: '#0f172a',
-                    color: '#ffffff',
-                    border: 'none',
-                    borderLeft: '1px solid #334155',
-                    padding: '8px 10px',
-                    cursor: 'pointer',
-                    fontSize: '12px',
-                  }}
-                  title="Toggle Split Preview"
-                >
-                  ▾
-                </button>
-              </div>
+                  if (editingBlogSlug) {
+                    updateBlogPost(editingBlogSlug, postData);
+                    onToast(`Article "${postData.title}" saved as Draft!`, 'info');
+                  } else {
+                    addBlogPost(postData);
+                    onToast(`Article "${postData.title}" created as Draft!`, 'info');
+                  }
+                  setBlogStatusInput('draft');
+                  setIsBlogModalOpen(false);
+                }}
+                style={{
+                  backgroundColor: '#f1f5f9',
+                  color: '#334155',
+                  border: '1px solid #cbd5e1',
+                  padding: '8px 16px',
+                  fontWeight: '600',
+                  fontSize: '13px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                💾 Save as Draft
+              </button>
+
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!blogTitleInput.trim() || !blogSlugInput.trim() || !blogContentInput.trim()) {
+                    onToast('Title, Slug, and Article Content are required.', 'error');
+                    return;
+                  }
+                  const cleanSlug = blogSlugInput.toLowerCase().trim().replace(/[^a-z0-9-]+/g, '-');
+                  const estMinutes = Math.max(1, Math.ceil(blogContentInput.trim().split(/\s+/).filter(Boolean).length / 220));
+                  const postData: any = {
+                    slug: cleanSlug,
+                    title: blogTitleInput.trim(),
+                    category: blogCategoryInput,
+                    author: blogAuthorInput.trim() || 'AIFynest Editorial Team',
+                    readTime: blogReadTimeInput.trim() || `${estMinutes} min read`,
+                    image: blogImageInput.trim() || '/images/best-ai-image-upscale-tools-2026.jpg',
+                    excerpt: blogExcerptInput.trim() || blogTitleInput.trim(),
+                    content: blogContentInput,
+                    status: 'published',
+                    date: new Date().toISOString().split('T')[0]
+                  };
+
+                  if (editingBlogSlug) {
+                    updateBlogPost(editingBlogSlug, postData);
+                    onToast(`Article "${postData.title}" published live!`, 'success');
+                  } else {
+                    addBlogPost(postData);
+                    onToast(`Article "${postData.title}" published live!`, 'success');
+                  }
+                  setBlogStatusInput('published');
+                  setIsBlogModalOpen(false);
+                }}
+                style={{
+                  backgroundColor: '#0f172a',
+                  color: '#ffffff',
+                  border: 'none',
+                  padding: '8px 18px',
+                  fontWeight: '600',
+                  fontSize: '13px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                }}
+              >
+                🚀 {editingBlogSlug && blogStatusInput === 'published' ? 'Update & Publish' : 'Publish Live'}
+              </button>
 
               <button
                 type="button"
@@ -4130,6 +4199,32 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                     +
                   </button>
                 </div>
+              </div>
+
+              {/* Publishing Status Selector */}
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: '#475569', marginBottom: '8px' }}>
+                  Publishing Status
+                </label>
+                <select
+                  value={blogStatusInput}
+                  onChange={(e) => setBlogStatusInput(e.target.value as 'draft' | 'published')}
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    color: blogStatusInput === 'draft' ? '#b45309' : '#15803d',
+                    backgroundColor: blogStatusInput === 'draft' ? '#fef3c7' : '#dcfce7',
+                    border: `1px solid ${blogStatusInput === 'draft' ? '#fde68a' : '#bbf7d0'}`,
+                    borderRadius: '6px',
+                    boxSizing: 'border-box',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <option value="published">🟢 Published (Live on Site)</option>
+                  <option value="draft">📝 Draft (Hidden from Site)</option>
+                </select>
               </div>
 
               {/* Slug Field with Unlock Link */}

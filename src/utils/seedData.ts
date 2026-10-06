@@ -240,6 +240,7 @@ export interface BlogPost {
   author: string;
   date: string;
   readTime: string;
+  status?: 'published' | 'draft';
 }
 
 export interface Collection {
