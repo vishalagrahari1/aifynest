@@ -31,7 +31,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, title, onClose, children }
         left: 0,
         right: 0,
         bottom: 0,
-        zIndex: varValue('--z-modal'),
+        zIndex: 100000,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -133,9 +133,4 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, title, onClose, children }
       `}</style>
     </div>
   );
-};
-
-// Simple helper to fetch root CSS variables safely inside inline styles if needed
-const varValue = (varName: string) => {
-  return `var(${varName})`;
 };

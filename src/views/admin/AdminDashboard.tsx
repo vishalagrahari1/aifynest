@@ -100,8 +100,10 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
   const [insertImageUrlInput, setInsertImageUrlInput] = useState('');
   const [insertImageAltInput, setInsertImageAltInput] = useState('');
 
-  // TABLE BUILDER & CONVERTER MODAL STATES
+  // TABLE BUILDER & CONVERTER MODAL & INLINE PANEL STATES
   const [isTableModalOpen, setIsTableModalOpen] = useState(false);
+  const [showInlineTablePanel, setShowInlineTablePanel] = useState(false);
+  const [showInlineImagePanel, setShowInlineImagePanel] = useState(false);
   const [tableActiveTab, setTableActiveTab] = useState<'paste' | 'builder'>('paste');
   const [tablePasteRawText, setTablePasteRawText] = useState('');
   const [tableGridRows, setTableGridRows] = useState(4);
@@ -3842,9 +3844,10 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                 <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('[Link Title](https://example.com)')} className="btn btn-outline btn-xs">🔗 Link</button>
                 <button
                   type="button"
-                  onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
                     updateCursorPosition();
+                    setShowInlineImagePanel(!showInlineImagePanel);
+                    setShowInlineTablePanel(false);
                     setIsInsertImageModalOpen(true);
                   }}
                   className="btn btn-primary btn-xs"
@@ -3854,9 +3857,10 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                 </button>
                 <button
                   type="button"
-                  onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
                     updateCursorPosition();
+                    setShowInlineTablePanel(!showInlineTablePanel);
+                    setShowInlineImagePanel(false);
                     setIsTableModalOpen(true);
                   }}
                   className="btn btn-outline btn-xs"
@@ -3864,9 +3868,113 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                 >
                   📊 Easy Table Builder & Converter
                 </button>
-                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('> Quote text here...\n')} className="btn btn-outline btn-xs">💬 Quote</button>
-                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('\n---\n')} className="btn btn-outline btn-xs">--- Line</button>
-                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('## Frequently Asked Questions\n\n### What is ...?\n\nAnswer paragraph here...\n')} className="btn btn-outline btn-xs" style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}>❓ Add FAQ Block</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('> Quote text here...\n')} className="btn btn-outline btn-xs">💬 Quote</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('\n---\n')} className="btn btn-outline btn-xs">--- Line</button>
+                <button type="button" onClick={() => insertMarkdownSnippet('## Frequently Asked Questions\n\n### What is ...?\n\nAnswer paragraph here...\n')} className="btn btn-outline btn-xs" style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}>❓ Add FAQ Block</button>
+              </div>
+            )}
+
+            {/* EXPANDABLE INLINE TABLE PASTE & CONVERTER PANEL */}
+            {showInlineTablePanel && (
+              <div style={{ backgroundColor: '#161b22', padding: '14px 24px', borderBottom: '2px solid #3b82f6', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#60a5fa' }}>
+                    📋 EASY TABLE PASTE & CONVERTER (INLINE STUDIO TOOL)
+                  </span>
+                  <button type="button" onClick={() => setShowInlineTablePanel(false)} className="btn btn-outline btn-xs">✕ Close Panel</button>
+                </div>
+                <textarea
+                  className="form-input"
+                  rows={4}
+                  placeholder="Paste raw table text from Excel, Google Sheets, ChatGPT, or web here...\nExample:\nFeature\tAdobe Super\tRemini\tTopaz\nPhoto Upscaling\tExcellent\tExcellent\tGood"
+                  value={tablePasteRawText}
+                  onChange={(e) => setTablePasteRawText(e.target.value)}
+                  style={{ fontFamily: 'monospace', fontSize: '12px', backgroundColor: '#0d1117', color: '#c9d1d9' }}
+                />
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                    Auto-detects tabs, pipes, commas & spaces!
+                  </span>
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm"
+                    style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', border: 'none', fontWeight: 'bold' }}
+                    onClick={() => {
+                      if (!tablePasteRawText.trim()) {
+                        onToast('Please paste raw table text inside the box first.', 'error');
+                        return;
+                      }
+                      const mdTable = parseRawTableToMarkdown(tablePasteRawText);
+                      insertMarkdownSnippet(mdTable);
+                      onToast('Table converted and inserted into article!', 'success');
+                      setTablePasteRawText('');
+                      setShowInlineTablePanel(false);
+                    }}
+                  >
+                    ⚡ Convert & Insert Table at Cursor Position
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* EXPANDABLE INLINE IMAGE UPLOADER PANEL */}
+            {showInlineImagePanel && (
+              <div style={{ backgroundColor: '#161b22', padding: '14px 24px', borderBottom: '2px solid #a855f7', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#c084fc' }}>
+                    🖼️ INLINE IMAGE UPLOADER & LINK INSERTER
+                  </span>
+                  <button type="button" onClick={() => setShowInlineImagePanel(false)} className="btn btn-outline btn-xs">✕ Close Panel</button>
+                </div>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <label className="btn btn-outline btn-sm" style={{ cursor: 'pointer', fontWeight: 'bold' }}>
+                    📁 Select Image File from Device
+                    <input
+                      type="file"
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        if (e.target.files?.[0]) handleLocalImageUpload(e.target.files[0], 'modal');
+                      }}
+                    />
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input btn-sm"
+                    placeholder="or paste direct URL e.g. https://img.photiu.ai/pimgs/banner.webp"
+                    value={insertImageUrlInput}
+                    onChange={(e) => setInsertImageUrlInput(e.target.value)}
+                    style={{ flex: 1, minWidth: '220px', fontSize: '12px' }}
+                  />
+                  <input
+                    type="text"
+                    className="form-input btn-sm"
+                    placeholder="Alt text / Caption"
+                    value={insertImageAltInput}
+                    onChange={(e) => setInsertImageAltInput(e.target.value)}
+                    style={{ width: '180px', fontSize: '12px' }}
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm"
+                    style={{ background: 'linear-gradient(135deg, var(--color-primary), #a855f7)', border: 'none', fontWeight: 'bold' }}
+                    onClick={() => {
+                      if (!insertImageUrlInput.trim()) {
+                        onToast('Please enter an image URL or choose a file', 'error');
+                        return;
+                      }
+                      const altText = insertImageAltInput.trim() || 'Article Image';
+                      const imgMarkdown = `\n\n![${altText}](${insertImageUrlInput.trim()})\n\n`;
+                      insertMarkdownSnippet(imgMarkdown);
+                      onToast('Image inserted into article!', 'success');
+                      setInsertImageUrlInput('');
+                      setInsertImageAltInput('');
+                      setShowInlineImagePanel(false);
+                    }}
+                  >
+                    🚀 Insert Image at Cursor
+                  </button>
+                </div>
               </div>
             )}
 
