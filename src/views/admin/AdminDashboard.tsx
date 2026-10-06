@@ -92,8 +92,9 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
   const [blogExcerptInput, setBlogExcerptInput] = useState('');
   const [blogContentInput, setBlogContentInput] = useState('');
   const [blogEditorMode, setBlogEditorMode] = useState<'split' | 'edit' | 'preview'>('split');
-  const [blogMetaOpen, setBlogMetaOpen] = useState<boolean>(true);
   const [savedCursorPos, setSavedCursorPos] = useState<{ start: number; end: number } | null>(null);
+  const [studioActiveTab, setStudioActiveTab] = useState<'content' | 'meta' | 'seo'>('content');
+  const [isSlugLocked, setIsSlugLocked] = useState<boolean>(true);
 
   // IMAGE INSERTER MODAL STATES
   const [isInsertImageModalOpen, setIsInsertImageModalOpen] = useState(false);
@@ -193,7 +194,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
     return md;
   };
 
-  const insertMarkdownSnippet = (snippet: string, wrapper = '') => {
+  const insertMarkdownSnippet = (snippet: string, wrapper = '', wrapperEnd = wrapper) => {
     const textarea = document.getElementById('blog-content-textarea') as HTMLTextAreaElement;
     let start = 0;
     let end = 0;
@@ -214,7 +215,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
 
     let replacement = '';
     if (wrapper) {
-      replacement = `${wrapper}${selected || 'text'}${wrapper}`;
+      replacement = `${wrapper}${selected || 'text'}${wrapperEnd}`;
     } else {
       replacement = snippet;
     }
@@ -3475,7 +3476,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
           </form>
         </Modal>
 
-      {/* STATE-OF-THE-ART ARTICLE PUBLISHING STUDIO SUITE */}
+      {/* STATE-OF-THE-ART ARTICLE PUBLISHING STUDIO SUITE (EXACT CMS SCREENSHOT DESIGN) */}
       {isBlogModalOpen && (
         <div
           style={{
@@ -3490,589 +3491,678 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
             flexDirection: 'column',
             animation: 'fade-in-overlay 0.2s ease-out',
             color: '#0f172a',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
           }}
         >
-          {/* STUDIO TOP HEADER CONTROL BAR */}
+          {/* TOP CONTROL BAR (MATCHING SCREENSHOT TOP BAR) */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              padding: '12px 24px',
+              padding: '12px 32px',
               backgroundColor: '#ffffff',
               borderBottom: '1px solid #e2e8f0',
-              gap: '16px',
+              fontSize: '13px',
             }}
           >
-            {/* Left Title & Status */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '10px',
-                  background: 'linear-gradient(135deg, var(--color-primary), #a855f7)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '18px',
-                  boxShadow: '0 2px 10px rgba(124, 58, 237, 0.2)',
-                  color: '#ffffff',
-                }}
-              >
-                ✍️
+            {/* Left Status Indicators */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '24px', color: '#64748b' }}>
+              <div>
+                Status: <strong style={{ color: '#0f172a' }}>{editingBlogSlug ? 'Published' : 'Draft'}</strong>
               </div>
               <div>
-                <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 'bold', color: '#0f172a', letterSpacing: '-0.01em' }}>
-                  {editingBlogSlug ? `Editing: "${blogTitleInput || 'Untitled Article'}"` : `New Article Studio`}
-                </h3>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: '#64748b' }}>
-                  <span>Slug: <code style={{ color: 'var(--color-primary)' }}>/blog/{blogSlugInput || 'slug-placeholder'}</code></span>
-                  <span>•</span>
-                  <span style={{ color: '#16a34a', fontWeight: 'bold' }}>● Ready to Publish</span>
-                </div>
+                Last Modified: <strong style={{ color: '#0f172a' }}>October 6th 2026, 1:01 PM</strong>
+              </div>
+              <div>
+                Created: <strong style={{ color: '#0f172a' }}>October 6th 2026, 1:01 PM</strong>
               </div>
             </div>
 
-            {/* Middle Stats & View Toggles */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              {/* Word & Read Time Counter Pill */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  backgroundColor: '#f1f5f9',
-                  padding: '6px 14px',
-                  borderRadius: '20px',
-                  fontSize: '11px',
-                  border: '1px solid #cbd5e1',
-                  color: '#334155',
-                }}
-              >
-                <span>📝 <strong>{blogContentInput.trim().split(/\s+/).filter(Boolean).length}</strong> words</span>
-                <span style={{ opacity: 0.4 }}>|</span>
-                <span>⏱️ <strong>{Math.max(1, Math.ceil(blogContentInput.trim().split(/\s+/).filter(Boolean).length / 220))} min read</strong></span>
-                <span style={{ opacity: 0.4 }}>|</span>
-                <span>📊 <strong>{blogContentInput.length}</strong> chars</span>
-              </div>
+            {/* Right Action Dropdown & Menu */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', borderRadius: '6px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (!blogTitleInput.trim() || !blogSlugInput.trim() || !blogContentInput.trim()) {
+                      onToast('Title, Slug, and Article Content are required.', 'error');
+                      return;
+                    }
+                    const cleanSlug = blogSlugInput.toLowerCase().trim().replace(/[^a-z0-9-]+/g, '-');
+                    const estMinutes = Math.max(1, Math.ceil(blogContentInput.trim().split(/\s+/).filter(Boolean).length / 220));
+                    const postData: any = {
+                      slug: cleanSlug,
+                      title: blogTitleInput.trim(),
+                      category: blogCategoryInput,
+                      author: blogAuthorInput.trim() || 'AIFynest Editorial Team',
+                      readTime: blogReadTimeInput.trim() || `${estMinutes} min read`,
+                      image: blogImageInput.trim() || '/images/best-ai-image-upscale-tools-2026.jpg',
+                      excerpt: blogExcerptInput.trim() || blogTitleInput.trim(),
+                      content: blogContentInput,
+                      date: new Date().toISOString().split('T')[0]
+                    };
 
-              {/* View Selector Tabs */}
-              <div
-                style={{
-                  display: 'flex',
-                  backgroundColor: '#f1f5f9',
-                  padding: '3px',
-                  borderRadius: '8px',
-                  border: '1px solid #cbd5e1',
-                }}
-              >
-                <button
-                  type="button"
-                  onClick={() => setBlogEditorMode('split')}
+                    if (editingBlogSlug) {
+                      updateBlogPost(editingBlogSlug, postData);
+                      onToast(`Article "${postData.title}" updated successfully!`, 'success');
+                    } else {
+                      addBlogPost(postData);
+                      onToast(`Article "${postData.title}" published live!`, 'success');
+                    }
+                    setIsBlogModalOpen(false);
+                  }}
                   style={{
-                    padding: '5px 12px',
-                    fontSize: '11px',
-                    fontWeight: blogEditorMode === 'split' ? 'bold' : 'normal',
-                    backgroundColor: blogEditorMode === 'split' ? 'var(--color-primary)' : 'transparent',
-                    color: blogEditorMode === 'split' ? '#fff' : '#475569',
+                    backgroundColor: '#1e293b',
+                    color: '#ffffff',
                     border: 'none',
-                    borderRadius: '6px',
+                    padding: '8px 18px',
+                    fontWeight: '600',
+                    fontSize: '13px',
                     cursor: 'pointer',
-                    transition: 'all 0.15s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
                   }}
                 >
-                  ↔️ Split View
+                  Publish changes
                 </button>
                 <button
                   type="button"
-                  onClick={() => setBlogEditorMode('edit')}
+                  onClick={() => setBlogEditorMode(blogEditorMode === 'split' ? 'edit' : 'split')}
                   style={{
-                    padding: '5px 12px',
-                    fontSize: '11px',
-                    fontWeight: blogEditorMode === 'edit' ? 'bold' : 'normal',
-                    backgroundColor: blogEditorMode === 'edit' ? 'var(--color-primary)' : 'transparent',
-                    color: blogEditorMode === 'edit' ? '#fff' : '#475569',
+                    backgroundColor: '#0f172a',
+                    color: '#ffffff',
                     border: 'none',
-                    borderRadius: '6px',
+                    borderLeft: '1px solid #334155',
+                    padding: '8px 10px',
                     cursor: 'pointer',
-                    transition: 'all 0.15s ease',
+                    fontSize: '12px',
                   }}
+                  title="Toggle Split Preview"
                 >
-                  📝 Editor Only
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setBlogEditorMode('preview')}
-                  style={{
-                    padding: '5px 12px',
-                    fontSize: '11px',
-                    fontWeight: blogEditorMode === 'preview' ? 'bold' : 'normal',
-                    backgroundColor: blogEditorMode === 'preview' ? 'var(--color-primary)' : 'transparent',
-                    color: blogEditorMode === 'preview' ? '#fff' : '#475569',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  👁️ Live Preview
+                  ▾
                 </button>
               </div>
 
-              {/* Toggle Metadata Panel Button */}
-              <button
-                type="button"
-                onClick={() => setBlogMetaOpen(!blogMetaOpen)}
-                className="btn btn-outline btn-xs"
-                style={{ fontSize: '11px', height: '30px', backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}
-              >
-                {blogMetaOpen ? '⚙️ Hide Metadata' : '⚙️ SEO & Settings'}
-              </button>
-            </div>
-
-            {/* Right Action Buttons */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <button
                 type="button"
                 onClick={() => setIsBlogModalOpen(false)}
-                className="btn btn-outline btn-sm"
-                style={{ opacity: 0.9, backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}
-              >
-                Close Studio
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (!blogTitleInput.trim() || !blogSlugInput.trim() || !blogContentInput.trim()) {
-                    onToast('Title, Slug, and Article Content are required.', 'error');
-                    return;
-                  }
-                  const cleanSlug = blogSlugInput.toLowerCase().trim().replace(/[^a-z0-9-]+/g, '-');
-                  const estMinutes = Math.max(1, Math.ceil(blogContentInput.trim().split(/\s+/).filter(Boolean).length / 220));
-                  const postData: any = {
-                    slug: cleanSlug,
-                    title: blogTitleInput.trim(),
-                    category: blogCategoryInput,
-                    author: blogAuthorInput.trim() || 'AIFynest Editorial Team',
-                    readTime: blogReadTimeInput.trim() || `${estMinutes} min read`,
-                    image: blogImageInput.trim() || '/images/best-ai-image-upscale-tools-2026.jpg',
-                    excerpt: blogExcerptInput.trim() || blogTitleInput.trim(),
-                    content: blogContentInput,
-                    date: new Date().toISOString().split('T')[0]
-                  };
-
-                  if (editingBlogSlug) {
-                    updateBlogPost(editingBlogSlug, postData);
-                    onToast(`Article "${postData.title}" updated successfully!`, 'success');
-                  } else {
-                    addBlogPost(postData);
-                    onToast(`Article "${postData.title}" published live!`, 'success');
-                  }
-                  setIsBlogModalOpen(false);
-                }}
-                className="btn btn-primary btn-sm pulse-glow"
                 style={{
-                  background: 'linear-gradient(135deg, var(--color-primary), #a855f7)',
-                  border: 'none',
+                  backgroundColor: 'transparent',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: '6px',
+                  width: '34px',
+                  height: '34px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: '#475569',
+                  fontSize: '16px',
                   fontWeight: 'bold',
-                  padding: '8px 18px',
-                  boxShadow: '0 4px 16px rgba(124, 58, 237, 0.4)',
                 }}
+                title="Close Editor"
               >
-                🚀 {editingBlogSlug ? 'Save Article Changes' : 'Publish Article Live'}
+                ✕
               </button>
             </div>
           </div>
 
-          {/* TOP METADATA CONFIG DRAWER */}
-          {blogMetaOpen && (
-            <div
-              style={{
-                backgroundColor: '#f8fafc',
-                borderBottom: '1px solid #e2e8f0',
-                padding: '16px 24px',
-                display: 'grid',
-                gridTemplateColumns: '2fr 1fr 1fr 1fr',
-                gap: '16px',
-                alignItems: 'start',
-                animation: 'fade-in-overlay 0.15s ease-out',
-                color: '#0f172a',
-              }}
-            >
-              {/* Title & Slug */}
+          {/* MAIN CMS CONTENT & SIDEBAR WORKSPACE */}
+          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 340px', overflow: 'hidden' }}>
+            {/* LEFT MAIN EDITING COLUMN */}
+            <div style={{ padding: '32px 48px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {/* Title Field */}
               <div>
-                <label style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '4px', display: 'block' }}>
-                  ARTICLE TITLE & AUTOMATIC URL SLUG *
+                <label style={{ fontSize: '13px', fontWeight: '500', color: '#475569', marginBottom: '8px', display: 'block' }}>
+                  Title <span style={{ color: '#ef4444' }}>*</span>
                 </label>
                 <input
                   type="text"
-                  className="form-input btn-sm"
-                  placeholder="Article Title (e.g. Best AI Image Upscale Tools in 2026)"
+                  placeholder="Enter article title..."
                   value={blogTitleInput}
                   onChange={(e) => {
                     setBlogTitleInput(e.target.value);
-                    if (!editingBlogSlug) {
+                    if (!editingBlogSlug || !isSlugLocked) {
                       setBlogSlugInput(e.target.value.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''));
                     }
                   }}
-                  style={{ fontWeight: 'bold', fontSize: '13px', marginBottom: '6px' }}
-                />
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>URL:</span>
-                  <input
-                    type="text"
-                    className="form-input btn-xs"
-                    value={blogSlugInput}
-                    onChange={(e) => setBlogSlugInput(e.target.value)}
-                    style={{ fontSize: '11px', fontFamily: 'monospace' }}
-                  />
-                </div>
-              </div>
-
-              {/* Category & Author */}
-              <div>
-                <label style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '4px', display: 'block' }}>
-                  CATEGORY & AUTHOR
-                </label>
-                <select
-                  className="form-input btn-sm"
-                  value={blogCategoryInput}
-                  onChange={(e) => setBlogCategoryInput(e.target.value)}
-                  style={{ marginBottom: '6px', fontWeight: '600' }}
-                >
-                  <option value="AI Image Generation">AI Image Generation</option>
-                  <option value="AI Productivity">AI Productivity</option>
-                  <option value="AI Writing">AI Writing</option>
-                  <option value="AI Coding">AI Coding</option>
-                  <option value="AI Video">AI Video</option>
-                  <option value="AI Business">AI Business</option>
-                  <option value="AI Study & Education">AI Study & Education</option>
-                </select>
-                <input
-                  type="text"
-                  className="form-input btn-xs"
-                  placeholder="Author Name"
-                  value={blogAuthorInput}
-                  onChange={(e) => setBlogAuthorInput(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    fontSize: '16px',
+                    fontWeight: '500',
+                    color: '#0f172a',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '6px',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
                 />
               </div>
 
-              {/* Image URL & Thumbnail */}
-              <div>
-                <label style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '4px', display: 'block' }}>
-                  COVER IMAGE & PREVIEW
-                </label>
-                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                  <input
-                    type="text"
-                    className="form-input btn-sm"
-                    placeholder="/images/banner.jpg"
-                    value={blogImageInput}
-                    onChange={(e) => setBlogImageInput(e.target.value)}
-                    style={{ flex: 1, fontSize: '11px' }}
-                  />
-                  <label className="btn btn-outline btn-xs" style={{ cursor: 'pointer', whiteSpace: 'nowrap', fontSize: '10px' }}>
-                    📁 Upload
-                    <input
-                      type="file"
-                      accept="image/*"
-                      style={{ display: 'none' }}
-                      onChange={(e) => {
-                        if (e.target.files?.[0]) handleLocalImageUpload(e.target.files[0], 'cover');
-                      }}
-                    />
-                  </label>
-                  {blogImageInput && (
-                    <img
-                      src={blogImageInput}
-                      alt="Cover"
-                      style={{ width: '32px', height: '28px', borderRadius: '4px', objectFit: 'cover', border: '1px solid var(--border-color)' }}
-                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                    />
-                  )}
-                </div>
-              </div>
-
-              {/* Meta Description / Excerpt */}
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                  <label style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)' }}>
-                    SEO EXCERPT / META DESCRIPTION
-                  </label>
-                  <span style={{ fontSize: '10px', color: blogExcerptInput.length > 160 ? 'var(--color-warning)' : 'var(--text-muted)' }}>
-                    {blogExcerptInput.length} / 160
-                  </span>
-                </div>
-                <textarea
-                  className="form-input btn-sm"
-                  rows={2}
-                  placeholder="Meta description for search engines..."
-                  value={blogExcerptInput}
-                  onChange={(e) => setBlogExcerptInput(e.target.value)}
-                  style={{ fontSize: '11px', resize: 'none' }}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* MAIN WRITING WORKSPACE */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            {/* FORMATTING TOOLBAR */}
-            {(blogEditorMode === 'split' || blogEditorMode === 'edit') && (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '8px 24px',
-                  backgroundColor: '#ffffff',
-                  borderBottom: '1px solid #e2e8f0',
-                  flexWrap: 'wrap',
-                }}
-              >
-                <span style={{ fontSize: '10px', fontWeight: 'bold', color: '#64748b', marginRight: '6px' }}>
-                  QUICK FORMATTING:
-                </span>
-                <button type="button" onClick={() => insertMarkdownSnippet('# ')} className="btn btn-outline btn-xs" style={{ backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}># H1</button>
-                <button type="button" onClick={() => insertMarkdownSnippet('## ')} className="btn btn-outline btn-xs" style={{ backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}>## H2</button>
-                <button type="button" onClick={() => insertMarkdownSnippet('### ')} className="btn btn-outline btn-xs" style={{ backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}>### H3</button>
-                <span style={{ opacity: 0.3 }}>|</span>
-                <button type="button" onClick={() => insertMarkdownSnippet('', '**')} className="btn btn-outline btn-xs" style={{ fontWeight: 'bold', backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}>B</button>
-                <button type="button" onClick={() => insertMarkdownSnippet('', '*')} className="btn btn-outline btn-xs" style={{ fontStyle: 'italic', backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}>I</button>
-                <button type="button" onClick={() => insertMarkdownSnippet('', '`')} className="btn btn-outline btn-xs" style={{ fontFamily: 'monospace', backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}>Code</button>
-                <span style={{ opacity: 0.3 }}>|</span>
-                <button type="button" onClick={() => insertMarkdownSnippet('[Link Title](https://example.com)')} className="btn btn-outline btn-xs" style={{ backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}>🔗 Link</button>
+              {/* CMS Navigation Tabs (Content | Meta | SEO) */}
+              <div style={{ display: 'flex', gap: '24px', borderBottom: '1px solid #e2e8f0' }}>
                 <button
                   type="button"
-                  onClick={() => {
-                    updateCursorPosition();
-                    setShowInlineImagePanel(!showInlineImagePanel);
-                    setShowInlineTablePanel(false);
+                  onClick={() => setStudioActiveTab('content')}
+                  style={{
+                    padding: '10px 0',
+                    fontSize: '14px',
+                    fontWeight: studioActiveTab === 'content' ? '600' : '400',
+                    color: studioActiveTab === 'content' ? '#0f172a' : '#64748b',
+                    border: 'none',
+                    borderBottom: studioActiveTab === 'content' ? '2px solid #0f172a' : '2px solid transparent',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
                   }}
-                  className="btn btn-primary btn-xs"
-                  style={{ fontWeight: 'bold', background: 'linear-gradient(135deg, var(--color-primary), #a855f7)', border: 'none' }}
                 >
-                  🖼️ Add / Upload Image
+                  Content
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    updateCursorPosition();
-                    setShowInlineTablePanel(!showInlineTablePanel);
-                    setShowInlineImagePanel(false);
+                  onClick={() => setStudioActiveTab('meta')}
+                  style={{
+                    padding: '10px 0',
+                    fontSize: '14px',
+                    fontWeight: studioActiveTab === 'meta' ? '600' : '400',
+                    color: studioActiveTab === 'meta' ? '#0f172a' : '#64748b',
+                    border: 'none',
+                    borderBottom: studioActiveTab === 'meta' ? '2px solid #0f172a' : '2px solid transparent',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
                   }}
-                  className="btn btn-outline btn-xs"
-                  style={{ borderColor: '#2563eb', color: '#2563eb', fontWeight: 'bold', backgroundColor: '#eff6ff' }}
                 >
-                  📊 Easy Table Converter
+                  Meta
                 </button>
-                <button type="button" onClick={() => insertMarkdownSnippet('> Quote text here...\n')} className="btn btn-outline btn-xs" style={{ backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}>💬 Quote</button>
-                <button type="button" onClick={() => insertMarkdownSnippet('\n---\n')} className="btn btn-outline btn-xs" style={{ backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}>--- Line</button>
-                <button type="button" onClick={() => insertMarkdownSnippet('## Frequently Asked Questions\n\n### What is ...?\n\nAnswer paragraph here...\n')} className="btn btn-outline btn-xs" style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)', backgroundColor: '#f5f3ff' }}>❓ Add FAQ Block</button>
+                <button
+                  type="button"
+                  onClick={() => setStudioActiveTab('seo')}
+                  style={{
+                    padding: '10px 0',
+                    fontSize: '14px',
+                    fontWeight: studioActiveTab === 'seo' ? '600' : '400',
+                    color: studioActiveTab === 'seo' ? '#0f172a' : '#64748b',
+                    border: 'none',
+                    borderBottom: studioActiveTab === 'seo' ? '2px solid #0f172a' : '2px solid transparent',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  SEO
+                </button>
               </div>
-            )}
 
-            {/* EXPANDABLE INLINE TABLE PASTE & CONVERTER PANEL */}
-            {showInlineTablePanel && (
-              <div style={{ backgroundColor: '#f8fafc', padding: '14px 24px', borderBottom: '2px solid #2563eb', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#1e40af' }}>
-                    📋 EASY TABLE PASTE & CONVERTER
-                  </span>
-                  <button type="button" onClick={() => setShowInlineTablePanel(false)} className="btn btn-outline btn-xs" style={{ backgroundColor: '#ffffff', color: '#475569' }}>✕ Close</button>
-                </div>
-                <p style={{ fontSize: '12px', color: '#475569', margin: 0 }}>
-                  Paste raw unformatted text copied from <strong>Excel, Google Sheets, ChatGPT, or Word</strong> below. Click <strong>Insert Table</strong> to add it to your article!
-                </p>
-                <textarea
-                  className="form-input"
-                  rows={5}
-                  placeholder="Paste raw table text here...\nExample:\nFeature\tAdobe Super\tRemini\tTopaz\nPhoto Upscaling\tExcellent\tExcellent\tGood"
-                  value={tablePasteRawText}
-                  onChange={(e) => setTablePasteRawText(e.target.value)}
-                  style={{ fontFamily: 'monospace', fontSize: '13px', backgroundColor: '#ffffff', color: '#0f172a', border: '1px solid #cbd5e1', padding: '10px', borderRadius: '6px' }}
-                />
-                <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', alignItems: 'center' }}>
-                  <span style={{ fontSize: '11px', color: '#64748b' }}>
-                    Auto-detects tabs, pipes (|), commas & spaces
-                  </span>
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-sm"
-                    style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)', border: 'none', fontWeight: 'bold' }}
-                    onClick={() => {
-                      if (!tablePasteRawText.trim()) {
-                        onToast('Please paste raw table text inside the box first.', 'error');
-                        return;
-                      }
-                      const mdTable = parseRawTableToMarkdown(tablePasteRawText);
-                      insertMarkdownSnippet(mdTable);
-                      onToast('Table converted and inserted into article!', 'success');
-                      setTablePasteRawText('');
-                      setShowInlineTablePanel(false);
-                    }}
-                  >
-                    ⚡ Convert & Insert Table at Cursor
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* EXPANDABLE INLINE IMAGE UPLOADER PANEL */}
-            {showInlineImagePanel && (
-              <div style={{ backgroundColor: '#f8fafc', padding: '14px 24px', borderBottom: '2px solid #a855f7', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#7e22ce' }}>
-                    🖼️ EASY IMAGE UPLOADER & LINK INSERTER
-                  </span>
-                  <button type="button" onClick={() => setShowInlineImagePanel(false)} className="btn btn-outline btn-xs" style={{ backgroundColor: '#ffffff', color: '#475569' }}>✕ Close</button>
-                </div>
-                <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <label className="btn btn-outline btn-sm" style={{ cursor: 'pointer', fontWeight: 'bold', backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}>
-                    📁 Choose Image File from Device
-                    <input
-                      type="file"
-                      accept="image/*"
-                      style={{ display: 'none' }}
-                      onChange={(e) => {
-                        if (e.target.files?.[0]) handleLocalImageUpload(e.target.files[0], 'modal');
+              {/* TAB 1: CONTENT TAB */}
+              {studioActiveTab === 'content' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  {/* Hero Image Dropzone Box (Exact match from screenshot) */}
+                  <div>
+                    <label style={{ fontSize: '13px', fontWeight: '500', color: '#475569', marginBottom: '8px', display: 'block' }}>
+                      Hero Image
+                    </label>
+                    <div
+                      style={{
+                        border: '1px dashed #cbd5e1',
+                        borderRadius: '6px',
+                        padding: '24px',
+                        backgroundColor: '#fafafa',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '12px',
+                        color: '#64748b',
+                        fontSize: '13px',
+                        flexWrap: 'wrap',
                       }}
-                    />
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input btn-sm"
-                    placeholder="or paste direct URL e.g. https://img.photiu.ai/pimgs/banner.webp"
-                    value={insertImageUrlInput}
-                    onChange={(e) => setInsertImageUrlInput(e.target.value)}
-                    style={{ flex: 1, minWidth: '220px', fontSize: '12px', backgroundColor: '#ffffff', color: '#0f172a', border: '1px solid #cbd5e1' }}
-                  />
-                  <input
-                    type="text"
-                    className="form-input btn-sm"
-                    placeholder="Alt text / Caption"
-                    value={insertImageAltInput}
-                    onChange={(e) => setInsertImageAltInput(e.target.value)}
-                    style={{ width: '180px', fontSize: '12px', backgroundColor: '#ffffff', color: '#0f172a', border: '1px solid #cbd5e1' }}
-                  />
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-sm"
-                    style={{ background: 'linear-gradient(135deg, var(--color-primary), #a855f7)', border: 'none', fontWeight: 'bold' }}
-                    onClick={() => {
-                      if (!insertImageUrlInput.trim()) {
-                        onToast('Please enter an image URL or choose a file', 'error');
-                        return;
-                      }
-                      const altText = insertImageAltInput.trim() || 'Article Image';
-                      const imgMarkdown = `\n\n![${altText}](${insertImageUrlInput.trim()})\n\n`;
-                      insertMarkdownSnippet(imgMarkdown);
-                      onToast('Image inserted into article!', 'success');
-                      setInsertImageUrlInput('');
-                      setInsertImageAltInput('');
-                      setShowInlineImagePanel(false);
-                    }}
-                  >
-                    🚀 Insert Image at Cursor
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* SPLIT / SINGLE VIEW WORKSPACE PANELS */}
-            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: blogEditorMode === 'split' ? '1fr 1fr' : '1fr', height: '100%', overflow: 'hidden' }}>
-              {/* LEFT: MARKDOWN TEXT EDITOR */}
-              {(blogEditorMode === 'split' || blogEditorMode === 'edit') && (
-                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', borderRight: blogEditorMode === 'split' ? '1px solid #e2e8f0' : 'none', backgroundColor: '#ffffff' }}>
-                  <div style={{ padding: '8px 16px', fontSize: '11px', fontWeight: 'bold', color: '#475569', backgroundColor: '#f1f5f9', borderBottom: '1px solid #cbd5e1', display: 'flex', justifyContent: 'space-between' }}>
-                    <span>📝 MARKDOWN ARTICLE EDITOR</span>
-                    <span>Cursor: {savedCursorPos ? `Pos ${savedCursorPos.start}` : 'Active'} • 📁 Drag & Drop Images Supported</span>
+                    >
+                      <label className="btn btn-outline btn-xs" style={{ cursor: 'pointer', backgroundColor: '#e2e8f0', border: '1px solid #cbd5e1', color: '#0f172a', fontWeight: '500', padding: '6px 14px', borderRadius: '4px' }}>
+                        Create New
+                        <input
+                          type="file"
+                          accept="image/*"
+                          style={{ display: 'none' }}
+                          onChange={(e) => {
+                            if (e.target.files?.[0]) handleLocalImageUpload(e.target.files[0], 'cover');
+                          }}
+                        />
+                      </label>
+                      <span>or</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const url = prompt('Enter Hero Image URL:', blogImageInput);
+                          if (url !== null) setBlogImageInput(url);
+                        }}
+                        style={{
+                          backgroundColor: '#e2e8f0',
+                          border: '1px solid #cbd5e1',
+                          color: '#0f172a',
+                          fontWeight: '500',
+                          padding: '6px 14px',
+                          borderRadius: '4px',
+                          fontSize: '13px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Choose from existing
+                      </button>
+                      <span style={{ color: '#94a3b8' }}>or drag and drop a file</span>
+                      {blogImageInput && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>
+                          <img src={blogImageInput} alt="Hero" style={{ height: '36px', width: '60px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #cbd5e1' }} />
+                          <span style={{ fontSize: '11px', color: '#16a34a', fontWeight: 'bold' }}>✓ Image Attached</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <textarea
-                    id="blog-content-textarea"
-                    value={blogContentInput}
-                    onSelect={updateCursorPosition}
-                    onClick={updateCursorPosition}
-                    onKeyUp={updateCursorPosition}
-                    onFocus={updateCursorPosition}
-                    onDragOver={(e) => e.preventDefault()}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      if (e.dataTransfer.files?.[0]) {
-                        handleLocalImageUpload(e.dataTransfer.files[0], 'editor');
-                      }
-                    }}
-                    onChange={(e) => {
-                      setBlogContentInput(e.target.value);
-                      updateCursorPosition();
-                      const words = e.target.value.trim().split(/\s+/).filter(Boolean).length;
-                      const estMinutes = Math.max(1, Math.ceil(words / 220));
-                      setBlogReadTimeInput(`${estMinutes} min read`);
-                    }}
-                    placeholder="# Article Title&#10;&#10;Write your article content here..."
+
+                  {/* FORMATTING TOOLBAR (EXACT MATCH SCREENSHOT) */}
+                  <div
                     style={{
-                      flex: 1,
-                      width: '100%',
-                      padding: '24px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '8px 12px',
                       backgroundColor: '#ffffff',
-                      color: '#0f172a',
-                      fontSize: '15px',
-                      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                      lineHeight: '1.7',
-                      border: 'none',
-                      outline: 'none',
-                      resize: 'none',
-                      boxSizing: 'border-box',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '6px',
+                      flexWrap: 'wrap',
                     }}
-                  />
+                  >
+                    <button type="button" onClick={() => insertMarkdownSnippet('## ')} className="btn btn-outline btn-xs" style={{ border: 'none', color: '#475569', fontWeight: 'bold' }}>+ ▾</button>
+                    <button type="button" onClick={() => insertMarkdownSnippet('### ')} className="btn btn-outline btn-xs" style={{ border: 'none', color: '#475569', fontWeight: 'bold' }}>T ▾</button>
+                    <span style={{ opacity: 0.3 }}>|</span>
+                    <button type="button" onClick={() => insertMarkdownSnippet('', '**')} style={{ border: 'none', background: 'transparent', fontWeight: 'bold', cursor: 'pointer', padding: '4px 8px', color: '#0f172a' }}>B</button>
+                    <button type="button" onClick={() => insertMarkdownSnippet('', '*')} style={{ border: 'none', background: 'transparent', fontStyle: 'italic', cursor: 'pointer', padding: '4px 8px', color: '#0f172a' }}>I</button>
+                    <button type="button" onClick={() => insertMarkdownSnippet('', '<u>', '</u>')} style={{ border: 'none', background: 'transparent', textDecoration: 'underline', cursor: 'pointer', padding: '4px 8px', color: '#0f172a' }}>U</button>
+                    <button type="button" onClick={() => insertMarkdownSnippet('', '`')} style={{ border: 'none', background: 'transparent', fontFamily: 'monospace', cursor: 'pointer', padding: '4px 8px', color: '#0f172a' }}>&lt;&gt;</button>
+                    <button type="button" onClick={() => insertMarkdownSnippet('[Link Title](https://example.com)')} style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: '4px 8px', color: '#0f172a' }}>🔗</button>
+                    <span style={{ opacity: 0.3 }}>|</span>
+                    <button
+                      type="button"
+                      onClick={() => setShowInlineTablePanel(!showInlineTablePanel)}
+                      style={{
+                        backgroundColor: '#eff6ff',
+                        color: '#2563eb',
+                        border: '1px solid #bfdbfe',
+                        borderRadius: '4px',
+                        padding: '4px 10px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      📊 Table Converter
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowInlineImagePanel(!showInlineImagePanel)}
+                      style={{
+                        backgroundColor: '#f5f3ff',
+                        color: '#7c3aed',
+                        border: '1px solid #ddd6fe',
+                        borderRadius: '4px',
+                        padding: '4px 10px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      🖼️ Upload Image
+                    </button>
+                    <button type="button" onClick={() => insertMarkdownSnippet('> Quote text here...\n')} style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: '4px 8px', color: '#0f172a' }}>💬</button>
+                    <button type="button" onClick={() => insertMarkdownSnippet('## Frequently Asked Questions\n\n### What is ...?\n\nAnswer paragraph here...\n')} style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: '4px 8px', color: '#0f172a' }}>❓ FAQ</button>
+                  </div>
+
+                  {/* EXPANDABLE INLINE TABLE PASTE & CONVERTER PANEL */}
+                  {showInlineTablePanel && (
+                    <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '6px', border: '1px solid #bfdbfe', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#1e40af' }}>
+                          📋 EASY TABLE PASTE & CONVERTER
+                        </span>
+                        <button type="button" onClick={() => setShowInlineTablePanel(false)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#64748b' }}>✕</button>
+                      </div>
+                      <textarea
+                        className="form-input"
+                        rows={4}
+                        placeholder="Paste raw unformatted table text from Excel, Google Sheets, ChatGPT, or Word..."
+                        value={tablePasteRawText}
+                        onChange={(e) => setTablePasteRawText(e.target.value)}
+                        style={{ fontFamily: 'monospace', fontSize: '13px', backgroundColor: '#ffffff', color: '#0f172a', border: '1px solid #cbd5e1', padding: '10px', borderRadius: '6px' }}
+                      />
+                      <button
+                        type="button"
+                        style={{ backgroundColor: '#2563eb', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', alignSelf: 'flex-end' }}
+                        onClick={() => {
+                          if (!tablePasteRawText.trim()) return onToast('Please paste table text first.', 'error');
+                          const mdTable = parseRawTableToMarkdown(tablePasteRawText);
+                          insertMarkdownSnippet(mdTable);
+                          onToast('Table inserted!', 'success');
+                          setTablePasteRawText('');
+                          setShowInlineTablePanel(false);
+                        }}
+                      >
+                        ⚡ Convert & Insert Table at Cursor
+                      </button>
+                    </div>
+                  )}
+
+                  {/* EXPANDABLE INLINE IMAGE UPLOADER PANEL */}
+                  {showInlineImagePanel && (
+                    <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '6px', border: '1px solid #ddd6fe', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#6b21a8' }}>
+                          🖼️ INLINE IMAGE UPLOADER
+                        </span>
+                        <button type="button" onClick={() => setShowInlineImagePanel(false)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#64748b' }}>✕</button>
+                      </div>
+                      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <label className="btn btn-outline btn-sm" style={{ cursor: 'pointer', backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1' }}>
+                          📁 Select Image File
+                          <input
+                            type="file"
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                            onChange={(e) => {
+                              if (e.target.files?.[0]) handleLocalImageUpload(e.target.files[0], 'modal');
+                            }}
+                          />
+                        </label>
+                        <input
+                          type="text"
+                          className="form-input btn-sm"
+                          placeholder="or paste direct URL..."
+                          value={insertImageUrlInput}
+                          onChange={(e) => setInsertImageUrlInput(e.target.value)}
+                          style={{ flex: 1, fontSize: '12px', backgroundColor: '#ffffff', border: '1px solid #cbd5e1' }}
+                        />
+                        <button
+                          type="button"
+                          style={{ backgroundColor: '#7c3aed', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}
+                          onClick={() => {
+                            if (!insertImageUrlInput.trim()) return onToast('Please enter an image URL', 'error');
+                            const imgMarkdown = `\n\n![${insertImageAltInput.trim() || 'Article Image'}](${insertImageUrlInput.trim()})\n\n`;
+                            insertMarkdownSnippet(imgMarkdown);
+                            onToast('Image inserted!', 'success');
+                            setInsertImageUrlInput('');
+                            setShowInlineImagePanel(false);
+                          }}
+                        >
+                          🚀 Insert Image
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* MARKDOWN TEXTAREA WRITING AREA */}
+                  <div style={{ display: 'flex', flexDirection: 'column', borderLeft: '2px solid #e2e8f0', paddingLeft: '16px', minHeight: '380px' }}>
+                    <textarea
+                      id="blog-content-textarea"
+                      value={blogContentInput}
+                      onSelect={updateCursorPosition}
+                      onClick={updateCursorPosition}
+                      onKeyUp={updateCursorPosition}
+                      onFocus={updateCursorPosition}
+                      onChange={(e) => {
+                        setBlogContentInput(e.target.value);
+                        updateCursorPosition();
+                        const words = e.target.value.trim().split(/\s+/).filter(Boolean).length;
+                        setBlogReadTimeInput(`${Math.max(1, Math.ceil(words / 220))} min read`);
+                      }}
+                      placeholder="Start typing, or press '/' for commands..."
+                      style={{
+                        flex: 1,
+                        width: '100%',
+                        minHeight: '380px',
+                        padding: '12px 0',
+                        backgroundColor: '#ffffff',
+                        color: '#0f172a',
+                        fontSize: '15px',
+                        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                        lineHeight: '1.7',
+                        border: 'none',
+                        outline: 'none',
+                        resize: 'none',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
                 </div>
               )}
 
-              {/* RIGHT: LIVE REAL-TIME PREVIEW */}
-              {(blogEditorMode === 'split' || blogEditorMode === 'preview') && (
-                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#ffffff', overflow: 'hidden' }}>
-                  <div style={{ padding: '8px 16px', fontSize: '11px', fontWeight: 'bold', color: 'var(--color-primary)', backgroundColor: '#f1f5f9', borderBottom: '1px solid #cbd5e1', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>👁️ LIVE PREVIEW — PUBLIC DISPLAY</span>
-                    <span>https://aifynest.com/blog/{blogSlugInput || 'slug'}</span>
+              {/* TAB 2: META TAB */}
+              {studioActiveTab === 'meta' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div>
+                    <label style={{ fontSize: '13px', fontWeight: '500', color: '#475569', marginBottom: '6px', display: 'block' }}>
+                      Article Excerpt / Summary
+                    </label>
+                    <textarea
+                      className="form-input"
+                      rows={3}
+                      placeholder="Short summary for homepage cards..."
+                      value={blogExcerptInput}
+                      onChange={(e) => setBlogExcerptInput(e.target.value)}
+                      style={{ width: '100%', padding: '10px 14px', fontSize: '13px', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '6px' }}
+                    />
                   </div>
-
-                  <div style={{ flex: 1, padding: '32px', overflowY: 'auto' }}>
-                    {/* Rendered Header Mockup */}
-                    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                      <span className="badge badge-featured" style={{ marginBottom: '12px', display: 'inline-block' }}>
-                        {blogCategoryInput}
-                      </span>
-                      <h1 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '14px', lineHeight: '1.3', color: 'var(--text-primary)' }}>
-                        {blogTitleInput || 'Untitled Article Title'}
-                      </h1>
-
-                      <div style={{ display: 'flex', gap: '12px', alignItems: 'center', fontSize: '12px', color: 'var(--text-muted)', marginBottom: '20px' }}>
-                        <span>By {blogAuthorInput || 'AIFynest Editorial Team'}</span>
-                        <span>•</span>
-                        <span>{new Date().toISOString().split('T')[0]}</span>
-                        <span>•</span>
-                        <span>{Math.max(1, Math.ceil(blogContentInput.trim().split(/\s+/).filter(Boolean).length / 220))} min read</span>
-                      </div>
-
-                      {blogImageInput && (
-                        <img
-                          src={blogImageInput}
-                          alt={blogTitleInput}
-                          style={{ width: '100%', maxHeight: '360px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', marginBottom: '28px', border: '1px solid var(--border-color)' }}
-                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                        />
-                      )}
-
-                      {/* Rendered Body */}
-                      <article style={{ color: 'var(--text-primary)', fontSize: '15px', lineHeight: '1.8' }}>
-                        <MarkdownRenderer content={blogContentInput || '*Start typing in the Markdown editor to see live rendering...*'} />
-                      </article>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div>
+                      <label style={{ fontSize: '13px', fontWeight: '500', color: '#475569', marginBottom: '6px', display: 'block' }}>
+                        Category
+                      </label>
+                      <select
+                        className="form-input"
+                        value={blogCategoryInput}
+                        onChange={(e) => setBlogCategoryInput(e.target.value)}
+                        style={{ width: '100%', padding: '10px 14px', fontSize: '13px', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '6px' }}
+                      >
+                        <option value="AI Image Generation">AI Image Generation</option>
+                        <option value="AI Productivity">AI Productivity</option>
+                        <option value="AI Writing">AI Writing</option>
+                        <option value="AI Coding">AI Coding</option>
+                        <option value="AI Video">AI Video</option>
+                        <option value="AI Business">AI Business</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '13px', fontWeight: '500', color: '#475569', marginBottom: '6px', display: 'block' }}>
+                        Estimated Read Time
+                      </label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        value={blogReadTimeInput}
+                        onChange={(e) => setBlogReadTimeInput(e.target.value)}
+                        style={{ width: '100%', padding: '10px 14px', fontSize: '13px', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '6px' }}
+                      />
                     </div>
                   </div>
                 </div>
               )}
+
+              {/* TAB 3: SEO TAB */}
+              {studioActiveTab === 'seo' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div>
+                    <label style={{ fontSize: '13px', fontWeight: '500', color: '#475569', marginBottom: '6px', display: 'block' }}>
+                      SEO Meta Description
+                    </label>
+                    <textarea
+                      className="form-input"
+                      rows={3}
+                      placeholder="Meta description for Google & LLM search indexing..."
+                      value={blogExcerptInput}
+                      onChange={(e) => setBlogExcerptInput(e.target.value)}
+                      style={{ width: '100%', padding: '10px 14px', fontSize: '13px', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '6px' }}
+                    />
+                  </div>
+                  <div style={{ padding: '16px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#2563eb' }}>Google Search Result Preview:</span>
+                    <h4 style={{ margin: '6px 0 2px 0', fontSize: '16px', color: '#1a0dab' }}>{blogTitleInput || 'Article Title'} - AIFynest</h4>
+                    <span style={{ fontSize: '12px', color: '#006621' }}>https://aifynest.com/blog/{blogSlugInput || 'slug'}</span>
+                    <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#545454' }}>{blogExcerptInput || 'Meta description placeholder...'}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* RIGHT SIDEBAR COLUMN (EXACT MATCH SCREENSHOT) */}
+            <div
+              style={{
+                borderLeft: '1px solid #e2e8f0',
+                padding: '32px 24px',
+                backgroundColor: '#ffffff',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '24px',
+                overflowY: 'auto',
+              }}
+            >
+              {/* Published At */}
+              <div>
+                <label style={{ fontSize: '13px', fontWeight: '500', color: '#475569', marginBottom: '8px', display: 'block' }}>
+                  Published At
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="text"
+                    readOnly
+                    value="October 6th 2026"
+                    style={{
+                      width: '100%',
+                      padding: '10px 36px 10px 14px',
+                      fontSize: '13px',
+                      color: '#0f172a',
+                      backgroundColor: '#ffffff',
+                      border: '1px solid #cbd5e1',
+                      borderRadius: '6px',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                  <span style={{ position: 'absolute', right: '12px', top: '10px', color: '#94a3b8' }}>📅</span>
+                </div>
+              </div>
+
+              {/* Authors */}
+              <div>
+                <label style={{ fontSize: '13px', fontWeight: '500', color: '#475569', marginBottom: '8px', display: 'block' }}>
+                  Authors
+                </label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    type="text"
+                    value={blogAuthorInput}
+                    onChange={(e) => setBlogAuthorInput(e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: '10px 14px',
+                      fontSize: '13px',
+                      color: '#0f172a',
+                      backgroundColor: '#ffffff',
+                      border: '1px solid #cbd5e1',
+                      borderRadius: '6px',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                  <button
+                    type="button"
+                    style={{
+                      padding: '0 14px',
+                      backgroundColor: '#ffffff',
+                      border: '1px solid #cbd5e1',
+                      borderRadius: '6px',
+                      fontSize: '16px',
+                      color: '#475569',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* Reviewers / Category */}
+              <div>
+                <label style={{ fontSize: '13px', fontWeight: '500', color: '#475569', marginBottom: '8px', display: 'block' }}>
+                  Reviewers / Category
+                </label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <select
+                    value={blogCategoryInput}
+                    onChange={(e) => setBlogCategoryInput(e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: '10px 14px',
+                      fontSize: '13px',
+                      color: '#0f172a',
+                      backgroundColor: '#ffffff',
+                      border: '1px solid #cbd5e1',
+                      borderRadius: '6px',
+                      boxSizing: 'border-box',
+                    }}
+                  >
+                    <option value="AI Image Generation">AI Image Generation</option>
+                    <option value="AI Productivity">AI Productivity</option>
+                    <option value="AI Writing">AI Writing</option>
+                    <option value="AI Coding">AI Coding</option>
+                  </select>
+                  <button
+                    type="button"
+                    style={{
+                      padding: '0 14px',
+                      backgroundColor: '#ffffff',
+                      border: '1px solid #cbd5e1',
+                      borderRadius: '6px',
+                      fontSize: '16px',
+                      color: '#475569',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* Slug Field with Unlock Link */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <label style={{ fontSize: '13px', fontWeight: '500', color: '#475569', margin: 0 }}>
+                    Slug
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setIsSlugLocked(!isSlugLocked)}
+                    style={{ border: 'none', background: 'transparent', color: '#2563eb', fontSize: '12px', cursor: 'pointer', fontWeight: '500' }}
+                  >
+                    {isSlugLocked ? 'Unlock' : 'Lock'}
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  disabled={isSlugLocked}
+                  value={blogSlugInput}
+                  onChange={(e) => setBlogSlugInput(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    fontSize: '13px',
+                    color: isSlugLocked ? '#64748b' : '#0f172a',
+                    backgroundColor: isSlugLocked ? '#f1f5f9' : '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '6px',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
