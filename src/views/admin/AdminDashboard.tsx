@@ -94,15 +94,101 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
   const [blogEditorMode, setBlogEditorMode] = useState<'split' | 'edit' | 'preview'>('split');
   const [blogMetaOpen, setBlogMetaOpen] = useState<boolean>(true);
   const [savedCursorPos, setSavedCursorPos] = useState<{ start: number; end: number } | null>(null);
+
+  // IMAGE INSERTER MODAL STATES
   const [isInsertImageModalOpen, setIsInsertImageModalOpen] = useState(false);
   const [insertImageUrlInput, setInsertImageUrlInput] = useState('');
   const [insertImageAltInput, setInsertImageAltInput] = useState('');
+
+  // TABLE BUILDER & CONVERTER MODAL STATES
+  const [isTableModalOpen, setIsTableModalOpen] = useState(false);
+  const [tableActiveTab, setTableActiveTab] = useState<'paste' | 'builder'>('paste');
+  const [tablePasteRawText, setTablePasteRawText] = useState('');
+  const [tableGridRows, setTableGridRows] = useState(4);
+  const [tableGridCols, setTableGridCols] = useState(3);
+  const [tableGridData, setTableGridData] = useState<string[][]>([
+    ['Header 1', 'Header 2', 'Header 3'],
+    ['Row 1, Cell 1', 'Row 1, Cell 2', 'Row 1, Cell 3'],
+    ['Row 2, Cell 1', 'Row 2, Cell 2', 'Row 2, Cell 3'],
+    ['Row 3, Cell 1', 'Row 3, Cell 2', 'Row 3, Cell 3'],
+  ]);
 
   const updateCursorPosition = () => {
     const textarea = document.getElementById('blog-content-textarea') as HTMLTextAreaElement;
     if (textarea) {
       setSavedCursorPos({ start: textarea.selectionStart, end: textarea.selectionEnd });
     }
+  };
+
+  const handleLocalImageUpload = (file: File, target: 'modal' | 'cover' | 'editor') => {
+    if (!file || !file.type.startsWith('image/')) {
+      onToast('Please select a valid image file (PNG, JPG, WEBP, GIF, SVG)', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      if (!dataUrl) return;
+      const cleanAlt = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+      if (target === 'modal') {
+        setInsertImageUrlInput(dataUrl);
+        if (!insertImageAltInput.trim()) setInsertImageAltInput(cleanAlt);
+        onToast(`Image "${file.name}" loaded for preview!`, 'success');
+      } else if (target === 'cover') {
+        setBlogImageInput(dataUrl);
+        onToast(`Cover image set to "${file.name}"!`, 'success');
+      } else if (target === 'editor') {
+        const markdownImg = `\n\n![${cleanAlt}](${dataUrl})\n\n`;
+        insertMarkdownSnippet(markdownImg);
+        onToast(`Image "${file.name}" uploaded and inserted into article!`, 'success');
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const parseRawTableToMarkdown = (raw: string): string => {
+    if (!raw.trim()) return '';
+    const lines = raw.trim().split(/\r?\n/).filter(line => line.trim().length > 0);
+    if (lines.length === 0) return '';
+
+    // Detect delimiter: tab \t, pipe |, comma , or 2+ spaces
+    const firstLine = lines[0];
+    let delimiter: string | RegExp = '\t';
+    if (firstLine.includes('\t')) {
+      delimiter = '\t';
+    } else if (firstLine.includes('|')) {
+      delimiter = '|';
+    } else if (firstLine.includes(',')) {
+      delimiter = ',';
+    } else {
+      delimiter = /\s{2,}/;
+    }
+
+    const rows = lines.map(line => {
+      let cells = line.split(delimiter).map(c => c.trim().replace(/^\||\|$/g, '').trim());
+      if (cells.length > 1 && cells[0] === '') cells.shift();
+      if (cells.length > 1 && cells[cells.length - 1] === '') cells.pop();
+      return cells;
+    }).filter(row => row.length > 0);
+
+    if (rows.length === 0) return '';
+
+    const maxCols = Math.max(...rows.map(r => r.length));
+
+    let md = '\n\n';
+    const header = rows[0];
+    while (header.length < maxCols) header.push(`Col ${header.length + 1}`);
+    md += '| ' + header.join(' | ') + ' |\n';
+    md += '| ' + Array(maxCols).fill('---').join(' | ') + ' |\n';
+
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (row.every(c => /^[-:|]+$/.test(c))) continue; // Skip existing markdown separator lines
+      while (row.length < maxCols) row.push('');
+      md += '| ' + row.join(' | ') + ' |\n';
+    }
+    md += '\n';
+    return md;
   };
 
   const insertMarkdownSnippet = (snippet: string, wrapper = '') => {
@@ -3672,9 +3758,9 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
               {/* Image URL & Thumbnail */}
               <div>
                 <label style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '4px', display: 'block' }}>
-                  COVER IMAGE URL & PREVIEW
+                  COVER IMAGE & PREVIEW
                 </label>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                   <input
                     type="text"
                     className="form-input btn-sm"
@@ -3683,11 +3769,22 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                     onChange={(e) => setBlogImageInput(e.target.value)}
                     style={{ flex: 1, fontSize: '11px' }}
                   />
+                  <label className="btn btn-outline btn-xs" style={{ cursor: 'pointer', whiteSpace: 'nowrap', fontSize: '10px' }}>
+                    📁 Upload
+                    <input
+                      type="file"
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        if (e.target.files?.[0]) handleLocalImageUpload(e.target.files[0], 'cover');
+                      }}
+                    />
+                  </label>
                   {blogImageInput && (
                     <img
                       src={blogImageInput}
                       alt="Cover"
-                      style={{ width: '36px', height: '32px', borderRadius: '4px', objectFit: 'cover', border: '1px solid var(--border-color)' }}
+                      style={{ width: '32px', height: '28px', borderRadius: '4px', objectFit: 'cover', border: '1px solid var(--border-color)' }}
                       onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
                   )}
@@ -3753,9 +3850,20 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                   className="btn btn-primary btn-xs"
                   style={{ fontWeight: 'bold', background: 'linear-gradient(135deg, var(--color-primary), #a855f7)', border: 'none' }}
                 >
-                  🖼️ Add Image at Cursor
+                  🖼️ Add / Upload Image
                 </button>
-                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('| Feature | Detail 1 | Detail 2 |\n|---|---|---|\n| Item 1 | Value A | Value B |\n')} className="btn btn-outline btn-xs">📊 Table</button>
+                <button
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    updateCursorPosition();
+                    setIsTableModalOpen(true);
+                  }}
+                  className="btn btn-outline btn-xs"
+                  style={{ borderColor: '#3b82f6', color: '#60a5fa', fontWeight: 'bold' }}
+                >
+                  📊 Easy Table Builder & Converter
+                </button>
                 <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('> Quote text here...\n')} className="btn btn-outline btn-xs">💬 Quote</button>
                 <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('\n---\n')} className="btn btn-outline btn-xs">--- Line</button>
                 <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMarkdownSnippet('## Frequently Asked Questions\n\n### What is ...?\n\nAnswer paragraph here...\n')} className="btn btn-outline btn-xs" style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}>❓ Add FAQ Block</button>
@@ -3769,7 +3877,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                 <div style={{ display: 'flex', flexDirection: 'column', height: '100%', borderRight: blogEditorMode === 'split' ? '1px solid var(--border-color)' : 'none', backgroundColor: '#0d1117' }}>
                   <div style={{ padding: '6px 16px', fontSize: '10px', fontWeight: 'bold', color: '#8b949e', backgroundColor: '#161b22', borderBottom: '1px solid #30363d', display: 'flex', justifyContent: 'space-between' }}>
                     <span>MARKDOWN EDITOR</span>
-                    <span>Cursor: {savedCursorPos ? `Pos ${savedCursorPos.start}` : 'Active'} • UTF-8 Supported</span>
+                    <span>Cursor: {savedCursorPos ? `Pos ${savedCursorPos.start}` : 'Active'} • 📁 Drag & Drop Images Supported</span>
                   </div>
                   <textarea
                     id="blog-content-textarea"
@@ -3778,6 +3886,13 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                     onClick={updateCursorPosition}
                     onKeyUp={updateCursorPosition}
                     onFocus={updateCursorPosition}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (e.dataTransfer.files?.[0]) {
+                        handleLocalImageUpload(e.dataTransfer.files[0], 'editor');
+                      }
+                    }}
                     onChange={(e) => {
                       setBlogContentInput(e.target.value);
                       updateCursorPosition();
@@ -3879,8 +3994,40 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
             📍 Inserting at Cursor Position: <strong>Pos {savedCursorPos?.start ?? 0}</strong>
           </div>
 
+          {/* File Upload Dropzone */}
+          <div
+            style={{
+              border: '2px dashed var(--border-color)',
+              borderRadius: '10px',
+              padding: '14px',
+              textAlign: 'center',
+              backgroundColor: 'var(--bg-tertiary)',
+              cursor: 'pointer',
+            }}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault();
+              if (e.dataTransfer.files?.[0]) handleLocalImageUpload(e.dataTransfer.files[0], 'modal');
+            }}
+          >
+            <p style={{ margin: '0 0 6px 0', fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' }}>
+              📁 Drag & Drop Local Image File or Click Below
+            </p>
+            <label className="btn btn-outline btn-xs" style={{ cursor: 'pointer', fontWeight: 'bold' }}>
+              Choose File from Computer
+              <input
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={(e) => {
+                  if (e.target.files?.[0]) handleLocalImageUpload(e.target.files[0], 'modal');
+                }}
+              />
+            </label>
+          </div>
+
           <div className="form-group">
-            <label className="form-label">Image Direct URL *</label>
+            <label className="form-label">Image Direct URL or Upload Data URL *</label>
             <input
               type="text"
               className="form-input"
@@ -3888,7 +4035,6 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
               value={insertImageUrlInput}
               onChange={(e) => setInsertImageUrlInput(e.target.value)}
               required
-              autoFocus
             />
           </div>
 
@@ -3970,6 +4116,212 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
             </button>
           </div>
         </form>
+      </Modal>
+
+      {/* DEDICATED EASY TABLE BUILDER & PASTE CONVERTER MODAL */}
+      <Modal
+        isOpen={isTableModalOpen}
+        title="📊 Easy Table Builder & Paste Converter"
+        onClose={() => setIsTableModalOpen(false)}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: '550px', maxWidth: '750px' }}>
+          {/* Tab selector */}
+          <div style={{ display: 'flex', borderBottom: '1px solid var(--border-color)', gap: '8px', paddingBottom: '8px' }}>
+            <button
+              type="button"
+              className={`btn btn-sm ${tableActiveTab === 'paste' ? 'btn-primary' : 'btn-outline'}`}
+              onClick={() => setTableActiveTab('paste')}
+              style={{ fontWeight: 'bold' }}
+            >
+              📋 Paste Raw Table / Text Converter
+            </button>
+            <button
+              type="button"
+              className={`btn btn-sm ${tableActiveTab === 'builder' ? 'btn-primary' : 'btn-outline'}`}
+              onClick={() => setTableActiveTab('builder')}
+              style={{ fontWeight: 'bold' }}
+            >
+              ✏️ Interactive Grid Builder
+            </button>
+          </div>
+
+          {tableActiveTab === 'paste' ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: 0 }}>
+                Paste raw table text from Excel, Google Sheets, ChatGPT, or websites below. It auto-detects tabs, pipes, commas, or spaces!
+              </p>
+              <textarea
+                className="form-input"
+                rows={7}
+                placeholder="Paste raw table text here...\nExample:\nFeature\tAdobe Super\tRemini\tTopaz\nPhoto Upscaling\tExcellent\tExcellent\tGood"
+                value={tablePasteRawText}
+                onChange={(e) => setTablePasteRawText(e.target.value)}
+                style={{ fontFamily: 'monospace', fontSize: '12px' }}
+              />
+
+              {/* Live Parsed Preview */}
+              {tablePasteRawText.trim() && (
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 'bold', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>
+                    CONVERTED TABLE PREVIEW:
+                  </label>
+                  <div style={{ maxHeight: '180px', overflowY: 'auto', backgroundColor: 'var(--bg-primary)', padding: '10px', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+                    <MarkdownRenderer content={parseRawTableToMarkdown(tablePasteRawText)} />
+                  </div>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                <button type="button" onClick={() => setIsTableModalOpen(false)} className="btn btn-outline">Cancel</button>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', border: 'none', fontWeight: 'bold' }}
+                  onClick={() => {
+                    if (!tablePasteRawText.trim()) {
+                      onToast('Please paste raw table text first', 'error');
+                      return;
+                    }
+                    const mdTable = parseRawTableToMarkdown(tablePasteRawText);
+                    insertMarkdownSnippet(mdTable);
+                    onToast('Table converted and inserted into article!', 'success');
+                    setTablePasteRawText('');
+                    setIsTableModalOpen(false);
+                  }}
+                >
+                  ⚡ Convert & Insert Table at Cursor
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* Grid Builder Tab */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 'bold' }}>Columns:</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={8}
+                    value={tableGridCols}
+                    onChange={(e) => {
+                      const cols = Math.max(1, Math.min(8, parseInt(e.target.value) || 1));
+                      setTableGridCols(cols);
+                      setTableGridData(prev => prev.map(row => {
+                        const newRow = [...row];
+                        while (newRow.length < cols) newRow.push(`Cell ${newRow.length + 1}`);
+                        return newRow.slice(0, cols);
+                      }));
+                    }}
+                    className="form-input btn-xs"
+                    style={{ width: '60px', marginLeft: '6px' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 'bold' }}>Rows:</label>
+                  <input
+                    type="number"
+                    min={2}
+                    max={15}
+                    value={tableGridRows}
+                    onChange={(e) => {
+                      const rows = Math.max(2, Math.min(15, parseInt(e.target.value) || 2));
+                      setTableGridRows(rows);
+                      setTableGridData(prev => {
+                        const newGrid = [...prev];
+                        while (newGrid.length < rows) {
+                          newGrid.push(Array(tableGridCols).fill('').map((_, i) => `Row ${newGrid.length}, Cell ${i + 1}`));
+                        }
+                        return newGrid.slice(0, rows);
+                      });
+                    }}
+                    className="form-input btn-xs"
+                    style={{ width: '60px', marginLeft: '6px' }}
+                  />
+                </div>
+              </div>
+
+              {/* Visual Matrix Grid Inputs */}
+              <div style={{ overflowX: 'auto', maxHeight: '250px', backgroundColor: 'var(--bg-primary)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr>
+                      {Array.from({ length: tableGridCols }).map((_, colIdx) => (
+                        <th key={colIdx} style={{ padding: '4px' }}>
+                          <input
+                            type="text"
+                            className="form-input btn-xs"
+                            placeholder={`Header ${colIdx + 1}`}
+                            value={tableGridData[0]?.[colIdx] || ''}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setTableGridData(prev => {
+                                const next = prev.map(r => [...r]);
+                                if (!next[0]) next[0] = [];
+                                next[0][colIdx] = val;
+                                return next;
+                              });
+                            }}
+                            style={{ fontWeight: 'bold', borderColor: 'var(--color-primary)' }}
+                          />
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tableGridData.slice(1).map((row, rowIdx) => (
+                      <tr key={rowIdx}>
+                        {Array.from({ length: tableGridCols }).map((_, colIdx) => (
+                          <td key={colIdx} style={{ padding: '4px' }}>
+                            <input
+                              type="text"
+                              className="form-input btn-xs"
+                              placeholder={`R${rowIdx + 1} C${colIdx + 1}`}
+                              value={row[colIdx] || ''}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setTableGridData(prev => {
+                                  const next = prev.map(r => [...r]);
+                                  if (!next[rowIdx + 1]) next[rowIdx + 1] = [];
+                                  next[rowIdx + 1][colIdx] = val;
+                                  return next;
+                                });
+                              }}
+                            />
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                <button type="button" onClick={() => setIsTableModalOpen(false)} className="btn btn-outline">Cancel</button>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  style={{ background: 'linear-gradient(135deg, var(--color-primary), #a855f7)', border: 'none', fontWeight: 'bold' }}
+                  onClick={() => {
+                    let md = '\n\n';
+                    const headerRow = tableGridData[0] || [];
+                    md += '| ' + headerRow.map(h => h || 'Col').join(' | ') + ' |\n';
+                    md += '| ' + Array(headerRow.length).fill('---').join(' | ') + ' |\n';
+                    tableGridData.slice(1).forEach(row => {
+                      md += '| ' + row.map(cell => cell || '').join(' | ') + ' |\n';
+                    });
+                    md += '\n';
+                    insertMarkdownSnippet(md);
+                    onToast('Custom table inserted into article!', 'success');
+                    setIsTableModalOpen(false);
+                  }}
+                >
+                  🚀 Insert Custom Grid Table at Cursor
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </Modal>
 
       {/* Styled definitions */}
