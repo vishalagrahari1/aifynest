@@ -32,6 +32,10 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
     auditLogs,
     affiliateLinks,
     notifications,
+    blogPosts,
+    addBlogPost,
+    updateBlogPost,
+    deleteBlogPost,
     approveTool,
     rejectTool,
     requestChanges,
@@ -62,7 +66,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
   const { user } = useAuth();
 
   // Navigation state
-  const [activeTab, setActiveTab] = useState<'overview' | 'submissions' | 'tools' | 'import' | 'affiliates' | 'claims' | 'reviews' | 'analytics' | 'notifications' | 'logs' | 'pending_review' | 'changes_requested' | 'data_quality' | 'monetization' | 'financial_ledger' | 'reports' | 'verification_requests'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'submissions' | 'tools' | 'blog' | 'import' | 'affiliates' | 'claims' | 'reviews' | 'analytics' | 'notifications' | 'logs' | 'pending_review' | 'changes_requested' | 'data_quality' | 'monetization' | 'financial_ledger' | 'reports' | 'verification_requests'>('overview');
 
   // Filters for submissions moderation table
   const [subStatusFilter, setSubStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected' | 'needs_changes'>('all');
@@ -72,6 +76,20 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
   // Filters for tools index list
   const [toolsStatusFilter, setToolsStatusFilter] = useState<string>('all');
   const [toolsSearch, setToolsSearch] = useState<string>('');
+
+  // Blog management states
+  const [blogSearch, setBlogSearch] = useState('');
+  const [blogCatFilter, setBlogCatFilter] = useState('all');
+  const [isBlogModalOpen, setIsBlogModalOpen] = useState(false);
+  const [editingBlogSlug, setEditingBlogSlug] = useState<string | null>(null);
+  const [blogTitleInput, setBlogTitleInput] = useState('');
+  const [blogSlugInput, setBlogSlugInput] = useState('');
+  const [blogCategoryInput, setBlogCategoryInput] = useState('AI Image Generation');
+  const [blogAuthorInput, setBlogAuthorInput] = useState('AIFynest Editorial Team');
+  const [blogReadTimeInput, setBlogReadTimeInput] = useState('8 min read');
+  const [blogImageInput, setBlogImageInput] = useState('');
+  const [blogExcerptInput, setBlogExcerptInput] = useState('');
+  const [blogContentInput, setBlogContentInput] = useState('');
 
   // Filters for Pending Review tab
   const [pendingSearch, setPendingSearch] = useState('');
@@ -919,6 +937,7 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
           {[
             { id: 'overview', name: 'Overview', count: 0 },
             { id: 'tools', name: 'All Tools', count: 0 },
+            { id: 'blog', name: '📰 Blog Articles', count: blogPosts ? blogPosts.length : 0 },
             { id: 'import', name: 'Import CSV', count: 0 },
             { id: 'pending_review', name: 'Pending Review', count: pendingNewCount + pendingEditsCount },
             { id: 'changes_requested', name: 'Changes Requested', count: changesRequestedCount },
@@ -1753,6 +1772,152 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
                         </td>
                       </tr>
                     ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: BLOG & ARTICLES CMS MANAGER */}
+          {activeTab === 'blog' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+                <div>
+                  <h3 style={{ fontSize: '18px', fontWeight: 'bold', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    📰 Blog & Article Publishing Manager
+                  </h3>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
+                    Create, edit, publish, and manage long-form SEO articles, buying guides, and AI tool roundups.
+                  </span>
+                </div>
+                <button
+                  onClick={() => {
+                    setEditingBlogSlug(null);
+                    setBlogTitleInput('');
+                    setBlogSlugInput('');
+                    setBlogCategoryInput('AI Image Generation');
+                    setBlogAuthorInput('AIFynest Editorial Team');
+                    setBlogReadTimeInput('8 min read');
+                    setBlogImageInput('');
+                    setBlogExcerptInput('');
+                    setBlogContentInput('');
+                    setIsBlogModalOpen(true);
+                  }}
+                  className="btn btn-primary btn-sm"
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <Plus size={16} />
+                  <span>Write & Publish Article</span>
+                </button>
+              </div>
+
+              {/* Filters Bar */}
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center', backgroundColor: 'var(--bg-card)', padding: '16px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
+                <input
+                  type="text"
+                  placeholder="Search articles by title or slug..."
+                  value={blogSearch}
+                  onChange={(e) => setBlogSearch(e.target.value)}
+                  style={{ padding: '8px 14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: 'var(--text-xs)', flex: 1, minWidth: '220px' }}
+                />
+                <select
+                  value={blogCatFilter}
+                  onChange={(e) => setBlogCatFilter(e.target.value)}
+                  style={{ padding: '8px 14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: 'var(--text-xs)', fontWeight: '600' }}
+                >
+                  <option value="all">All Categories</option>
+                  <option value="AI Image Generation">AI Image Generation</option>
+                  <option value="AI Productivity">AI Productivity</option>
+                  <option value="AI Writing">AI Writing</option>
+                  <option value="AI Coding">AI Coding</option>
+                  <option value="AI Video">AI Video</option>
+                  <option value="AI Business">AI Business</option>
+                  <option value="AI Study & Education">AI Study & Education</option>
+                </select>
+                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
+                  Total Articles: <strong>{blogPosts ? blogPosts.length : 0}</strong>
+                </span>
+              </div>
+
+              {/* Articles Table */}
+              <div style={{ overflowX: 'auto', backgroundColor: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th style={{ width: '70px' }}>Banner</th>
+                      <th>Article Title & Slug</th>
+                      <th>Category</th>
+                      <th>Author</th>
+                      <th>Date</th>
+                      <th>Read Time</th>
+                      <th style={{ textAlign: 'right' }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(blogPosts || [])
+                      .filter((b) => {
+                        const matchQuery = !blogSearch.trim() || b.title.toLowerCase().includes(blogSearch.toLowerCase()) || b.slug.toLowerCase().includes(blogSearch.toLowerCase());
+                        const matchCat = blogCatFilter === 'all' || b.category === blogCatFilter;
+                        return matchQuery && matchCat;
+                      })
+                      .map((post) => (
+                        <tr key={post.slug}>
+                          <td>
+                            <img
+                              src={post.image || '/logo.png'}
+                              alt={post.title}
+                              style={{ width: '48px', height: '36px', borderRadius: '4px', objectFit: 'cover', border: '1px solid var(--border-color)' }}
+                              onError={(e) => { (e.target as HTMLImageElement).src = '/logo.png'; }}
+                            />
+                          </td>
+                          <td>
+                            <div style={{ fontWeight: 'bold', fontSize: 'var(--text-xs)', color: 'var(--text-primary)' }}>{post.title}</div>
+                            <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>/blog/{post.slug}</span>
+                          </td>
+                          <td>
+                            <span className="badge badge-featured" style={{ fontSize: '10px' }}>{post.category || 'General'}</span>
+                          </td>
+                          <td style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{post.author || 'Editorial Team'}</td>
+                          <td style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{post.date}</td>
+                          <td style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{post.readTime}</td>
+                          <td style={{ textAlign: 'right' }}>
+                            <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                              <a href={`/blog/${post.slug}`} target="_blank" rel="noreferrer" className="btn btn-outline btn-xs" style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                                <Eye size={12} /> View
+                              </a>
+                              <button
+                                onClick={() => {
+                                  setEditingBlogSlug(post.slug);
+                                  setBlogTitleInput(post.title);
+                                  setBlogSlugInput(post.slug);
+                                  setBlogCategoryInput(post.category || 'AI Image Generation');
+                                  setBlogAuthorInput(post.author || 'AIFynest Editorial Team');
+                                  setBlogReadTimeInput(post.readTime || '8 min read');
+                                  setBlogImageInput(post.image || '');
+                                  setBlogExcerptInput(post.excerpt || '');
+                                  setBlogContentInput(post.content || '');
+                                  setIsBlogModalOpen(true);
+                                }}
+                                className="btn btn-outline btn-xs"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => {
+                                  if (window.confirm(`Delete article "${post.title}" permanently?`)) {
+                                    deleteBlogPost(post.slug);
+                                    onToast(`Article "${post.title}" deleted.`, 'info');
+                                  }
+                                }}
+                                className="btn btn-outline btn-xs"
+                                style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)' }}
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>
@@ -3161,6 +3326,132 @@ export const AdminDashboard: React.FC<{ onToast: (msg: string, type?: 'success' 
             </div>
           </form>
         </Modal>
+
+      {/* PUBLISH & EDIT ARTICLE MODAL */}
+      <Modal
+        isOpen={isBlogModalOpen}
+        title={editingBlogSlug ? "✏️ Edit Blog Article" : "📰 Write & Publish New Article"}
+        onClose={() => setIsBlogModalOpen(false)}
+      >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!blogTitleInput.trim() || !blogSlugInput.trim() || !blogContentInput.trim()) {
+              onToast('Title, Slug, and Article Content are required.', 'error');
+              return;
+            }
+            const cleanSlug = blogSlugInput.toLowerCase().trim().replace(/[^a-z0-9-]+/g, '-');
+            const postData: any = {
+              slug: cleanSlug,
+              title: blogTitleInput.trim(),
+              category: blogCategoryInput,
+              author: blogAuthorInput.trim() || 'AIFynest Editorial Team',
+              readTime: blogReadTimeInput.trim() || '8 min read',
+              image: blogImageInput.trim() || '/images/best-ai-image-upscale-tools-2026.jpg',
+              excerpt: blogExcerptInput.trim() || blogTitleInput.trim(),
+              content: blogContentInput,
+              date: new Date().toISOString().split('T')[0]
+            };
+
+            if (editingBlogSlug) {
+              updateBlogPost(editingBlogSlug, postData);
+              onToast(`Article "${postData.title}" updated successfully!`, 'success');
+            } else {
+              addBlogPost(postData);
+              onToast(`Article "${postData.title}" published successfully!`, 'success');
+            }
+            setIsBlogModalOpen(false);
+          }}
+          style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: '600px', maxWidth: '800px', width: '100%', maxHeight: '80vh', overflowY: 'auto', padding: '10px 4px' }}
+        >
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '12px' }}>
+            <div className="form-group">
+              <label className="form-label">Article Title *</label>
+              <input
+                type="text"
+                className="form-input"
+                placeholder="e.g., Best AI Image Upscale Tools in 2026"
+                value={blogTitleInput}
+                onChange={(e) => {
+                  setBlogTitleInput(e.target.value);
+                  if (!editingBlogSlug) {
+                    setBlogSlugInput(e.target.value.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''));
+                  }
+                }}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">URL Slug *</label>
+              <input
+                type="text"
+                className="form-input"
+                placeholder="e.g., best-ai-image-upscale-tools-2026"
+                value={blogSlugInput}
+                onChange={(e) => setBlogSlugInput(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+            <div className="form-group">
+              <label className="form-label">Category</label>
+              <select className="form-input" value={blogCategoryInput} onChange={(e) => setBlogCategoryInput(e.target.value)}>
+                <option value="AI Image Generation">AI Image Generation</option>
+                <option value="AI Productivity">AI Productivity</option>
+                <option value="AI Writing">AI Writing</option>
+                <option value="AI Coding">AI Coding</option>
+                <option value="AI Video">AI Video</option>
+                <option value="AI Business">AI Business</option>
+                <option value="AI Study & Education">AI Study & Education</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Author Name</label>
+              <input type="text" className="form-input" value={blogAuthorInput} onChange={(e) => setBlogAuthorInput(e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Estimated Read Time</label>
+              <input type="text" className="form-input" placeholder="e.g., 10 min read" value={blogReadTimeInput} onChange={(e) => setBlogReadTimeInput(e.target.value)} />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Featured Image URL</label>
+            <input type="text" className="form-input" placeholder="/images/best-ai-image-upscale-tools-2026.jpg or image URL" value={blogImageInput} onChange={(e) => setBlogImageInput(e.target.value)} />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Meta Description / Excerpt</label>
+            <textarea
+              className="form-input"
+              rows={2}
+              placeholder="Brief summary for Google search meta description & blog cards..."
+              value={blogExcerptInput}
+              onChange={(e) => setBlogExcerptInput(e.target.value)}
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Article Content (Markdown Format) *</label>
+            <textarea
+              className="form-input"
+              rows={12}
+              style={{ fontFamily: 'monospace', fontSize: '13px', lineHeight: '1.5' }}
+              placeholder="# [H1] Article Title&#10;&#10;Introduction paragraph...&#10;&#10;## [H2] Section Heading&#10;&#10;![Alt text](/images/filename.jpg)"
+              value={blogContentInput}
+              onChange={(e) => setBlogContentInput(e.target.value)}
+              required
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '12px' }}>
+            <button type="button" onClick={() => setIsBlogModalOpen(false)} className="btn btn-outline">Cancel</button>
+            <button type="submit" className="btn btn-primary">{editingBlogSlug ? "Save Article Changes" : "Publish Article Now"}</button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Styled definitions */}
       <style>{`

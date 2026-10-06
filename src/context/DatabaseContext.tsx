@@ -87,6 +87,11 @@ interface DatabaseContextType {
   updateAffiliateLink: (id: string, updatedFields: Partial<AffiliateLink>) => void;
   deleteAffiliateLink: (id: string) => void;
 
+  // Blog Management
+  addBlogPost: (post: BlogPost) => void;
+  updateBlogPost: (slug: string, updatedFields: Partial<BlogPost>) => void;
+  deleteBlogPost: (slug: string) => void;
+
   // Notifications
   addNotification: (userId: string, title: string, message: string, type: Notification['type']) => void;
   markNotificationRead: (id: string) => void;
@@ -1934,6 +1939,52 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     saveToStorage('ai_affiliates', updated);
   };
 
+  // --- BLOG MANAGEMENT ---
+  const addBlogPost = (post: BlogPost) => {
+    const updated = [post, ...blogPosts.filter(b => b.slug !== post.slug)];
+    setBlogPosts(updated);
+    saveToStorage('ai_blog_posts', updated);
+    if (useSupabase) {
+      supabase.from('blog_posts').upsert({
+        slug: post.slug,
+        title: post.title,
+        excerpt: post.excerpt,
+        content: post.content,
+        category: post.category,
+        author: post.author,
+        read_time: post.readTime,
+        image: post.image,
+        date: post.date || new Date().toISOString()
+      }).then(() => fetchDatabaseState());
+    }
+  };
+
+  const updateBlogPost = (slug: string, updatedFields: Partial<BlogPost>) => {
+    const updated = blogPosts.map((b) => (b.slug === slug ? { ...b, ...updatedFields } : b));
+    setBlogPosts(updated);
+    saveToStorage('ai_blog_posts', updated);
+    if (useSupabase) {
+      supabase.from('blog_posts').update({
+        ...(updatedFields.title ? { title: updatedFields.title } : {}),
+        ...(updatedFields.excerpt ? { excerpt: updatedFields.excerpt } : {}),
+        ...(updatedFields.content ? { content: updatedFields.content } : {}),
+        ...(updatedFields.category ? { category: updatedFields.category } : {}),
+        ...(updatedFields.author ? { author: updatedFields.author } : {}),
+        ...(updatedFields.readTime ? { read_time: updatedFields.readTime } : {}),
+        ...(updatedFields.image ? { image: updatedFields.image } : {}),
+      }).eq('slug', slug).then(() => fetchDatabaseState());
+    }
+  };
+
+  const deleteBlogPost = (slug: string) => {
+    const updated = blogPosts.filter((b) => b.slug !== slug);
+    setBlogPosts(updated);
+    saveToStorage('ai_blog_posts', updated);
+    if (useSupabase) {
+      supabase.from('blog_posts').delete().eq('slug', slug).then(() => fetchDatabaseState());
+    }
+  };
+
   // --- NOTIFICATIONS DISPATCH ---
   const addNotification = (userId: string, title: string, message: string, type: Notification['type']) => {
     const newNotif: Notification = {
@@ -2020,6 +2071,9 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         addAffiliateLink,
         updateAffiliateLink,
         deleteAffiliateLink,
+        addBlogPost,
+        updateBlogPost,
+        deleteBlogPost,
         addNotification,
         markNotificationRead,
         seedTenToolsPerCategory,
