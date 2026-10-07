@@ -1984,20 +1984,25 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const updateBlogPost = (slug: string, updatedFields: Partial<BlogPost>) => {
-    const updated = blogPosts.map((b) => (b.slug === slug ? { ...b, ...updatedFields } : b));
+    const targetPost = blogPosts.find((b) => b.slug === slug);
+    const mergedPost: any = targetPost ? { ...targetPost, ...updatedFields } : updatedFields;
+
+    const updated = blogPosts.map((b) => (b.slug === slug ? mergedPost : b));
     setBlogPosts(updated);
     saveToStorage('ai_blog_posts', updated);
     if (useSupabase) {
-      supabase.from('blog_posts').update({
-        ...(updatedFields.title ? { title: updatedFields.title } : {}),
-        ...(updatedFields.excerpt ? { excerpt: updatedFields.excerpt } : {}),
-        ...(updatedFields.content ? { content: updatedFields.content } : {}),
-        ...(updatedFields.category ? { category: updatedFields.category } : {}),
-        ...(updatedFields.author ? { author: updatedFields.author } : {}),
-        ...(updatedFields.readTime ? { read_time: updatedFields.readTime } : {}),
-        ...(updatedFields.image ? { image: updatedFields.image } : {}),
-        ...(updatedFields.status ? { status: updatedFields.status } : {}),
-      }).eq('slug', slug).then(() => fetchDatabaseState());
+      supabase.from('blog_posts').upsert({
+        slug: mergedPost.slug || slug,
+        title: mergedPost.title,
+        excerpt: mergedPost.excerpt,
+        content: mergedPost.content,
+        category: mergedPost.category,
+        author: mergedPost.author,
+        read_time: mergedPost.readTime,
+        image: mergedPost.image,
+        status: mergedPost.status || 'published',
+        date: mergedPost.date || new Date().toISOString()
+      }, { onConflict: 'slug' }).then(() => fetchDatabaseState());
     }
   };
 
