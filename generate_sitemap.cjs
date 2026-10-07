@@ -36,7 +36,6 @@ function writeSitemap(categories, tools, blogPosts = []) {
     '/privacy',
     '/refund-policy',
     '/pricing',
-    '/new',
     '/new-tools',
     '/collections',
     '/trending',
@@ -53,7 +52,6 @@ function writeSitemap(categories, tools, blogPosts = []) {
     blogPosts.forEach((post) => {
       if (post.slug) {
         staticUrls.push(`/blog/${post.slug}`);
-        staticUrls.push(`/${post.slug}`);
       }
     });
   }
@@ -74,7 +72,7 @@ function writeSitemap(categories, tools, blogPosts = []) {
   if (categories && categories.length > 0) {
     categories.forEach((cat) => {
       xml += `  <url>\n`;
-      xml += `    <loc>${SITE_URL}/ai-tools/${cat.slug}</loc>\n`;
+      xml += `    <loc>${SITE_URL}/categories/${cat.slug}</loc>\n`;
       xml += `    <changefreq>weekly</changefreq>\n`;
       xml += `    <priority>0.7</priority>\n`;
       xml += `  </url>\n`;

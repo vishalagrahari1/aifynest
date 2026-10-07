@@ -71,7 +71,8 @@ function buildPageHTML(templateHTML, options) {
     canonicalUrl,
     ogImage = 'https://aifynest.com/logo.png',
     ogType = 'website',
-    schemaMarkup
+    schemaMarkup,
+    bodyHTML
   } = options;
 
   const formattedTitle = title.includes('AIFynest') ? title : `${title} | AIFynest`;
@@ -116,6 +117,11 @@ function buildPageHTML(templateHTML, options) {
     if (html.includes('</head>')) {
       html = html.replace('</head>', `${jsonLdScript}\n</head>`);
     }
+  }
+
+  // Inject prerendered semantic body HTML for search crawlers inside <div id="root">
+  if (bodyHTML) {
+    html = html.replace(/<div id="root">[\s\S]*?<\/div>/, `<div id="root">${bodyHTML}</div>`);
   }
 
   return html;
@@ -213,7 +219,11 @@ async function runPrerender() {
         slug: p.slug,
         title: p.title,
         excerpt: p.excerpt || p.description,
-        image: p.featured_image || p.image
+        content: p.content || '',
+        author: p.author || 'AIFynest Editorial Team',
+        date: p.date || '2026-09-16',
+        readTime: p.read_time || p.readTime || '8 min read',
+        image: p.featured_image || p.image || '/logo.png'
       }));
     }
   } catch (e) {}
@@ -268,7 +278,7 @@ async function runPrerender() {
     }
   ];
 
-  // Dynamically add all blog post routes (/blog/:slug and /:slug)
+  // Dynamically add all blog post routes (/blog/:slug)
   if (blogPosts && blogPosts.length > 0) {
     blogPosts.forEach(post => {
       if (!post.slug) return;
@@ -283,14 +293,8 @@ async function runPrerender() {
         path: `/blog/${post.slug}`,
         title,
         description,
-        ogImage
-      });
-
-      staticRoutes.push({
-        path: `/${post.slug}`,
-        title,
-        description,
-        ogImage
+        ogImage,
+        postObj: post
       });
     });
   }
@@ -564,12 +568,34 @@ async function runPrerender() {
       };
     }
 
+    let bodyHTML = null;
+    if (route.postObj) {
+      const p = route.postObj;
+      const paragraphs = (p.content || '').split('\n\n').map(para => {
+        const cleanP = para.trim();
+        if (cleanP.startsWith('# ')) return `<h1 style="font-size:1.8rem;margin:24px 0 12px 0;">${escapeAttribute(cleanP.replace(/^#\s+/, ''))}</h1>`;
+        if (cleanP.startsWith('## ')) return `<h2 style="font-size:1.5rem;margin:20px 0 10px 0;">${escapeAttribute(cleanP.replace(/^##\s+/, ''))}</h2>`;
+        if (cleanP.startsWith('### ')) return `<h3 style="font-size:1.25rem;margin:16px 0 8px 0;">${escapeAttribute(cleanP.replace(/^###\s+/, ''))}</h3>`;
+        return `<p style="margin-bottom:16px;line-height:1.7;">${escapeAttribute(cleanP)}</p>`;
+      }).join('\n');
+
+      bodyHTML = `<article class="container section" style="max-width:900px;margin:0 auto;padding:32px 16px;">
+        <nav style="font-size:12px;margin-bottom:16px;color:#64748b;"><a href="/">Home</a> &gt; <a href="/blog">Blog</a> &gt; <span>${escapeAttribute(p.title)}</span></nav>
+        <h1 style="font-size:2rem;font-weight:bold;margin-bottom:16px;">${escapeAttribute(p.title)}</h1>
+        <div style="font-size:13px;color:#64748b;margin-bottom:24px;">By ${escapeAttribute(p.author || 'AIFynest Editorial Team')} &bull; ${escapeAttribute(p.date || '2026-09-16')} &bull; ${escapeAttribute(p.readTime || '8 min read')}</div>
+        ${p.image ? `<img src="${escapeAttribute(p.image)}" alt="${escapeAttribute(p.title)}" style="width:100%;max-height:400px;object-fit:cover;border-radius:12px;margin-bottom:24px;" />` : ''}
+        <p style="font-size:1.1rem;line-height:1.6;font-weight:500;color:#334155;margin-bottom:24px;">${escapeAttribute(p.excerpt || '')}</p>
+        <div class="article-body">${paragraphs}</div>
+      </article>`;
+    }
+
     const html = buildPageHTML(templateHTML, {
       title: route.title,
       description: route.description,
       canonicalUrl: `${SITE_URL}${route.path}`,
       ogImage: route.ogImage || `${SITE_URL}/logo.png`,
-      schemaMarkup
+      schemaMarkup,
+      bodyHTML
     });
     writeStaticFile(route.path, html);
   });
@@ -622,11 +648,18 @@ async function runPrerender() {
         ]
       };
 
+      const catBodyHTML = `<main class="container section" style="max-width:1000px;margin:0 auto;padding:32px 16px;">
+        <nav style="font-size:12px;margin-bottom:16px;color:#64748b;"><a href="/">Home</a> &gt; <a href="/ai-tools">Categories</a> &gt; <span>${escapeAttribute(catDisplayName)}</span></nav>
+        <h1 style="font-size:2.2rem;font-weight:bold;margin-bottom:12px;">${escapeAttribute(catTitle)}</h1>
+        <p style="font-size:1.1rem;color:#475569;margin-bottom:32px;">${escapeAttribute(catDesc)}</p>
+      </main>`;
+
       const html = buildPageHTML(templateHTML, {
         title: catTitle,
         description: catDesc,
         canonicalUrl: `${SITE_URL}/categories/${cat.slug}`,
-        schemaMarkup
+        schemaMarkup,
+        bodyHTML: catBodyHTML
       });
 
       writeStaticFile(`/ai-tools/${cat.slug}`, html);
@@ -733,13 +766,37 @@ async function runPrerender() {
         }
       ];
 
+      const toolBodyHTML = `<main class="container section" style="max-width:1000px;margin:0 auto;padding:32px 16px;">
+        <nav style="font-size:12px;margin-bottom:16px;color:#64748b;"><a href="/">Home</a> &gt; <a href="/ai-tools">AI Tools</a> &gt; <a href="/categories/${escapeAttribute(tool.categorySlug)}">${escapeAttribute(getCategoryDisplayName(tool.categorySlug))}</a> &gt; <span>${escapeAttribute(tool.name)}</span></nav>
+        <header style="display:flex;gap:20px;align-items:center;margin-bottom:24px;">
+          <img src="${escapeAttribute(tool.logoUrl)}" alt="${escapeAttribute(tool.name)}" style="width:72px;height:72px;border-radius:12px;object-fit:cover;" />
+          <div>
+            <h1 style="font-size:2rem;font-weight:bold;margin:0 0 8px 0;">${escapeAttribute(tool.name)}</h1>
+            <p style="font-size:1.1rem;color:#475569;margin:0;">${escapeAttribute(tool.tagline)}</p>
+          </div>
+        </header>
+        <section style="margin-bottom:32px;background:#f8fafc;padding:24px;border-radius:12px;border:1px solid #e2e8f0;">
+          <h2 style="font-size:1.3rem;margin-top:0;">About ${escapeAttribute(tool.name)}</h2>
+          <p style="line-height:1.7;color:#334155;">${escapeAttribute(tool.description)}</p>
+        </section>
+        ${tool.features && tool.features.length > 0 ? `
+          <section style="margin-bottom:32px;">
+            <h2 style="font-size:1.3rem;">Key Features</h2>
+            <ul style="line-height:1.8;color:#334155;">
+              ${tool.features.map(f => `<li>${escapeAttribute(f)}</li>`).join('')}
+            </ul>
+          </section>
+        ` : ''}
+      </main>`;
+
       const html = buildPageHTML(templateHTML, {
         title: toolSeoTitle,
         description: toolMetaDescription,
         canonicalUrl,
         ogImage,
         ogType: 'product',
-        schemaMarkup
+        schemaMarkup,
+        bodyHTML: toolBodyHTML
       });
 
       writeStaticFile(`/tools/${cleanSlug}`, html);

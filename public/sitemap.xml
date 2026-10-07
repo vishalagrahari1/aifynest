@@ -46,11 +46,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/new</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://aifynest.com/new-tools</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
@@ -106,17 +101,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/best-ai-image-upscale-tools-2026</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://aifynest.com/blog/10-best-ai-productivity-tools-2026</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/10-best-ai-productivity-tools-2026</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
@@ -126,17 +111,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/10-best-ai-tools-for-coding-2026</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://aifynest.com/blog/10-best-ai-tools-for-business-2026</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/10-best-ai-tools-for-business-2026</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
@@ -146,17 +121,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/10-best-ai-study-tools-for-students-2026</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://aifynest.com/blog/best-image-generation-tools</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/best-image-generation-tools</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
@@ -166,17 +131,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/best-ai-writing-tools-2026</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://aifynest.com/blog/how-to-use-ai-coding-assistants</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/how-to-use-ai-coding-assistants</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
@@ -186,77 +141,67 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/best-ai-video-editing-tools-2026</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://aifynest.com/blog/best-ai-tools-dropshipping-2026</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/best-ai-tools-dropshipping-2026</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/ai-tools/writing</loc>
+    <loc>https://aifynest.com/categories/writing</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/ai-tools/image-generation</loc>
+    <loc>https://aifynest.com/categories/image-generation</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/ai-tools/video</loc>
+    <loc>https://aifynest.com/categories/video</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/ai-tools/audio</loc>
+    <loc>https://aifynest.com/categories/audio</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/ai-tools/coding</loc>
+    <loc>https://aifynest.com/categories/coding</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/ai-tools/marketing</loc>
+    <loc>https://aifynest.com/categories/marketing</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/ai-tools/productivity</loc>
+    <loc>https://aifynest.com/categories/productivity</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/ai-tools/design</loc>
+    <loc>https://aifynest.com/categories/design</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/ai-tools/research</loc>
+    <loc>https://aifynest.com/categories/research</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/ai-tools/education</loc>
+    <loc>https://aifynest.com/categories/education</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/ai-tools/business</loc>
+    <loc>https://aifynest.com/categories/business</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/ai-tools/finance</loc>
+    <loc>https://aifynest.com/categories/finance</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
