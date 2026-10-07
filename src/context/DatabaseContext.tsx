@@ -505,25 +505,57 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         })));
       }
 
-      // 6.5 Blog Posts
+      // 6.5 Blog Posts Sync (Merge Supabase overrides onto seed list)
       try {
-        const { data: dbBlogData } = await supabase.from('blog_posts').select('*');
-        if (dbBlogData && dbBlogData.length > 0) {
-          const fetchedPosts: BlogPost[] = dbBlogData.map(b => ({
-            slug: b.slug,
-            title: b.title,
-            excerpt: b.excerpt,
-            content: b.content,
-            category: b.category,
-            author: b.author,
-            readTime: b.read_time,
-            image: b.image,
-            status: b.status || 'published',
-            date: b.date
-          }));
-          setBlogPosts(fetchedPosts);
-          try { localStorage.setItem('ai_blog_posts', JSON.stringify(fetchedPosts)); } catch (e) {}
+        const { data: dbBlogData, error: dbBlogErr } = await supabase.from('blog_posts').select('*');
+        if (dbBlogErr) {
+          console.warn('Supabase blog_posts select warning:', dbBlogErr.message);
         }
+        
+        const dbMap = new Map((dbBlogData || []).map((b: any) => [b.slug, b]));
+
+        // Merge initial seed blog posts with database overrides
+        const mergedPosts: BlogPost[] = initialBlogPosts.map(seed => {
+          const dbMatch = dbMap.get(seed.slug);
+          if (dbMatch) {
+            dbMap.delete(seed.slug);
+            return {
+              slug: dbMatch.slug,
+              title: dbMatch.title || seed.title,
+              excerpt: dbMatch.excerpt || seed.excerpt,
+              content: dbMatch.content || seed.content,
+              category: dbMatch.category || seed.category,
+              author: dbMatch.author || seed.author,
+              readTime: dbMatch.read_time || seed.readTime,
+              image: dbMatch.image || seed.image,
+              status: dbMatch.status || seed.status || 'published',
+              date: dbMatch.date || seed.date
+            };
+          }
+          return seed;
+        });
+
+        // Append any new blog posts created in Supabase
+        dbMap.forEach((dbMatch: any) => {
+          mergedPosts.push({
+            slug: dbMatch.slug,
+            title: dbMatch.title,
+            excerpt: dbMatch.excerpt,
+            content: dbMatch.content,
+            category: dbMatch.category,
+            author: dbMatch.author,
+            readTime: dbMatch.read_time,
+            image: dbMatch.image,
+            status: dbMatch.status || 'published',
+            date: dbMatch.date
+          });
+        });
+
+        // Sort by date newest first
+        mergedPosts.sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime());
+
+        setBlogPosts(mergedPosts);
+        try { localStorage.setItem('ai_blog_posts', JSON.stringify(mergedPosts)); } catch (e) {}
       } catch (bErr) {
         console.warn('Blog posts sync from database skipped/failed:', bErr);
       }
@@ -1967,42 +1999,88 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const updated = [post, ...blogPosts.filter(b => b.slug !== post.slug)];
     setBlogPosts(updated);
     saveToStorage('ai_blog_posts', updated);
+
     if (useSupabase) {
-      supabase.from('blog_posts').upsert({
-        slug: post.slug,
-        title: post.title,
-        excerpt: post.excerpt,
-        content: post.content,
-        category: post.category,
-        author: post.author,
-        read_time: post.readTime,
-        image: post.image,
-        status: post.status || 'published',
-        date: post.date || new Date().toISOString()
-      }).then(() => fetchDatabaseState());
+      const runAdd = async () => {
+        const payload = {
+          slug: post.slug,
+          title: post.title,
+          excerpt: post.excerpt,
+          content: post.content,
+          category: post.category,
+          author: post.author,
+          read_time: post.readTime,
+          image: post.image,
+          status: post.status || 'published',
+          date: post.date || new Date().toISOString()
+        };
+
+        try {
+          const { data: existing } = await supabase.from('blog_posts').select('slug').eq('slug', post.slug);
+          if (existing && existing.length > 0) {
+            const { error: updateErr } = await supabase.from('blog_posts').update(payload).eq('slug', post.slug);
+            if (updateErr) console.error('Supabase blog update error:', updateErr);
+          } else {
+            const { error: insertErr } = await supabase.from('blog_posts').insert(payload);
+            if (insertErr) {
+              console.warn('Supabase insert failed, attempting upsert fallback:', insertErr.message);
+              await supabase.from('blog_posts').upsert(payload, { onConflict: 'slug' });
+            }
+          }
+        } catch (err) {
+          console.error('Error syncing addBlogPost to Supabase:', err);
+        }
+        await fetchDatabaseState();
+      };
+      runAdd();
     }
   };
 
   const updateBlogPost = (slug: string, updatedFields: Partial<BlogPost>) => {
     const targetPost = blogPosts.find((b) => b.slug === slug);
     const mergedPost: any = targetPost ? { ...targetPost, ...updatedFields } : updatedFields;
+    const targetSlug = mergedPost.slug || slug;
 
-    const updated = blogPosts.map((b) => (b.slug === slug ? mergedPost : b));
+    const updated = blogPosts.map((b) => (b.slug === slug || b.slug === targetSlug ? mergedPost : b));
     setBlogPosts(updated);
     saveToStorage('ai_blog_posts', updated);
+
     if (useSupabase) {
-      supabase.from('blog_posts').upsert({
-        slug: mergedPost.slug || slug,
-        title: mergedPost.title,
-        excerpt: mergedPost.excerpt,
-        content: mergedPost.content,
-        category: mergedPost.category,
-        author: mergedPost.author,
-        read_time: mergedPost.readTime,
-        image: mergedPost.image,
-        status: mergedPost.status || 'published',
-        date: mergedPost.date || new Date().toISOString()
-      }, { onConflict: 'slug' }).then(() => fetchDatabaseState());
+      const runUpdate = async () => {
+        const payload = {
+          slug: targetSlug,
+          title: mergedPost.title,
+          excerpt: mergedPost.excerpt,
+          content: mergedPost.content,
+          category: mergedPost.category,
+          author: mergedPost.author,
+          read_time: mergedPost.readTime,
+          image: mergedPost.image,
+          status: mergedPost.status || 'published',
+          date: mergedPost.date || new Date().toISOString()
+        };
+
+        try {
+          const { data: existing } = await supabase.from('blog_posts').select('slug').or(`slug.eq.${slug},slug.eq.${targetSlug}`);
+          if (existing && existing.length > 0) {
+            const { error: updateErr } = await supabase.from('blog_posts').update(payload).or(`slug.eq.${slug},slug.eq.${targetSlug}`);
+            if (updateErr) {
+              console.warn('Supabase update by slug failed, attempting upsert fallback:', updateErr.message);
+              await supabase.from('blog_posts').upsert(payload, { onConflict: 'slug' });
+            }
+          } else {
+            const { error: insertErr } = await supabase.from('blog_posts').insert(payload);
+            if (insertErr) {
+              console.warn('Supabase insert failed, attempting upsert fallback:', insertErr.message);
+              await supabase.from('blog_posts').upsert(payload, { onConflict: 'slug' });
+            }
+          }
+        } catch (err) {
+          console.error('Error syncing updateBlogPost to Supabase:', err);
+        }
+        await fetchDatabaseState();
+      };
+      runUpdate();
     }
   };
 

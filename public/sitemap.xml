@@ -281,11 +281,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/synthesia</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://aifynest.com/tools/notion-ai</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -297,6 +292,11 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/pi</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://aifynest.com/tools/synthesia</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
