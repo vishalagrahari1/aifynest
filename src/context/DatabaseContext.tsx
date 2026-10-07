@@ -505,6 +505,29 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         })));
       }
 
+      // 6.5 Blog Posts
+      try {
+        const { data: dbBlogData } = await supabase.from('blog_posts').select('*');
+        if (dbBlogData && dbBlogData.length > 0) {
+          const fetchedPosts: BlogPost[] = dbBlogData.map(b => ({
+            slug: b.slug,
+            title: b.title,
+            excerpt: b.excerpt,
+            content: b.content,
+            category: b.category,
+            author: b.author,
+            readTime: b.read_time,
+            image: b.image,
+            status: b.status || 'published',
+            date: b.date
+          }));
+          setBlogPosts(fetchedPosts);
+          try { localStorage.setItem('ai_blog_posts', JSON.stringify(fetchedPosts)); } catch (e) {}
+        }
+      } catch (bErr) {
+        console.warn('Blog posts sync from database skipped/failed:', bErr);
+      }
+
       // 7. Audit logs
       const { data: logData } = await supabase.from('audit_logs').select('*').order('timestamp', { ascending: false });
       if (logData) {

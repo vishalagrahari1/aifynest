@@ -401,7 +401,7 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/remini</loc>
+    <loc>https://aifynest.com/tools/bolt-new</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -411,7 +411,7 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/bolt-new</loc>
+    <loc>https://aifynest.com/tools/remini</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -496,6 +496,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://aifynest.com/tools/cursor</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://aifynest.com/tools/codeium</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -506,22 +511,12 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/cursor</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/tools/10web</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://aifynest.com/tools/tweet-hunter</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/github-copilot</loc>
+    <loc>https://aifynest.com/tools/10web</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -532,6 +527,11 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/pdf-ai</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://aifynest.com/tools/github-copilot</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -666,6 +666,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://aifynest.com/tools/sourcegraph-cody</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://aifynest.com/tools/wisecut</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -687,11 +692,6 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/uizard</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/tools/sourcegraph-cody</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -731,17 +731,17 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/windsurf</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://aifynest.com/tools/amazon-q-developer</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://aifynest.com/tools/n8n</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://aifynest.com/tools/windsurf</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -776,6 +776,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://aifynest.com/tools/otter-ai</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://aifynest.com/tools/keyword-insights</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -792,11 +797,6 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/fathom</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/tools/otter-ai</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -1001,12 +1001,12 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/taplio</loc>
+    <loc>https://aifynest.com/tools/ideogram</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/ideogram</loc>
+    <loc>https://aifynest.com/tools/taplio</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
