@@ -492,6 +492,30 @@ export const BlogDetail: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {/* Sidebar Guest Post Promo Widget */}
+            <div
+              style={{
+                backgroundColor: 'var(--bg-card)',
+                border: '1px dashed var(--color-primary)',
+                borderRadius: 'var(--radius-lg)',
+                padding: '20px',
+                textAlign: 'center'
+              }}
+            >
+              <span style={{ fontSize: '10px', fontWeight: 'bold', color: 'var(--color-primary)', backgroundColor: 'var(--color-primary-light)', padding: '3px 8px', borderRadius: '4px' }}>
+                GUEST POSTING ($99)
+              </span>
+              <h4 style={{ fontSize: '14px', fontWeight: 'bold', margin: '10px 0 6px 0', color: 'var(--text-primary)' }}>
+                Publish Your Article Here
+              </h4>
+              <p style={{ fontSize: '11px', color: 'var(--text-secondary)', margin: '0 0 14px 0', lineHeight: '1.4' }}>
+                Get dofollow backlinks, traffic, and LLM citations on AIFynest.
+              </p>
+              <Link to="/write-for-us" className="btn btn-primary btn-sm w-full" style={{ fontSize: '12px', textAlign: 'center', justifyContent: 'center' }}>
+                Write For Us Guidelines →
+              </Link>
+            </div>
           </aside>
         </div>
 

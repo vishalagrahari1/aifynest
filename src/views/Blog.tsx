@@ -275,6 +275,50 @@ export const Blog: React.FC = () => {
           </div>
         )}
 
+        {/* Guest Post Callout Banner */}
+        <div
+          style={{
+            backgroundColor: 'var(--bg-card)',
+            border: '1px dashed var(--color-primary)',
+            borderRadius: 'var(--radius-xl)',
+            padding: '24px 32px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '16px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
+          }}
+        >
+          <div style={{ maxWidth: '600px' }}>
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: 'bold',
+                color: 'var(--color-primary)',
+                backgroundColor: 'var(--color-primary-light)',
+                padding: '3px 10px',
+                borderRadius: 'var(--radius-full)',
+                display: 'inline-block',
+                marginBottom: '8px',
+              }}
+            >
+              📝 GUEST POSTING OPPORTUNITIES ($99)
+            </span>
+            <h3 style={{ margin: '0 0 6px 0', fontSize: 'var(--text-lg)', fontWeight: 'bold' }}>
+              Want to Publish a Guest Article on AIFynest?
+            </h3>
+            <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+              Publish your article with permanent dofollow SEO backlinks, get indexed in ChatGPT & Perplexity, and reach thousands of tech buyers.
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <Link to="/write-for-us" className="btn btn-primary btn-sm" style={{ padding: '10px 20px', fontWeight: 'bold' }}>
+              Write For Us Guidelines →
+            </Link>
+          </div>
+        </div>
+
         {/* Section Heading for Grid */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
           <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', margin: 0 }}>

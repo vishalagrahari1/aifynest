@@ -112,9 +112,9 @@ export const Footer: React.FC = () => {
             <h4 style={{ fontSize: 'var(--text-xs)', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-primary)' }}>For AI Builders</h4>
             <Link to="/submit-tool" style={footerLinkStyle}>Submit a Tool</Link>
             <Link to="/claim" style={footerLinkStyle}>Claim Your Listing</Link>
+            <Link to="/write-for-us" style={{ ...footerLinkStyle, color: 'var(--color-primary)', fontWeight: 'bold' }}>Write For Us (Guest Posts)</Link>
             <Link to="/advertise" style={footerLinkStyle}>Promote Your Tool</Link>
-            <Link to="/advertise" style={footerLinkStyle}>Advertising</Link>
-            <Link to="/pricing" style={footerLinkStyle}>Developer API</Link>
+            <Link to="/pricing" style={footerLinkStyle}>Sponsorship Plans</Link>
           </div>
 
           {/* Links Column 3: Trust & Legal */}

@@ -22,6 +22,7 @@ import { NewTools } from './views/NewTools';
 import { Blog } from './views/Blog';
 import { BlogDetail } from './views/BlogDetail';
 import { Pricing } from './views/Pricing';
+import { WriteForUs } from './views/WriteForUs';
 import { About } from './views/About';
 import { Contact } from './views/Contact';
 import { Terms } from './views/Terms';
@@ -208,7 +209,9 @@ const AppContent: React.FC<{
           <Route path="/submit-tool" element={<SubmitTool onToast={showToast} />} />
           <Route path="/claim" element={<ClaimListing onToast={showToast} />} />
           <Route path="/pricing" element={<Pricing />} />
-          <Route path="/advertise" element={<Navigate to="/pricing" replace />} />
+          <Route path="/advertise" element={<Pricing />} />
+          <Route path="/write-for-us" element={<WriteForUs />} />
+          <Route path="/guest-post" element={<Navigate to="/write-for-us" replace />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogDetail />} />
           <Route path="/best-image-generation-tools" element={<Navigate to="/blog/best-image-generation-tools" replace />} />
