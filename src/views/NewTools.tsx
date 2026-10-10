@@ -20,7 +20,7 @@ export const NewTools: React.FC<NewToolsProps> = ({
 
   const newTools = tools
     .filter((t) => t.status === 'approved')
-    .sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime());
+    .sort((a, b) => new Date(b.approvedAt || b.lastUpdated || 0).getTime() - new Date(a.approvedAt || a.lastUpdated || 0).getTime());
 
   return (
     <div className="container section">

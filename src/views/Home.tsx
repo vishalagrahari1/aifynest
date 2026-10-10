@@ -1065,9 +1065,21 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                       .sort((a, b) => new Date(b.approvedAt || b.lastUpdated || 0).getTime() - new Date(a.approvedAt || a.lastUpdated || 0).getTime())
                       .slice(0, 5);
 
-                    const timesAgo = ['2d ago', '3d ago', '3d ago', '4d ago', '5d ago'];
+                    const formatTimeAgo = (dateStr?: string | null) => {
+                      if (!dateStr) return 'recently';
+                      const time = new Date(dateStr).getTime();
+                      if (isNaN(time) || time === 0) return 'recently';
+                      const diffMs = Date.now() - time;
+                      if (diffMs < 2 * 60 * 60 * 1000) return 'Just now';
+                      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                      if (diffHours < 24) return `${diffHours}h ago`;
+                      const diffDays = Math.floor(diffHours / 24);
+                      if (diffDays === 1) return '1d ago';
+                      if (diffDays < 30) return `${diffDays}d ago`;
+                      return `${Math.floor(diffDays / 30)}mo ago`;
+                    };
 
-                    return recent.map((tool, idx) => (
+                    return recent.map((tool) => (
                       <div
                         key={tool.id}
                         onClick={() => navigate(`/tools/${tool.slug}`)}
@@ -1116,7 +1128,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
                             flexShrink: 0
                           }}
                         >
-                          {timesAgo[idx] || 'recently'}
+                          {formatTimeAgo(tool.approvedAt || tool.lastUpdated)}
                         </span>
                       </div>
                     ));
@@ -1126,7 +1138,7 @@ export const Home: React.FC<HomeProps> = ({ onToast }) => {
 
               {/* Bottom Link */}
               <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                <Link to="/ai-tools?q=new" className="dashboard-view-all-link">
+                <Link to="/new-tools" className="dashboard-view-all-link">
                   <span>View All New Additions</span>
                   <ArrowRight size={14} />
                 </Link>
