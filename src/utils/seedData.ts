@@ -284,8 +284,8 @@ export const initialTools: Tool[] = [
   "id": "tool-h1btrends",
   "name": "H1BTrends",
   "slug": "h1btrends",
-  "tagline": "AI-Powered US H-1B Visa Insights, Salary Trends & Employer Analytics",
-  "description": "H1BTrends is an AI-assisted analytics platform that provides comprehensive insights into H-1B visa approvals, salary benchmarks, employer filing trends, and job opportunities across the United States.\\n\\nDesigned for international professionals, job seekers, recruiters, and immigration consultants, H1BTrends makes complex US Department of Labor and USCIS data easy to analyze. Users can search by employer, job title, work location, and wage tier to compare compensation packages and evaluate visa sponsorship historical rates.\\n\\nWith features like AI salary prediction, employer sponsorship risk scoring, and interactive location heatmaps, H1BTrends empowers candidates to make data-driven career moves and negotiate competitive compensation with confidence.",
+  "tagline": "AI-Powered US H-1B Visa Insights, Salary Trends, PERM Tracker & Employer Analytics",
+  "description": "H1BTrends is a comprehensive AI-assisted immigration analytics platform that indexes over 2,895,000+ H-1B and PERM filings across 51,179+ active US sponsoring companies, delivering real-time salary benchmarks, approval rates, and policy updates.\\n\\nDesigned for international professionals, software engineers, recruiters, and immigration lawyers, H1BTrends makes complex US Department of Labor (DOL) and USCIS datasets instant to search and analyze. Users can explore top-paying cities, active visa sponsors, software engineering salary ranges, and side-by-side employer metrics.\\n\\nIn addition to deep salary analytics, H1BTrends features specialized calculators (F-1/OPT STEM tools, PERM Green Card processing estimators, and H-1B Lottery calculators) alongside breaking immigration policy news—including DOL PERM suspensions, DHS grace period updates, and monthly Visa Bulletin cutoffs.",
   "categorySlug": "business",
   "subCategory": "HR & Recruiting",
   "pricing": "freemium",
@@ -299,9 +299,10 @@ export const initialTools: Tool[] = [
       "name": "Free Search",
       "price": "$0 / month",
       "features": [
-        "Employer H-1B lookup",
-        "Salary benchmarks",
-        "Basic visa filing stats"
+        "Employer H-1B & PERM lookup",
+        "Salary benchmarks (Median & Wage Tiers)",
+        "Basic visa approval statistics",
+        "Visa Bulletin updates & Policy alerts"
       ],
       "billingPeriod": "free"
     },
@@ -309,44 +310,46 @@ export const initialTools: Tool[] = [
       "name": "Pro Analytics",
       "price": "$15 / month",
       "features": [
-        "Full employer history",
-        "AI salary predictor",
-        "Export CSV reports",
-        "Priority job alerts"
+        "Full employer historical filings (2.89M+ records)",
+        "AI salary predictor & negotiation tool",
+        "Side-by-side employer comparison matrix",
+        "Export CSV data reports & Job alerts"
       ],
       "billingPeriod": "monthly"
     }
   ],
   "features": [
-    "H-1B Visa Employer Database",
-    "Salary & Wage Tier Analytics",
-    "Sponsorship Approval Trends",
-    "AI Salary Prediction Model",
-    "Location & Industry Heatmaps",
-    "Job Alert & Employer Tracking"
+    "2.89M+ H-1B & PERM Filings Database",
+    "51,000+ Sponsoring Companies Directory",
+    "Average Salary ($113.5k) & 93.4% Approval Rate Index",
+    "Software Engineer & Top-Paying City Benchmarks",
+    "Side-by-Side Employer Comparison Engine",
+    "DOL PERM Suspensions & Immigration Breaking News",
+    "F-1/OPT, PERM & H-1B Lottery Calculators",
+    "Monthly USCIS Visa Bulletin Cutoff Trackers"
   ],
   "useCases": [
-    "Researching H-1B visa sponsoring companies",
-    "Benchmarking US salary compensation by role",
-    "Evaluating employer visa approval rates",
-    "Finding top visa sponsors in specific states"
+    "Researching H-1B visa & PERM sponsoring companies (Google, Microsoft, Amazon, etc.)",
+    "Benchmarking Software Engineer (SWE) salaries by city and level",
+    "Evaluating employer visa approval rates and filing volumes",
+    "Tracking breaking DOL & DHS immigration policy updates"
   ],
   "pros": [
-    "Comprehensive USCIS & DOL dataset",
-    "Clean interactive visualization tools",
-    "Helps international candidates negotiate better",
-    "Free tier for quick lookups"
+    "Comprehensive 2.89M+ USCIS & DOL dataset",
+    "Real-time alerts on PERM suspensions & Visa Bulletins",
+    "Interactive calculators for F-1/OPT and Green Card timelines",
+    "Free search access with clean responsive UI"
   ],
   "cons": [
-    "Focused specifically on US H-1B visa ecosystem",
-    "Advanced filtering requires Pro plan"
+    "Focused specifically on US work visa ecosystem",
+    "Advanced CSV export requires Pro subscription"
   ],
   "logoUrl": "https://www.google.com/s2/favicons?domain=h1btrends.com&sz=128",
   "screenshotUrls": [
     "https://www.h1btrends.com/og-image.png"
   ],
-  "rating": 4.8,
-  "reviewCount": 19,
+  "rating": 4.9,
+  "reviewCount": 28,
   "isVerified": true,
   "isFeatured": true,
   "isSponsored": false,
@@ -356,17 +359,33 @@ export const initialTools: Tool[] = [
   "lastUpdated": "2026-10-10",
   "tags": [
     "h1b visa",
+    "perm green card",
     "salary trends",
     "us immigration",
     "visa sponsors",
-    "employer analytics"
+    "employer analytics",
+    "opt tools"
   ],
-  "approvedAt": "2026-10-10T10:00:00.000Z",
+  "approvedAt": "2026-10-10T14:00:00.000Z",
   "approvedBy": "admin",
-  "seoTitle": "H1BTrends Review 2026: H-1B Visa Employer Analytics & Salary Insights",
-  "metaDescription": "H1BTrends review, features, and pricing. Explore US H-1B visa approval stats, employer filing trends, and salary benchmarks with H1BTrends.",
-  "h1Title": "H1BTrends - AI-Powered H-1B Visa & Salary Analytics Platform",
-  "canonicalUrl": "https://aifynest.com/tools/h1btrends"
+  "seoTitle": "H1BTrends Review 2026: H-1B Visa Employer Analytics, PERM Tracker & Salary Data",
+  "metaDescription": "H1BTrends review, features, and pricing. Explore 2.89M+ US H-1B & PERM visa filings, employer approval rates, salary benchmarks, and policy updates with H1BTrends.com.",
+  "h1Title": "H1BTrends - AI-Powered H-1B Visa, PERM & Salary Analytics Platform",
+  "canonicalUrl": "https://aifynest.com/tools/h1btrends",
+  "faq": [
+    {
+      "q": "What data does H1BTrends track?",
+      "a": "H1BTrends indexes over 2,895,000+ H-1B and PERM filings across 51,179+ US companies, providing real-time salary benchmarks, approval rates, wage tiers, and location statistics."
+    },
+    {
+      "q": "Does H1BTrends provide real-time immigration policy alerts?",
+      "a": "Yes. H1BTrends tracks real-time Department of Labor (DOL) PERM suspensions, DHS immigration policy updates, monthly Visa Bulletin cutoffs, and tech layoff impact reports."
+    },
+    {
+      "q": "Which calculators are available on H1BTrends?",
+      "a": "H1BTrends includes specialized F-1/OPT STEM tools, PERM Green Card processing timeline estimators, and H-1B Lottery probability calculators."
+    }
+  ]
 },
 {
   "id": "tool-huffl",
