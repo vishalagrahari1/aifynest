@@ -1,7 +1,7 @@
 /* src/components/layout/Footer.tsx */
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { InstagramIcon, PinterestIcon, XIcon, GitHubIcon, FacebookIcon } from '../shared/Icons';
+import { InstagramIcon, PinterestIcon, XIcon, GitHubIcon, FacebookIcon, LinkedInIcon } from '../shared/Icons';
 
 
 export const Footer: React.FC = () => {
@@ -182,7 +182,7 @@ export const Footer: React.FC = () => {
               <GitHubIcon size={17} />
             </a>
             <a
-              href="https://www.facebook.com/aifynes"
+              href="https://www.facebook.com/aifynest"
               target="_blank"
               rel="noopener noreferrer"
               title="AIFynest on Facebook"
@@ -191,6 +191,17 @@ export const Footer: React.FC = () => {
               className="social-footer-icon"
             >
               <FacebookIcon size={17} />
+            </a>
+            <a
+              href="https://www.linkedin.com/company/aifynest"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="AIFynest on LinkedIn"
+              aria-label="AIFynest on LinkedIn"
+              style={socialLinkStyle}
+              className="social-footer-icon"
+            >
+              <LinkedInIcon size={17} />
             </a>
           </div>
         </div>
