@@ -281,6 +281,446 @@ export const initialCategories: Category[] = [
 // Initial preloaded Tools
 export const initialTools: Tool[] = [
 {
+  "id": "tool-h1btrends",
+  "name": "H1BTrends",
+  "slug": "h1btrends",
+  "tagline": "AI-Powered US H-1B Visa Insights, Salary Trends & Employer Analytics",
+  "description": "H1BTrends is an AI-assisted analytics platform that provides comprehensive insights into H-1B visa approvals, salary benchmarks, employer filing trends, and job opportunities across the United States.\\n\\nDesigned for international professionals, job seekers, recruiters, and immigration consultants, H1BTrends makes complex US Department of Labor and USCIS data easy to analyze. Users can search by employer, job title, work location, and wage tier to compare compensation packages and evaluate visa sponsorship historical rates.\\n\\nWith features like AI salary prediction, employer sponsorship risk scoring, and interactive location heatmaps, H1BTrends empowers candidates to make data-driven career moves and negotiate competitive compensation with confidence.",
+  "categorySlug": "business",
+  "subCategory": "HR & Recruiting",
+  "pricing": "freemium",
+  "pricingUrl": "https://www.h1btrends.com/",
+  "websiteUrl": "https://www.h1btrends.com/",
+  "platforms": [
+    "Web"
+  ],
+  "pricingPlans": [
+    {
+      "name": "Free Search",
+      "price": "$0 / month",
+      "features": [
+        "Employer H-1B lookup",
+        "Salary benchmarks",
+        "Basic visa filing stats"
+      ],
+      "billingPeriod": "free"
+    },
+    {
+      "name": "Pro Analytics",
+      "price": "$15 / month",
+      "features": [
+        "Full employer history",
+        "AI salary predictor",
+        "Export CSV reports",
+        "Priority job alerts"
+      ],
+      "billingPeriod": "monthly"
+    }
+  ],
+  "features": [
+    "H-1B Visa Employer Database",
+    "Salary & Wage Tier Analytics",
+    "Sponsorship Approval Trends",
+    "AI Salary Prediction Model",
+    "Location & Industry Heatmaps",
+    "Job Alert & Employer Tracking"
+  ],
+  "useCases": [
+    "Researching H-1B visa sponsoring companies",
+    "Benchmarking US salary compensation by role",
+    "Evaluating employer visa approval rates",
+    "Finding top visa sponsors in specific states"
+  ],
+  "pros": [
+    "Comprehensive USCIS & DOL dataset",
+    "Clean interactive visualization tools",
+    "Helps international candidates negotiate better",
+    "Free tier for quick lookups"
+  ],
+  "cons": [
+    "Focused specifically on US H-1B visa ecosystem",
+    "Advanced filtering requires Pro plan"
+  ],
+  "logoUrl": "https://www.google.com/s2/favicons?domain=h1btrends.com&sz=128",
+  "screenshotUrls": [
+    "https://www.h1btrends.com/og-image.png"
+  ],
+  "rating": 4.8,
+  "reviewCount": 19,
+  "isVerified": true,
+  "isFeatured": true,
+  "isSponsored": false,
+  "status": "approved",
+  "ownerId": null,
+  "claimStatus": "unclaimed",
+  "lastUpdated": "2026-10-10",
+  "tags": [
+    "h1b visa",
+    "salary trends",
+    "us immigration",
+    "visa sponsors",
+    "employer analytics"
+  ],
+  "approvedAt": "2026-10-10T10:00:00.000Z",
+  "approvedBy": "admin",
+  "seoTitle": "H1BTrends Review 2026: H-1B Visa Employer Analytics & Salary Insights",
+  "metaDescription": "H1BTrends review, features, and pricing. Explore US H-1B visa approval stats, employer filing trends, and salary benchmarks with H1BTrends.",
+  "h1Title": "H1BTrends - AI-Powered H-1B Visa & Salary Analytics Platform",
+  "canonicalUrl": "https://aifynest.com/tools/h1btrends"
+},
+{
+  "id": "tool-huffl",
+  "name": "huffl",
+  "slug": "huffl",
+  "tagline": "AI Social Media & Short-Form Content Generator for Viral Posts",
+  "description": "huffl is an AI-powered social media engine that turns ideas, blogs, and marketing goals into engaging short-form content, viral hooks, and social posts across platforms like X (Twitter), LinkedIn, TikTok, and Instagram.\\n\\nBuilt for content creators, marketers, indie hackers, and agency owners, huffl streamlines daily social media workflow. Simply enter a topic or URL, and huffl automatically generates multiple creative post variations, thread outlines, caption hooks, and strategic calls-to-action.\\n\\nWith features like viral tone tailoring, multi-platform formatting, and real-time trend adaptation, huffl helps brands grow their audience consistently without spending hours writing posts manually.",
+  "categorySlug": "marketing",
+  "subCategory": "Social Media Ads",
+  "pricing": "freemium",
+  "pricingUrl": "https://huffl.ai/#pricing",
+  "websiteUrl": "https://huffl.ai/",
+  "platforms": [
+    "Web"
+  ],
+  "pricingPlans": [
+    {
+      "name": "Free Creator",
+      "price": "$0 / month",
+      "features": [
+        "15 AI posts per month",
+        "Basic viral templates",
+        "Multi-platform export"
+      ],
+      "billingPeriod": "free"
+    },
+    {
+      "name": "Pro Marketer",
+      "price": "$19 / month",
+      "features": [
+        "Unlimited AI post generation",
+        "Custom brand voice tuning",
+        "Thread builder & scheduler",
+        "Priority trend suggestions"
+      ],
+      "billingPeriod": "monthly"
+    }
+  ],
+  "features": [
+    "AI Viral Post Generator",
+    "Multi-Platform Copy Adapter",
+    "Hook & Caption Assistant",
+    "Thread & Carousel Outliner",
+    "Custom Brand Voice Tuning",
+    "One-Click Social Sharing"
+  ],
+  "useCases": [
+    "Generating daily social posts for X & LinkedIn",
+    "Creating viral TikTok & Reel captions",
+    "Repurposing blog posts into social content",
+    "Drafting marketing campaign hooks"
+  ],
+  "pros": [
+    "Fast high-converting post generation",
+    "Understands social media algorithm formats",
+    "Clean minimal interface",
+    "Generous free starter tier"
+  ],
+  "cons": [
+    "Requires user review for brand-specific nuances",
+    "Best features require Pro subscription"
+  ],
+  "logoUrl": "https://www.google.com/s2/favicons?domain=huffl.ai&sz=128",
+  "screenshotUrls": [
+    "https://huffl.ai/og-image.png"
+  ],
+  "rating": 4.7,
+  "reviewCount": 24,
+  "isVerified": true,
+  "isFeatured": false,
+  "isSponsored": false,
+  "status": "approved",
+  "ownerId": null,
+  "claimStatus": "unclaimed",
+  "lastUpdated": "2026-10-10",
+  "tags": [
+    "social media ai",
+    "viral content",
+    "copywriting generator",
+    "twitter threads",
+    "linkedin content"
+  ],
+  "approvedAt": "2026-10-10T10:00:00.000Z",
+  "approvedBy": "admin",
+  "seoTitle": "huffl AI Review 2026: AI Social Media & Viral Content Generator",
+  "metaDescription": "huffl AI review, features, and pricing. Generate viral social media posts, captions, and short-form content instantly with huffl.ai.",
+  "h1Title": "huffl - AI-Powered Social Media & Short-Form Content Engine",
+  "canonicalUrl": "https://aifynest.com/tools/huffl"
+},
+{
+  "id": "tool-newsletrix",
+  "name": "Newsletrix",
+  "slug": "newsletrix",
+  "tagline": "AI Newsletter Curation, Writing & Audience Growth Engine",
+  "description": "Newsletrix is an AI platform engineered to curate, write, format, and automate email newsletters for creators, publishers, and businesses.\\n\\nInstead of hunting for news and spending hours drafting articles, Newsletrix connects to RSS feeds, web links, and industry trends to automatically curate relevant content. The AI then writes engaging summaries, subject lines, and intro copy tailored to your brand voice.\\n\\nCompatible with major newsletter platforms such as Substack, Beehiiv, Mailchimp, and ConvertKit, Newsletrix simplifies email publishing and enables creators to grow consistent subscriber engagement.",
+  "categorySlug": "writing",
+  "subCategory": "AI Email",
+  "pricing": "freemium",
+  "pricingUrl": "https://newsletrix.com/#pricing",
+  "websiteUrl": "https://newsletrix.com/",
+  "platforms": [
+    "Web"
+  ],
+  "pricingPlans": [
+    {
+      "name": "Free Plan",
+      "price": "$0 / month",
+      "features": [
+        "2 AI newsletters / month",
+        "Basic curation engine",
+        "Export to HTML & Markdown"
+      ],
+      "billingPeriod": "free"
+    },
+    {
+      "name": "Creator Plan",
+      "price": "$29 / month",
+      "features": [
+        "Unlimited AI newsletter drafting",
+        "Automated RSS & Web curation",
+        "Custom brand tone editor",
+        "Direct Beehiiv & Substack export"
+      ],
+      "billingPeriod": "monthly"
+    }
+  ],
+  "features": [
+    "AI Automated Curation Engine",
+    "Smart Subject Line Generator",
+    "Brand Voice Customization",
+    "Multi-Platform Export (Substack, Beehiiv)",
+    "RSS & Link Digest Summarizer",
+    "Subscriber Engagement Analytics"
+  ],
+  "useCases": [
+    "Publishing weekly industry digests",
+    "Curating curated news for newsletter subscribers",
+    "Automating company update newsletters",
+    "Writing promotional email campaigns"
+  ],
+  "pros": [
+    "Saves 5+ hours per newsletter issue",
+    "Automates topic research and curation",
+    "Seamless integration with Beehiiv & Substack",
+    "High open-rate subject line suggestions"
+  ],
+  "cons": [
+    "Curated links require manual quick inspection",
+    "Advanced features on paid tier"
+  ],
+  "logoUrl": "https://www.google.com/s2/favicons?domain=newsletrix.com&sz=128",
+  "screenshotUrls": [
+    "https://newsletrix.com/og-image.png"
+  ],
+  "rating": 4.9,
+  "reviewCount": 31,
+  "isVerified": true,
+  "isFeatured": true,
+  "isSponsored": false,
+  "status": "approved",
+  "ownerId": null,
+  "claimStatus": "unclaimed",
+  "lastUpdated": "2026-10-10",
+  "tags": [
+    "newsletter ai",
+    "email marketing",
+    "content curation",
+    "substack helper",
+    "beehiiv tool"
+  ],
+  "approvedAt": "2026-10-10T10:00:00.000Z",
+  "approvedBy": "admin",
+  "seoTitle": "Newsletrix Review 2026: AI Newsletter Curation & Writing Tool",
+  "metaDescription": "Newsletrix review, pricing, and features. Curate, write, and publish high-converting email newsletters with Newsletrix.com.",
+  "h1Title": "Newsletrix - AI-Powered Newsletter Curation & Writing Engine",
+  "canonicalUrl": "https://aifynest.com/tools/newsletrix"
+},
+{
+  "id": "tool-celebifyai-com",
+  "name": "Celebifyai",
+  "slug": "celebifyai",
+  "tagline": "AI Celebrity Voice & Digital Portrait Avatar Generator (.com)",
+  "description": "Celebifyai (.com) is an AI entertainment and media platform that enables users to generate realistic celebrity voiceovers, custom photo avatars, and interactive digital personality covers using state-of-the-art voice synthesis.\\n\\nDesigned for content creators, social media producers, and video editors, Celebifyai provides a vast library of celebrity voice profiles and portrait avatars. Simply type your script, select a voice style, and render high-fidelity audio or video tracks in minutes.\\n\\nWith features like custom voice tuning, pitch adjustments, and HD video export, Celebifyai offers a fast and creative playground for parody videos, podcasts, and digital media.",
+  "categorySlug": "audio",
+  "subCategory": "Voiceovers",
+  "pricing": "freemium",
+  "pricingUrl": "https://celebifyai.com/#pricing",
+  "websiteUrl": "https://celebifyai.com/",
+  "platforms": [
+    "Web"
+  ],
+  "pricingPlans": [
+    {
+      "name": "Free Starter",
+      "price": "$0 / month",
+      "features": [
+        "3 AI Voice Generations / day",
+        "Standard Audio Output",
+        "Community Library Access"
+      ],
+      "billingPeriod": "free"
+    },
+    {
+      "name": "Pro Creator",
+      "price": "$14.99 / month",
+      "features": [
+        "Unlimited High Quality Voiceovers",
+        "HD Portrait Video Avatars",
+        "Commercial License Rights",
+        "Fast Priority Generation"
+      ],
+      "billingPeriod": "monthly"
+    }
+  ],
+  "features": [
+    "AI Celebrity Voice Synthesis",
+    "Interactive Photo Portrait Avatars",
+    "Pitch & Emotion Voice Controls",
+    "Multilingual Voice Generation",
+    "High Definition Audio Export",
+    "Commercial Content Rights"
+  ],
+  "useCases": [
+    "Creating social media video voiceovers",
+    "Generating fun podcast & video parodies",
+    "Producing audio skits and narration",
+    "Custom avatar greeting videos"
+  ],
+  "pros": [
+    "Large selection of realistic AI voices",
+    "Fast rendering speed",
+    "Easy to use web studio",
+    "Supports multiple languages"
+  ],
+  "cons": [
+    "Parody & entertainment usage guidelines apply",
+    "Watermark on free tier videos"
+  ],
+  "logoUrl": "https://www.google.com/s2/favicons?domain=celebifyai.com&sz=128",
+  "screenshotUrls": [
+    "https://celebifyai.com/og-image.png"
+  ],
+  "rating": 4.6,
+  "reviewCount": 18,
+  "isVerified": true,
+  "isFeatured": false,
+  "isSponsored": false,
+  "status": "approved",
+  "ownerId": null,
+  "claimStatus": "unclaimed",
+  "lastUpdated": "2026-10-10",
+  "tags": [
+    "celebrity voice ai",
+    "voice generator",
+    "text to speech",
+    "avatar generator",
+    "ai voiceover"
+  ],
+  "approvedAt": "2026-10-10T10:00:00.000Z",
+  "approvedBy": "admin",
+  "seoTitle": "Celebifyai Review 2026: AI Celebrity Voice & Avatar Generator",
+  "metaDescription": "Celebifyai review, pricing, and features. Generate realistic celebrity voiceovers and portrait avatars with Celebifyai.com.",
+  "h1Title": "Celebifyai - AI Celebrity Voice & Portrait Avatar Studio",
+  "canonicalUrl": "https://aifynest.com/tools/celebifyai"
+},
+{
+  "id": "tool-celebifyai-net",
+  "name": "CelebifyAI Net",
+  "slug": "celebifyai-net",
+  "tagline": "AI Digital Celebrity Video & Multi-Model Voice Studio (.net)",
+  "description": "CelebifyAI Net (.net) provides realistic AI celebrity impersonation, voice cloning, and interactive video avatar creation for digital creators, streamers, and video producers.\\n\\nThe platform combines multi-model speech synthesis with animated AI facial avatars. Users can input text scripts or upload raw audio files to convert them into lip-synced celebrity video clips with natural expressions and dynamic lighting.\\n\\nFeaturing instant preview tools, custom voice upload options, and broadcast resolution rendering, CelebifyAI Net is ideal for creative content channels, meme creators, and marketing campaigns.",
+  "categorySlug": "video",
+  "subCategory": "Avatars",
+  "pricing": "freemium",
+  "pricingUrl": "https://celebifyai.net/#pricing",
+  "websiteUrl": "https://celebifyai.net/",
+  "platforms": [
+    "Web"
+  ],
+  "pricingPlans": [
+    {
+      "name": "Free Trial",
+      "price": "$0 / month",
+      "features": [
+        "5 Video Clips / month",
+        "720p Video Resolution",
+        "Standard Voice Library"
+      ],
+      "billingPeriod": "free"
+    },
+    {
+      "name": "Studio Pass",
+      "price": "$19.99 / month",
+      "features": [
+        "Unlimited 1080p Lip-Synced Videos",
+        "Custom Voice Cloning",
+        "Commercial License",
+        "Priority Cloud Rendering"
+      ],
+      "billingPeriod": "monthly"
+    }
+  ],
+  "features": [
+    "AI Lip-Sync Video Generation",
+    "Multi-Model Voice Synthesis",
+    "Custom Audio & Voice Upload",
+    "1080p HD Video Export",
+    "Natural Facial Animations",
+    "Commercial Usage Rights"
+  ],
+  "useCases": [
+    "Creating YouTube shorts & Reels videos",
+    "Lip-synced AI celebrity video parodies",
+    "Digital marketing avatar campaigns",
+    "Streaming video clips & skits"
+  ],
+  "pros": [
+    "Accurate lip-syncing and expression matching",
+    "Supports custom voice cloning uploads",
+    "High resolution video output",
+    "Fast cloud rendering"
+  ],
+  "cons": [
+    "Render queue delays during peak times on free plan",
+    "Commercial usage policy applies"
+  ],
+  "logoUrl": "https://www.google.com/s2/favicons?domain=celebifyai.net&sz=128",
+  "screenshotUrls": [
+    "https://celebifyai.net/og-image.png"
+  ],
+  "rating": 4.7,
+  "reviewCount": 15,
+  "isVerified": true,
+  "isFeatured": false,
+  "isSponsored": false,
+  "status": "approved",
+  "ownerId": null,
+  "claimStatus": "unclaimed",
+  "lastUpdated": "2026-10-10",
+  "tags": [
+    "ai video avatar",
+    "celebrity lip sync",
+    "voice cloning",
+    "video generator",
+    "digital studio"
+  ],
+  "approvedAt": "2026-10-10T10:00:00.000Z",
+  "approvedBy": "admin",
+  "seoTitle": "CelebifyAI Net Review 2026: AI Celebrity Video & Lip-Sync Studio",
+  "metaDescription": "CelebifyAI Net review, features, and pricing. Generate lip-synced AI celebrity video avatars and cloned voices with CelebifyAI.net.",
+  "h1Title": "CelebifyAI Net - AI Digital Celebrity Video & Voice Studio",
+  "canonicalUrl": "https://aifynest.com/tools/celebifyai-net"
+},
+{
   "id": "tool-photiu-ai",
   "name": "Photiu AI",
   "slug": "photiu-ai",
