@@ -96,6 +96,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://aifynest.com/blog/best-mcp-servers-ai-tools</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://aifynest.com/blog/best-ai-image-upscale-tools-2026</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
@@ -346,12 +351,12 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/bolt-new</loc>
+    <loc>https://aifynest.com/tools/base44</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/base44</loc>
+    <loc>https://aifynest.com/tools/bolt-new</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -446,22 +451,17 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/codeium</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://aifynest.com/tools/lovable</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/tweet-hunter</loc>
+    <loc>https://aifynest.com/tools/codeium</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://aifynest.com/tools/10web</loc>
+    <loc>https://aifynest.com/tools/tweet-hunter</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -477,6 +477,11 @@
   </url>
   <url>
     <loc>https://aifynest.com/tools/github-copilot</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://aifynest.com/tools/10web</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -751,17 +756,17 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://aifynest.com/tools/v0</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://aifynest.com/tools/soundraw</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://aifynest.com/tools/khanmigo</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://aifynest.com/tools/v0</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
