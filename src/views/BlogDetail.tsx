@@ -351,11 +351,11 @@ export const BlogDetail: React.FC = () => {
 
         {/* Hero Featured Image */}
         {post.image && (
-          <div style={{ marginBottom: '36px', borderRadius: 'var(--radius-lg)', overflow: 'hidden', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-md)' }}>
+          <div style={{ marginBottom: '36px', borderRadius: 'var(--radius-lg)', overflow: 'hidden', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-md)', backgroundColor: 'var(--bg-card)' }}>
             <img
               src={post.image}
               alt={post.title}
-              style={{ width: '100%', maxHeight: '480px', objectFit: 'cover', display: 'block' }}
+              style={{ width: '100%', height: 'auto', display: 'block' }}
             />
           </div>
         )}

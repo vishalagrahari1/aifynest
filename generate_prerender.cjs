@@ -583,7 +583,7 @@ async function runPrerender() {
         <nav style="font-size:12px;margin-bottom:16px;color:#64748b;"><a href="/">Home</a> &gt; <a href="/blog">Blog</a> &gt; <span>${escapeAttribute(p.title)}</span></nav>
         <h1 style="font-size:2rem;font-weight:bold;margin-bottom:16px;">${escapeAttribute(p.title)}</h1>
         <div style="font-size:13px;color:#64748b;margin-bottom:24px;">By ${escapeAttribute(p.author || 'AIFynest Editorial Team')} &bull; ${escapeAttribute(p.date || '2026-09-16')} &bull; ${escapeAttribute(p.readTime || '8 min read')}</div>
-        ${p.image ? `<img src="${escapeAttribute(p.image)}" alt="${escapeAttribute(p.title)}" style="width:100%;max-height:400px;object-fit:cover;border-radius:12px;margin-bottom:24px;" />` : ''}
+        ${p.image ? `<img src="${escapeAttribute(p.image)}" alt="${escapeAttribute(p.title)}" style="width:100%;height:auto;border-radius:12px;margin-bottom:24px;display:block;" />` : ''}
         ${p.excerpt ? `<p style="font-size:1.1rem;line-height:1.6;font-weight:500;color:#334155;margin-bottom:24px;">${escapeAttribute(p.excerpt)}</p>` : ''}
         <div class="article-body">${paragraphs}</div>
       </article>`;
