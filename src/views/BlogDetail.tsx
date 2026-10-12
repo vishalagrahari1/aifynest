@@ -115,7 +115,7 @@ export const BlogDetail: React.FC = () => {
       '@context': 'https://schema.org',
       '@type': 'Article',
       'headline': post.title,
-      'description': post.excerpt,
+      'description': post.metaDescription || post.excerpt,
       'author': {
         '@type': 'Person',
         'name': post.author || 'AIFynest Editorial Team'
@@ -181,7 +181,7 @@ export const BlogDetail: React.FC = () => {
 
       <SEOHead
         title={`${post.title} — AIFynest Blog`}
-        description={post.excerpt}
+        description={post.metaDescription || post.excerpt}
         ogType="article"
         ogImage={postImageUrl}
         canonicalUrl={articleUrl}

@@ -258,7 +258,7 @@ export const Blog: React.FC = () => {
               </Link>
 
               <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', lineHeight: '1.6', margin: 0 }}>
-                {featuredPost.excerpt}
+                {featuredPost.excerpt || featuredPost.metaDescription}
               </p>
 
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '12px', paddingTop: '16px', borderTop: '1px solid var(--border-color)' }}>
@@ -431,7 +431,7 @@ export const Blog: React.FC = () => {
                       overflow: 'hidden',
                     }}
                   >
-                    {post.excerpt}
+                    {post.excerpt || post.metaDescription}
                   </p>
 
                   <div

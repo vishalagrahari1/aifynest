@@ -283,7 +283,7 @@ async function runPrerender() {
     blogPosts.forEach(post => {
       if (!post.slug) return;
       const title = post.title.includes('AIFynest') ? post.title : `${post.title} — AIFynest Blog`;
-      const description = post.excerpt || post.title;
+      const description = post.metaDescription || post.excerpt || post.title;
       let ogImage = post.image || 'https://aifynest.com/logo.png';
       if (ogImage.startsWith('/')) {
         ogImage = `${SITE_URL}${ogImage}`;
@@ -584,7 +584,7 @@ async function runPrerender() {
         <h1 style="font-size:2rem;font-weight:bold;margin-bottom:16px;">${escapeAttribute(p.title)}</h1>
         <div style="font-size:13px;color:#64748b;margin-bottom:24px;">By ${escapeAttribute(p.author || 'AIFynest Editorial Team')} &bull; ${escapeAttribute(p.date || '2026-09-16')} &bull; ${escapeAttribute(p.readTime || '8 min read')}</div>
         ${p.image ? `<img src="${escapeAttribute(p.image)}" alt="${escapeAttribute(p.title)}" style="width:100%;max-height:400px;object-fit:cover;border-radius:12px;margin-bottom:24px;" />` : ''}
-        <p style="font-size:1.1rem;line-height:1.6;font-weight:500;color:#334155;margin-bottom:24px;">${escapeAttribute(p.excerpt || '')}</p>
+        ${p.excerpt ? `<p style="font-size:1.1rem;line-height:1.6;font-weight:500;color:#334155;margin-bottom:24px;">${escapeAttribute(p.excerpt)}</p>` : ''}
         <div class="article-body">${paragraphs}</div>
       </article>`;
     }
